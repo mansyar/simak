@@ -583,17 +583,17 @@
     "milestonesCheckpoints": "{count} Tahapan / Checkpoint",
     "initiallyUnlocked": "Awalnya Terbuka",
     "selectTemplateHint": "Pilih templat untuk melihat peta jalan tahapannya.",
-      "selectAll": "Pilih Semua",
-      "deselectAll": "Batalkan Semua Pilihan",
-      "discussions": {
-        "searchLabel": "Cari diskusi",
-        "searchPlaceholder": "Cari berdasarkan mahasiswa atau checkpoint...",
-        "studentFilterLabel": "Filter berdasarkan mahasiswa",
-        "allStudents": "Semua mahasiswa",
-        "threadListLabel": "Daftar utas diskusi",
-        "noMatches": "Tidak ada diskusi yang sesuai dengan filter."
-      }
-    },
+    "selectAll": "Pilih Semua",
+    "deselectAll": "Batalkan Semua Pilihan",
+    "discussions": {
+      "searchLabel": "Cari diskusi",
+      "searchPlaceholder": "Cari berdasarkan mahasiswa atau checkpoint...",
+      "studentFilterLabel": "Filter berdasarkan mahasiswa",
+      "allStudents": "Semua mahasiswa",
+      "threadListLabel": "Daftar utas diskusi",
+      "noMatches": "Tidak ada diskusi yang sesuai dengan filter."
+    }
+  },
   "studentSidebar": {
     "dashboard": "Dasbor",
     "assignments": "Tugas",
@@ -1378,6 +1378,7 @@
       "validationErrorsFoundGroups": "ditemukan kesalahan validasi. Grup yang tidak valid akan dilewati.",
       "invalidFormat": "Hanya file .xlsx yang diterima",
       "fileTooLarge": "Ukuran file harus kurang dari 5MB",
+      "parsing": "Mengurai file...",
       "parseFailed": "Gagal mengurai file xlsx",
       "importFailed": "Gagal mengimpor. Silakan coba lagi.",
       "importComplete": "Impor Selesai",
@@ -1389,6 +1390,8 @@
     },
     "users": {
       "title": "Impor Massal Pengguna",
+      "previewCaption": "Pratinjau impor pengguna",
+      "resultCaption": "Kesalahan impor pengguna",
       "subtitle": "Unggah file .xlsx untuk mengimpor pengguna secara massal",
       "button": "Impor Massal",
       "name": "Nama",
@@ -1409,6 +1412,8 @@
       }
     },
     "templates": {
+      "previewCaption": "Pratinjau impor template",
+      "resultCaption": "Kesalahan impor template",
       "title": "Impor Massal Template",
       "subtitle": "Unggah file .xlsx untuk mengimpor template secara massal",
       "button": "Impor Massal",

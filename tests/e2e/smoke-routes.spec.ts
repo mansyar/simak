@@ -125,6 +125,23 @@ test.describe('Smoke Route Tests', () => {
       await expect(page.getByTestId('bulk-import-dropzone')).toBeVisible();
       expect(consoleErrors).toEqual([]);
     });
+
+    test('bulk import controls remain usable at 320px', async ({ page }) => {
+      await page.setViewportSize({ width: 320, height: 640 });
+
+      for (const path of ['/admin/users/import', '/admin/templates/import']) {
+        await page.goto(path);
+        await page.waitForLoadState('networkidle');
+
+        expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(
+          320,
+        );
+        const dropzone = await page.getByTestId('bulk-import-dropzone').boundingBox();
+        expect(dropzone).not.toBeNull();
+        expect((dropzone?.x ?? 0) + (dropzone?.width ?? 0)).toBeLessThanOrEqual(320);
+        await expect(page.getByTestId('bulk-import-dropzone-input')).toHaveAttribute('id', /.+/);
+      }
+    });
   });
 
   test.describe('Instructor Routes', () => {

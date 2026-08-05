@@ -42,6 +42,8 @@ function BulkTemplateImportPage() {
   const [validationError, setValidationError] = useState<string | null>(null);
   const [parsedGroups, setParsedGroups] = useState<TemplateGroup[]>([]);
   const [parseErrors, setParseErrors] = useState<string[]>([]);
+  const [isParsing, setIsParsing] = useState(false);
+  const [retryFile, setRetryFile] = useState<File | null>(null);
   const [isCommitting, setIsCommitting] = useState(false);
   const [result, setResult] = useState<ImportResult | null>(null);
   const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set());
@@ -67,9 +69,12 @@ function BulkTemplateImportPage() {
         setValidationError(error);
         setParsedGroups([]);
         setParseErrors([]);
+        setRetryFile(null);
         return;
       }
       setValidationError(null);
+      setRetryFile(null);
+      setIsParsing(true);
 
       try {
         const parsed = await parseTemplatesXlsx(file);
@@ -81,6 +86,9 @@ function BulkTemplateImportPage() {
         setParsedGroups(parsed.groups);
       } catch {
         setValidationError(t('bulkImport.common.parseFailed'));
+        setRetryFile(file);
+      } finally {
+        setIsParsing(false);
       }
     },
     [validateFile, t],
@@ -152,7 +160,7 @@ function BulkTemplateImportPage() {
     try {
       const response = await bulkCreateTemplatesFn({ data: { rows } });
       if (isServerError(response)) {
-        setValidationError(response.error.message);
+        setValidationError(t('bulkImport.common.importFailed'));
       } else {
         setResult(response);
       }
@@ -200,17 +208,30 @@ function BulkTemplateImportPage() {
           accept=".xlsx"
           className="sr-only"
           onChange={handleFileChange}
+          disabled={isParsing}
         />
         <Upload className="mx-auto h-12 w-12 text-muted-foreground" />
         <p className="mt-2 text-sm text-muted-foreground">{t('bulkImport.common.dropzoneText')}</p>
         <p className="mt-1 text-xs text-muted-foreground">{t('bulkImport.common.dropzoneHint')}</p>
       </label>
 
+      {isParsing && (
+        <div role="status" aria-live="polite" aria-busy="true">
+          {t('bulkImport.common.parsing')}
+        </div>
+      )}
+
       {/* Validation error */}
       {validationError && (
         <AlertBanner variant="error" title={t('bulkImport.common.error')}>
           {validationError}
         </AlertBanner>
+      )}
+
+      {retryFile && !isParsing && (
+        <Button type="button" variant="outline" onClick={() => processFile(retryFile)}>
+          {t('common.retry')}
+        </Button>
       )}
 
       {/* Parse errors */}
@@ -223,7 +244,7 @@ function BulkTemplateImportPage() {
       {/* Preview grouped table */}
       {parsedGroups.length > 0 && !result && (
         <div className="space-y-4">
-          <div className="flex items-center gap-4 text-sm">
+          <div role="status" aria-live="polite" className="flex items-center gap-4 text-sm">
             <span className="text-green-600">
               {validCount} {t('bulkImport.common.valid')}
             </span>
@@ -234,13 +255,22 @@ function BulkTemplateImportPage() {
 
           <div className="border rounded-lg overflow-auto max-h-96">
             <table className="w-full text-sm">
+              <caption className="sr-only">{t('bulkImport.templates.previewCaption')}</caption>
               <thead className="bg-muted sticky top-0">
                 <tr>
-                  <th className="p-2 text-left w-8"></th>
-                  <th className="p-2 text-left">{t('bulkImport.templates.templateName')}</th>
-                  <th className="p-2 text-left">{t('bulkImport.templates.type')}</th>
-                  <th className="p-2 text-left">{t('bulkImport.templates.checkpoints')}</th>
-                  <th className="p-2 text-left">{t('bulkImport.common.status')}</th>
+                  <th scope="col" className="p-2 text-left w-8"></th>
+                  <th scope="col" className="p-2 text-left">
+                    {t('bulkImport.templates.templateName')}
+                  </th>
+                  <th scope="col" className="p-2 text-left">
+                    {t('bulkImport.templates.type')}
+                  </th>
+                  <th scope="col" className="p-2 text-left">
+                    {t('bulkImport.templates.checkpoints')}
+                  </th>
+                  <th scope="col" className="p-2 text-left">
+                    {t('bulkImport.common.status')}
+                  </th>
                 </tr>
               </thead>
               {parsedGroups.map((group, i) => {
@@ -329,10 +359,15 @@ function BulkTemplateImportPage() {
           {result.errors.length > 0 && (
             <div className="border rounded-lg overflow-auto">
               <table className="w-full text-sm">
+                <caption className="sr-only">{t('bulkImport.templates.resultCaption')}</caption>
                 <thead className="bg-muted">
                   <tr>
-                    <th className="p-2 text-left">{t('bulkImport.templates.templateName')}</th>
-                    <th className="p-2 text-left">{t('bulkImport.common.reason')}</th>
+                    <th scope="col" className="p-2 text-left">
+                      {t('bulkImport.templates.templateName')}
+                    </th>
+                    <th scope="col" className="p-2 text-left">
+                      {t('bulkImport.common.reason')}
+                    </th>
                   </tr>
                 </thead>
                 <tbody>

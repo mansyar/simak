@@ -90,6 +90,48 @@ describe('Admin Users Import page', () => {
   });
 
   describe('dropzone', () => {
+    it('announces parsing progress', async () => {
+      let resolveParse: (value: any) => void = () => undefined;
+      const { parseUsersXlsx } = await import('@/lib/bulk-import/parse-users');
+      (parseUsersXlsx as any).mockReturnValueOnce(
+        new Promise((resolve) => {
+          resolveParse = resolve;
+        }),
+      );
+
+      const Component = await getComponent();
+      render(<Component />);
+      const input = screen.getByTestId('bulk-import-dropzone-input') as HTMLInputElement;
+      const xlsxFile = new File(['data'], 'users.xlsx', {
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      });
+
+      fireEvent.change(input, { target: { files: [xlsxFile] } });
+
+      await waitFor(() => expect(screen.getByRole('status')).toBeDefined());
+      resolveParse({ rows: [], errors: [] });
+    });
+
+    it('allows retrying a failed parse without selecting the file again', async () => {
+      const { parseUsersXlsx } = await import('@/lib/bulk-import/parse-users');
+      (parseUsersXlsx as any)
+        .mockRejectedValueOnce(new Error('parse failed'))
+        .mockResolvedValueOnce({ rows: [], errors: [] });
+
+      const Component = await getComponent();
+      render(<Component />);
+      const input = screen.getByTestId('bulk-import-dropzone-input') as HTMLInputElement;
+      const xlsxFile = new File(['data'], 'users.xlsx', {
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      });
+
+      fireEvent.change(input, { target: { files: [xlsxFile] } });
+      const retryButton = await screen.findByRole('button', { name: 'common.retry' });
+      fireEvent.click(retryButton);
+
+      await waitFor(() => expect(parseUsersXlsx).toHaveBeenCalledTimes(2));
+    });
+
     it('should expose a keyboard-accessible native label for the file picker', async () => {
       const Component = await getComponent();
       render(<Component />);
@@ -203,6 +245,14 @@ describe('Admin Users Import page', () => {
       // Should show valid/invalid status
       expect(screen.getByTestId('row-status-0')).toHaveTextContent('bulkImport.common.valid');
       expect(screen.getByTestId('row-status-1')).toHaveTextContent('bulkImport.common.invalid');
+
+      const previewTable = screen.getByRole('table');
+      expect(previewTable.querySelector('caption')).toBeDefined();
+      expect(
+        Array.from(previewTable.querySelectorAll('th')).every(
+          (header) => header.getAttribute('scope') === 'col',
+        ),
+      ).toBe(true);
 
       // Should show row data
       expect(screen.getByText('Alice')).toBeInTheDocument();

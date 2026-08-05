@@ -583,17 +583,17 @@
     "milestonesCheckpoints": "{count} Milestones / Checkpoints",
     "initiallyUnlocked": "Initially Unlocked",
     "selectTemplateHint": "Select a template to view its milestones roadmap.",
-      "selectAll": "Select All",
-      "deselectAll": "Deselect All",
-      "discussions": {
-        "searchLabel": "Search discussions",
-        "searchPlaceholder": "Search by student or checkpoint...",
-        "studentFilterLabel": "Filter by student",
-        "allStudents": "All students",
-        "threadListLabel": "Discussion threads",
-        "noMatches": "No discussions match your filters."
-      }
-    },
+    "selectAll": "Select All",
+    "deselectAll": "Deselect All",
+    "discussions": {
+      "searchLabel": "Search discussions",
+      "searchPlaceholder": "Search by student or checkpoint...",
+      "studentFilterLabel": "Filter by student",
+      "allStudents": "All students",
+      "threadListLabel": "Discussion threads",
+      "noMatches": "No discussions match your filters."
+    }
+  },
   "studentSidebar": {
     "dashboard": "Dashboard",
     "assignments": "Assignments",
@@ -1378,6 +1378,7 @@
       "validationErrorsFoundGroups": "validation error(s) found. Invalid groups will be skipped.",
       "invalidFormat": "Only .xlsx files are accepted",
       "fileTooLarge": "File size must be under 5MB",
+      "parsing": "Parsing file...",
       "parseFailed": "Failed to parse xlsx file",
       "importFailed": "Import failed. Please try again.",
       "importComplete": "Import Complete",
@@ -1389,6 +1390,8 @@
     },
     "users": {
       "title": "Bulk Import Users",
+      "previewCaption": "User import preview",
+      "resultCaption": "User import errors",
       "subtitle": "Upload an .xlsx file to import users in bulk",
       "button": "Bulk Import",
       "name": "Name",
@@ -1409,6 +1412,8 @@
       }
     },
     "templates": {
+      "previewCaption": "Template import preview",
+      "resultCaption": "Template import errors",
       "title": "Bulk Import Templates",
       "subtitle": "Upload an .xlsx file to import templates in bulk",
       "button": "Bulk Import",

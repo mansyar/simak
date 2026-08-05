@@ -1383,6 +1383,7 @@ export type Translation = {
       validationErrorsFoundGroups: string
       invalidFormat: string
       fileTooLarge: string
+      parsing: string
       parseFailed: string
       importFailed: string
       importComplete: string
@@ -1394,6 +1395,8 @@ export type Translation = {
     }
     users: {
       title: string
+      previewCaption: string
+      resultCaption: string
       subtitle: string
       button: string
       name: string
@@ -1414,6 +1417,8 @@ export type Translation = {
       }
     }
     templates: {
+      previewCaption: string
+      resultCaption: string
       title: string
       subtitle: string
       button: string
