@@ -126,10 +126,10 @@
   - [x] Write failing tests for sheet overflow, tab semantics, unread announcements, localized relative time, unknown notification types, and load-more feedback. [f3ffc9b]
   - [x] Implement a mobile-safe notification panel with explicit state announcements. [f3ffc9b]
   - [x] Add a meaningful empty state and non-color unread indicator. [f3ffc9b]
-- [~] Task: Improve public and authentication surfaces
-  - [ ] Write failing tests for landing navigation, locale/theme access, login field errors, loading feedback, and narrow control sizing.
-  - [ ] Implement public navigation controls and localized field-level authentication errors.
-  - [ ] Align landing and login controls with the shared visual system.
+- [x] Task: Improve public and authentication surfaces [1872ed7]
+  - [x] Write failing tests for landing navigation, locale/theme access, login field errors, loading feedback, and narrow control sizing. [1872ed7]
+  - [x] Implement public navigation controls and localized field-level authentication errors. [1872ed7]
+  - [x] Align landing and login controls with the shared visual system. [1872ed7]
 - [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
 
 ## Phase 6 — Visual system, i18n, motion, and final quality gates
