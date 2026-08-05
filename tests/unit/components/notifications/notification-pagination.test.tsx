@@ -7,6 +7,7 @@ import * as hooks from '@/hooks/use-notifications';
 // Mock the i18n context hook
 vi.mock('@/routes/__root', () => ({
   useI18n: () => ({
+    locale: 'en',
     t: (key: string) => {
       if (key === 'notifications.title') return 'Notifications';
       if (key === 'notifications.markAllRead') return 'Mark all read';
@@ -14,6 +15,9 @@ vi.mock('@/routes/__root', () => ({
       if (key === 'notifications.filterAll') return 'All';
       if (key === 'notifications.filterUnread') return 'Unread';
       if (key === 'notifications.loadMore') return 'Load More';
+      if (key === 'notifications.loadingMore') return 'Loading more notifications...';
+      if (key === 'notifications.filterLabel') return 'Notification filter';
+      if (key === 'notifications.emptyDescription') return "You're all caught up.";
       if (key === 'notifications.groups.newReviews') return 'New Reviews';
       if (key === 'notifications.groups.consultations') return 'Consultation Updates';
       if (key === 'notifications.groups.submissions') return 'Submissions';
@@ -124,6 +128,19 @@ describe('NotificationCenter - Load More Pagination (FR-4)', () => {
     render(<NotificationCenter isOpen={true} onClose={vi.fn()} />);
     fireEvent.click(screen.getByText('Load More'));
     expect(fetchNextPage).toHaveBeenCalled();
+  });
+
+  it('announces loading more and keeps the control touch-safe', () => {
+    setupMocks([{ items: [makeItem(1)], total: 10 }], {
+      hasNextPage: true,
+      isFetchingNextPage: true,
+    });
+    render(<NotificationCenter isOpen={true} onClose={vi.fn()} />);
+
+    const button = screen.getByRole('button', { name: 'Loading more notifications...' });
+    expect(button.className).toContain('min-h-11');
+    expect(button.getAttribute('aria-busy')).toBe('true');
+    expect(screen.getByRole('status')).toBeDefined();
   });
 
   it('renders items from all pages via data.pages.flatMap', () => {

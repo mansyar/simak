@@ -1041,13 +1041,21 @@
     "unreadCount": "{count} unread notifications",
     "filterAll": "All",
     "filterUnread": "Unread",
+    "filterLabel": "Notification filter",
+    "loading": "Loading notifications...",
+    "loadingMore": "Loading more notifications...",
+    "emptyDescription": "You're all caught up.",
+    "justNow": "Just now",
+    "read": "Read notification",
+    "unread": "Unread notification",
     "loadMore": "Load More",
     "toasterLabel": "Notifications",
     "groups": {
       "newReviews": "New Reviews",
       "consultations": "Consultation Updates",
       "submissions": "Submissions",
-      "system": "System Notifications"
+      "system": "System Notifications",
+      "other": "Other notifications"
     },
     "events": {
       "review_completed": {

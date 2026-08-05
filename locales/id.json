@@ -1041,13 +1041,21 @@
     "unreadCount": "{count} notifikasi belum dibaca",
     "filterAll": "Semua",
     "filterUnread": "Belum Dibaca",
+    "filterLabel": "Filter notifikasi",
+    "loading": "Memuat notifikasi...",
+    "loadingMore": "Memuat lebih banyak notifikasi...",
+    "emptyDescription": "Semua notifikasi sudah ditinjau.",
+    "justNow": "Baru saja",
+    "read": "Notifikasi sudah dibaca",
+    "unread": "Notifikasi belum dibaca",
     "loadMore": "Muat Lainnya",
     "toasterLabel": "Notifikasi",
     "groups": {
       "newReviews": "Ulasan Baru",
       "consultations": "Pembaruan Konsultasi",
       "submissions": "Unggahan",
-      "system": "Notifikasi Sistem"
+      "system": "Notifikasi Sistem",
+      "other": "Notifikasi lainnya"
     },
     "events": {
       "review_completed": {

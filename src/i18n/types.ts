@@ -1046,6 +1046,13 @@ export type Translation = {
     unreadCount: string
     filterAll: string
     filterUnread: string
+    filterLabel: string
+    loading: string
+    loadingMore: string
+    emptyDescription: string
+    justNow: string
+    read: string
+    unread: string
     loadMore: string
     toasterLabel: string
     groups: {
@@ -1053,6 +1060,7 @@ export type Translation = {
       consultations: string
       submissions: string
       system: string
+      other: string
     }
     events: {
       review_completed: {
