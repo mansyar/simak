@@ -14,7 +14,7 @@
   - [x] Assert assignment context and explicit individual/group mode columns
   - [x] Add migration/preflight coverage proving unexpected existing production assignment rows are rejected
   - [x] Add fixture-reset coverage for development and test data
-- [x] Task: Implement the academic-context schema (Green)
+- [x] Task: Implement the academic-context schema (Green) [commit: 6bab1f5]
   - [x] Add the smallest normalized schema for `academic_terms`, `courses`, `course_sections`, and role-aware section enrollments
   - [x] Add lifecycle/status columns and foreign keys with history-safe delete behavior
   - [x] Add assignment `sectionId`/academic-context association and explicit `mode` defaulting to `individual`
