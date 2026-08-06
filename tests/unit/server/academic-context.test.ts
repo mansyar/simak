@@ -43,6 +43,9 @@ vi.mock('@tanstack/react-start', () => ({
     inputValidator: vi.fn().mockReturnThis(),
     handler: vi.fn().mockImplementation((fn) => fn),
   }),
+  createMiddleware: vi.fn().mockReturnValue({
+    server: vi.fn().mockImplementation((fn) => fn),
+  }),
 }));
 
 type MockDb = Record<string, any>;
@@ -177,7 +180,7 @@ describe('academic context server handlers', () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(sessionFor(role));
 
       await expect(
-        listAcademicTermsHandler({ data: { page: 1, limit: 20, search: '' } }),
+        listAcademicTermsHandler({ data: { page: 1, limit: 20, search: '', status: '' } }),
       ).resolves.toMatchObject({ error: { code: 'FORBIDDEN' } });
       expect(mockDb.select).not.toHaveBeenCalled();
     },
@@ -187,7 +190,7 @@ describe('academic context server handlers', () => {
     vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(null);
 
     await expect(
-      listAcademicTermsHandler({ data: { page: 1, limit: 20, search: '' } }),
+      listAcademicTermsHandler({ data: { page: 1, limit: 20, search: '', status: '' } }),
     ).resolves.toMatchObject({ error: { code: 'UNAUTHORIZED' } });
     expect(mockDb.select).not.toHaveBeenCalled();
   });
@@ -214,7 +217,7 @@ describe('academic context server handlers', () => {
         );
 
       await expect(
-        listAcademicTermsHandler({ data: { page: 1, limit: 20, search: '' } }),
+        listAcademicTermsHandler({ data: { page: 1, limit: 20, search: '', status: '' } }),
       ).resolves.toEqual({
         terms: [
           {
@@ -233,9 +236,13 @@ describe('academic context server handlers', () => {
 
   it('creates a term through an admin transaction boundary and returns its projection', async () => {
     vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(sessionFor('admin'));
-    mockDb.then.mockImplementationOnce((onfulfilled: (value: unknown[]) => unknown) =>
-      Promise.resolve([{ id: 11 }]).then(onfulfilled),
-    );
+    mockDb.then
+      .mockImplementationOnce((onfulfilled: (value: unknown[]) => unknown) =>
+        Promise.resolve([]).then(onfulfilled),
+      )
+      .mockImplementationOnce((onfulfilled: (value: unknown[]) => unknown) =>
+        Promise.resolve([{ id: 11, code: '2026/2027-GASAL' }]).then(onfulfilled),
+      );
 
     await expect(
       createAcademicTermHandler({
@@ -299,7 +306,7 @@ describe('academic context server handlers', () => {
 
     await expect(
       addSectionEnrollmentHandler({
-        data: { sectionId: 3, userId: 'student-1', role: 'student' },
+        data: { sectionId: 3, userId: 'student-1', role: 'student', isActive: true },
       }),
     ).resolves.toMatchObject({ error: { code: 'BAD_REQUEST' } });
     expect(mockDb.insert).not.toHaveBeenCalled();
@@ -346,6 +353,7 @@ describe('academic context server handlers', () => {
     const result = await listCourseSectionsHandler({
       data: { page: 1, limit: 20, termId: 1, courseId: 2, status: '', search: '' },
     });
+    if ('error' in result) return;
     expect(result).toEqual({ sections: [{ id: 4, code: 'A', status: 'active' }], total: 1 });
     expect(result.sections[0]).not.toHaveProperty('deletedAt');
   });

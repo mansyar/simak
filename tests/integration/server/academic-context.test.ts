@@ -91,7 +91,12 @@ describe('academic context administration integration', () => {
     if ('error' in sectionResult) return;
 
     const enrollmentResult = await addSectionEnrollmentHandler({
-      data: { sectionId: sectionResult.section.id, userId: studentId, role: 'student' },
+      data: {
+        sectionId: sectionResult.section.id,
+        userId: studentId,
+        role: 'student',
+        isActive: true,
+      },
     });
     expect(enrollmentResult).toMatchObject({ enrollment: { userId: studentId, role: 'student' } });
 
@@ -130,12 +135,22 @@ describe('academic context administration integration', () => {
 
     await expect(
       addSectionEnrollmentHandler({
-        data: { sectionId: sectionResult.section.id, userId: studentId, role: 'student' },
+        data: {
+          sectionId: sectionResult.section.id,
+          userId: studentId,
+          role: 'student',
+          isActive: true,
+        },
       }),
     ).resolves.toMatchObject({ enrollment: { userId: studentId } });
     await expect(
       addSectionEnrollmentHandler({
-        data: { sectionId: sectionResult.section.id, userId: studentId, role: 'student' },
+        data: {
+          sectionId: sectionResult.section.id,
+          userId: studentId,
+          role: 'student',
+          isActive: true,
+        },
       }),
     ).resolves.toMatchObject({ error: { code: 'CONFLICT' } });
 

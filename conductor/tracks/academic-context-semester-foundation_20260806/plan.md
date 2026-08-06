@@ -46,15 +46,15 @@
   - [x] Add `src/server/academic-context.ts`
   - [x] Define schemas and `typedServerFn` stubs with appropriate read/destructive rate limits
   - [x] Keep handlers out of the client bundle through dynamic imports
-- [~] Task: Implement server-only academic-context handlers
-  - [ ] Add `src/server/academic-context.server.ts`
-  - [ ] Implement term, course, and section list/detail/create/update/archive operations
-  - [ ] Implement section enrollment add/remove/update operations
-  - [ ] Enforce active, non-deleted user role checks server-side
-  - [ ] Enforce admin-managed context ownership and history-safe archive rules
-  - [ ] Wrap multi-row writes in transactions and use lock/re-check patterns for mutable state
-  - [ ] Emit auditable context and enrollment events without sensitive payloads
-  - [ ] Split handler-only extras if the 500-line limit requires it
+- [x] Task: Implement server-only academic-context handlers
+  - [x] Add `src/server/academic-context.server.ts`
+  - [x] Implement term, course, and section list/detail/create/update/archive operations
+  - [x] Implement section enrollment add/remove/update operations
+  - [x] Enforce active, non-deleted user role checks server-side
+  - [x] Enforce admin-managed context ownership and history-safe archive rules
+  - [x] Wrap multi-row writes in transactions and use lock/re-check patterns for mutable state
+  - [x] Emit auditable context and enrollment events without sensitive payloads
+  - [x] Split handler-only extras if the 500-line limit requires it
 - [ ] Task: Run Phase 2 Green verification
   - [ ] Run focused unit and integration server tests
   - [ ] Confirm all new handlers return typed serializable DTOs
