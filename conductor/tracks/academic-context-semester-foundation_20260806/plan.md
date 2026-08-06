@@ -42,10 +42,10 @@
   - [x] Test duplicate, invalid-date, inactive-user, wrong-role, and cross-section cases
   - [x] Test pagination, filtering, and explicit response projections
   - [x] Add integration tests for context CRUD and enrollment persistence/rollback
-- [~] Task: Implement client-safe academic-context stubs
-  - [ ] Add `src/server/academic-context.ts`
-  - [ ] Define schemas and `typedServerFn` stubs with appropriate read/destructive rate limits
-  - [ ] Keep handlers out of the client bundle through dynamic imports
+- [x] Task: Implement client-safe academic-context stubs
+  - [x] Add `src/server/academic-context.ts`
+  - [x] Define schemas and `typedServerFn` stubs with appropriate read/destructive rate limits
+  - [x] Keep handlers out of the client bundle through dynamic imports
 - [ ] Task: Implement server-only academic-context handlers
   - [ ] Add `src/server/academic-context.server.ts`
   - [ ] Implement term, course, and section list/detail/create/update/archive operations
