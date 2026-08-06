@@ -59,7 +59,7 @@
   - [x] Run focused unit and integration server tests
   - [x] Confirm all new handlers return typed serializable DTOs
   - [x] Confirm authorization tests do not query protected data before rejection
-- [ ] Task: Phase Verification & Checkpoint (Refer to `workflow.md`)
+- [~] Task: Phase Verification & Checkpoint (Refer to `workflow.md`)
 
 ## Phase 3: Assignment Context Association & Lifecycle
 
