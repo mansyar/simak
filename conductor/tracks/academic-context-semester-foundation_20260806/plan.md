@@ -115,12 +115,12 @@
 - [x] Task: Implement clone and rollover server contracts [commit: ea679f3]
   - [x] Add validated inputs and typed stubs using the established assignment server split
   - [x] Define explicit deadline/configuration input rules without relative-date inference
-- [~] Task: Implement transactional clone/rollover handlers
-  - [ ] Lock and re-check the source and target context inside a transaction
-  - [ ] Create a new draft assignment with fresh configuration/checkpoint records
-  - [ ] Require explicit student selection after creation
-  - [ ] Preserve the source assignment and all historical records
-  - [ ] Record source/target identifiers in audit details without copying academic content
+- [x] Task: Implement transactional clone/rollover handlers [commit: 9f883b7]
+  - [x] Lock and re-check the source and target context inside a transaction
+  - [x] Create a new draft assignment with fresh configuration/checkpoint records
+  - [x] Require explicit student selection after creation
+  - [x] Preserve the source assignment and all historical records
+  - [x] Record source/target identifiers in audit details without copying academic content
 - [ ] Task: Run Phase 4 Green verification
   - [ ] Run focused unit and database integration tests
   - [ ] Verify rollback leaves no partial assignment, enrollment, or checkpoint rows
