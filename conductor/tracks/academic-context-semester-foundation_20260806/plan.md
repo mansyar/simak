@@ -46,7 +46,7 @@
   - [x] Add `src/server/academic-context.ts`
   - [x] Define schemas and `typedServerFn` stubs with appropriate read/destructive rate limits
   - [x] Keep handlers out of the client bundle through dynamic imports
-- [ ] Task: Implement server-only academic-context handlers
+- [~] Task: Implement server-only academic-context handlers
   - [ ] Add `src/server/academic-context.server.ts`
   - [ ] Implement term, course, and section list/detail/create/update/archive operations
   - [ ] Implement section enrollment add/remove/update operations
