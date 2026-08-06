@@ -1,6 +1,6 @@
 # Implementation Plan: TRACK-057 — Academic Context & Semester Foundation
 
-## Phase 1: Academic Context Schema & Prelaunch Migration
+## Phase 1: Academic Context Schema & Prelaunch Migration [checkpoint: 86d4ce9]
 
 **Objective:** Establish the normalized academic model and a safe prelaunch migration boundary without fabricating legacy facts.
 
@@ -29,7 +29,7 @@
   - [x] Run focused schema tests and confirm they pass
   - [x] Apply the migration to a disposable database
   - [x] Verify forward, rollback, and re-apply behavior
-- [~] Task: Phase Verification & Checkpoint (Refer to `workflow.md`)
+- [x] Task: Phase Verification & Checkpoint (Refer to `workflow.md`) [checkpoint: 86d4ce9]
 
 ## Phase 2: Academic Context Administration Server Functions
 
