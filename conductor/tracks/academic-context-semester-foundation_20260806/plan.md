@@ -103,15 +103,15 @@
 
 **Objective:** Add atomic, auditable, history-safe creation of independent assignments from existing configuration.
 
-- [~] Task: Write failing clone/rollover tests (Red)
-  - [ ] Add `tests/unit/server/assignment-clone-rollover.test.ts`
-  - [ ] Test source ownership and target-section authorization
-  - [ ] Test configuration-only copying and explicit target context
-  - [ ] Test no automatic student copying
-  - [ ] Test fresh checkpoint identity/state and absence of submissions, reviews, audit history, and released grades
-  - [ ] Test source assignment remains unchanged
-  - [ ] Test invalid target terms/sections and archived/draft source behavior
-  - [ ] Add integration tests for rollback and concurrent clone requests
+- [x] Task: Write failing clone/rollover tests (Red)
+  - [x] Add `tests/unit/server/assignment-clone-rollover.test.ts`
+  - [x] Test source ownership and target-section authorization
+  - [x] Test configuration-only copying and explicit target context
+  - [x] Test no automatic student copying
+  - [x] Test fresh checkpoint identity/state and absence of submissions, reviews, audit history, and released grades
+  - [x] Test source assignment remains unchanged
+  - [x] Test invalid target terms/sections and archived/draft source behavior
+  - [x] Add integration tests for rollback and concurrent clone requests
 - [ ] Task: Implement clone and rollover server contracts
   - [ ] Add validated inputs and typed stubs using the established assignment server split
   - [ ] Define explicit deadline/configuration input rules without relative-date inference
