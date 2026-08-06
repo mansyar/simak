@@ -183,4 +183,9 @@ export {
 
 export { transitionAssignmentStatusHandler } from './assignments-lifecycle.server';
 
+export {
+  cloneAssignmentHandler,
+  rolloverAssignmentHandler,
+} from './assignments-clone-rollover.server';
+
 export { reassignAssignmentHandler } from './assignments-admin.server';
