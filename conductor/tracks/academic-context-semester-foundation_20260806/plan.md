@@ -35,13 +35,13 @@
 
 **Objective:** Provide typed, role-protected admin operations for terms, courses, sections, and enrollments.
 
-- [~] Task: Write failing server-function tests (Red)
-  - [ ] Add `tests/unit/server/academic-context.test.ts`
-  - [ ] Test Zod validation for term, course, section, and enrollment inputs
-  - [ ] Test admin/superadmin authorization and rejection of instructor/student access
-  - [ ] Test duplicate, invalid-date, inactive-user, wrong-role, and cross-section cases
-  - [ ] Test pagination, filtering, and explicit response projections
-  - [ ] Add integration tests for context CRUD and enrollment persistence/rollback
+- [x] Task: Write failing server-function tests (Red)
+  - [x] Add `tests/unit/server/academic-context.test.ts`
+  - [x] Test Zod validation for term, course, section, and enrollment inputs
+  - [x] Test admin/superadmin authorization and rejection of instructor/student access
+  - [x] Test duplicate, invalid-date, inactive-user, wrong-role, and cross-section cases
+  - [x] Test pagination, filtering, and explicit response projections
+  - [x] Add integration tests for context CRUD and enrollment persistence/rollback
 - [ ] Task: Implement client-safe academic-context stubs
   - [ ] Add `src/server/academic-context.ts`
   - [ ] Define schemas and `typedServerFn` stubs with appropriate read/destructive rate limits
