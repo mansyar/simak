@@ -121,7 +121,7 @@
   - [x] Require explicit student selection after creation
   - [x] Preserve the source assignment and all historical records
   - [x] Record source/target identifiers in audit details without copying academic content
-- [ ] Task: Run Phase 4 Green verification
+- [~] Task: Run Phase 4 Green verification
   - [ ] Run focused unit and database integration tests
   - [ ] Verify rollback leaves no partial assignment, enrollment, or checkpoint rows
   - [ ] Verify clone output is independently mutable
