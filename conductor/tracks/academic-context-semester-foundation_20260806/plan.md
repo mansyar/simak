@@ -4,7 +4,7 @@
 
 **Objective:** Establish the normalized academic model and a safe prelaunch migration boundary without fabricating legacy facts.
 
-- [x] Task: Re-read `spec.md`, `workflow.md`, `docs/PRD.md`, and `docs/TDD.md` before implementation
+- [x] Task: Re-read `spec.md`, `workflow.md`, `docs/PRD.md`, and `docs/TDD.md` before implementation [commit: 5def3f6]
   - [x] Confirm the course + term + section model and individual-assignment compatibility requirements
   - [x] Confirm migration, transaction, testing, i18n, and file-size constraints
 - [ ] Task: Write failing database schema and migration tests (Red)
