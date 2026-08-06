@@ -1,5 +1,5 @@
 /** @vitest-environment node */
-import { and, eq, inArray } from 'drizzle-orm';
+import { and, eq, inArray, ne } from 'drizzle-orm';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { getDb } from '@/db/index';
 import {
@@ -418,8 +418,8 @@ describe('assignment clone and semester rollover', () => {
     const createdForTemplate = await db
       .select({ id: assignments.id })
       .from(assignments)
-      .where(and(eq(assignments.templateId, templateId), eq(assignments.id, sourceAssignmentId)));
-    expect(createdForTemplate).toHaveLength(1);
+      .where(and(eq(assignments.templateId, templateId), ne(assignments.id, sourceAssignmentId)));
+    expect(createdForTemplate).toHaveLength(0);
   });
 
   it('creates independent targets for concurrent clone requests', async () => {
@@ -451,5 +451,19 @@ describe('assignment clone and semester rollover', () => {
     expect(
       await db.select({ id: assignments.id }).from(assignments).where(inArray(assignments.id, ids)),
     ).toHaveLength(2);
+
+    await db.update(assignments).set({ title: 'Mutated clone' }).where(eq(assignments.id, ids[0]));
+    const clonedTitles = await db
+      .select({ id: assignments.id, title: assignments.title })
+      .from(assignments)
+      .where(inArray(assignments.id, ids));
+    expect(clonedTitles.find((row) => row.id === ids[0])?.title).toBe('Mutated clone');
+    expect(clonedTitles.find((row) => row.id === ids[1])?.title).not.toBe('Mutated clone');
+
+    const [source] = await db
+      .select({ title: assignments.title })
+      .from(assignments)
+      .where(eq(assignments.id, sourceAssignmentId));
+    expect(source.title).toBe(`Source Assignment ${runId}`);
   });
 });

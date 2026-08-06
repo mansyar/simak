@@ -121,10 +121,10 @@
   - [x] Require explicit student selection after creation
   - [x] Preserve the source assignment and all historical records
   - [x] Record source/target identifiers in audit details without copying academic content
-- [~] Task: Run Phase 4 Green verification
-  - [ ] Run focused unit and database integration tests
-  - [ ] Verify rollback leaves no partial assignment, enrollment, or checkpoint rows
-  - [ ] Verify clone output is independently mutable
+- [x] Task: Run Phase 4 Green verification [commit pending]
+  - [x] Run focused unit and database integration tests
+  - [x] Verify rollback leaves no partial assignment, enrollment, or checkpoint rows
+  - [x] Verify clone output is independently mutable
 - [ ] Task: Phase Verification & Checkpoint (Refer to `workflow.md`)
 
 ## Phase 5: Bilingual Admin, Instructor, and Student UI
