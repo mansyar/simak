@@ -65,7 +65,7 @@
 
 **Objective:** Integrate academic context into existing assignment creation, authorization, listing, dashboards, and lifecycle transitions without changing individual checkpoint semantics.
 
-- [x] Task: Write failing assignment integration and regression tests (Red)
+- [x] Task: Write failing assignment integration and regression tests (Red) [commit: 5496392]
   - [x] Extend assignment server tests for required section selection and individual default mode
   - [x] Test instructor authorization through section membership
   - [x] Test student selection is limited to active students in the selected section
