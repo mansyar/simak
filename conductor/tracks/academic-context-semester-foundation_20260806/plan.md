@@ -20,12 +20,12 @@
   - [x] Add assignment `sectionId`/academic-context association and explicit `mode` defaulting to `individual`
   - [x] Register schema exports and Drizzle relations
   - [x] Add only justified indexes for term/section lookup, active membership, and assignment context filters
-- [x] Task: Implement and review the next Drizzle migration plus rollback
+- [x] Task: Implement and review the next Drizzle migration plus rollback [commits: 86d4ce9, cb42855]
   - [x] Generate or author the forward migration using the repository’s migration conventions
   - [x] Add the matching rollback migration
   - [x] Make the prelaunch empty-production assumption explicit and non-destructive
   - [x] Update development, integration, and E2E fixture setup to recreate classified context data
-- [x] Task: Run Phase 1 Red/Green and database verification
+- [x] Task: Run Phase 1 Red/Green and database verification [commit: 86d4ce9]
   - [x] Run focused schema tests and confirm they pass
   - [x] Apply the migration to a disposable database
   - [x] Verify forward, rollback, and re-apply behavior
