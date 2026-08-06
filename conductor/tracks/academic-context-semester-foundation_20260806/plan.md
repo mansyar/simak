@@ -7,13 +7,13 @@
 - [x] Task: Re-read `spec.md`, `workflow.md`, `docs/PRD.md`, and `docs/TDD.md` before implementation [commit: 5def3f6]
   - [x] Confirm the course + term + section model and individual-assignment compatibility requirements
   - [x] Confirm migration, transaction, testing, i18n, and file-size constraints
-- [ ] Task: Write failing database schema and migration tests (Red)
-  - [ ] Add `tests/unit/db/academic-context.test.ts`
-  - [ ] Assert academic term, course, section, and section-enrollment table contracts
-  - [ ] Assert unique course/term/section identity and membership constraints
-  - [ ] Assert assignment context and explicit individual/group mode columns
-  - [ ] Add migration/preflight coverage proving unexpected existing production assignment rows are rejected
-  - [ ] Add fixture-reset coverage for development and test data
+- [x] Task: Write failing database schema and migration tests (Red)
+  - [x] Add `tests/unit/db/academic-context.test.ts`
+  - [x] Assert academic term, course, section, and section-enrollment table contracts
+  - [x] Assert unique course/term/section identity and membership constraints
+  - [x] Assert assignment context and explicit individual/group mode columns
+  - [x] Add migration/preflight coverage proving unexpected existing production assignment rows are rejected
+  - [x] Add fixture-reset coverage for development and test data
 - [ ] Task: Implement the academic-context schema (Green)
   - [ ] Add the smallest normalized schema for `academic_terms`, `courses`, `course_sections`, and role-aware section enrollments
   - [ ] Add lifecycle/status columns and foreign keys with history-safe delete behavior
