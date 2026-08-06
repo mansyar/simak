@@ -55,10 +55,10 @@
   - [x] Wrap multi-row writes in transactions and use lock/re-check patterns for mutable state
   - [x] Emit auditable context and enrollment events without sensitive payloads
   - [x] Split handler-only extras if the 500-line limit requires it
-- [~] Task: Run Phase 2 Green verification
-  - [ ] Run focused unit and integration server tests
-  - [ ] Confirm all new handlers return typed serializable DTOs
-  - [ ] Confirm authorization tests do not query protected data before rejection
+- [x] Task: Run Phase 2 Green verification
+  - [x] Run focused unit and integration server tests
+  - [x] Confirm all new handlers return typed serializable DTOs
+  - [x] Confirm authorization tests do not query protected data before rejection
 - [ ] Task: Phase Verification & Checkpoint (Refer to `workflow.md`)
 
 ## Phase 3: Assignment Context Association & Lifecycle
