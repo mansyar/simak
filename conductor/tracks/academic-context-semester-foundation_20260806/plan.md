@@ -35,7 +35,7 @@
 
 **Objective:** Provide typed, role-protected admin operations for terms, courses, sections, and enrollments.
 
-- [x] Task: Write failing server-function tests (Red)
+- [x] Task: Write failing server-function tests (Red) [commit: a66b3cf]
   - [x] Add `tests/unit/server/academic-context.test.ts`
   - [x] Test Zod validation for term, course, section, and enrollment inputs
   - [x] Test admin/superadmin authorization and rejection of instructor/student access
