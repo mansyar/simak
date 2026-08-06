@@ -42,7 +42,7 @@
   - [x] Test duplicate, invalid-date, inactive-user, wrong-role, and cross-section cases
   - [x] Test pagination, filtering, and explicit response projections
   - [x] Add integration tests for context CRUD and enrollment persistence/rollback
-- [x] Task: Implement client-safe academic-context stubs
+- [x] Task: Implement client-safe academic-context stubs [commit: a6b5684]
   - [x] Add `src/server/academic-context.ts`
   - [x] Define schemas and `typedServerFn` stubs with appropriate read/destructive rate limits
   - [x] Keep handlers out of the client bundle through dynamic imports
