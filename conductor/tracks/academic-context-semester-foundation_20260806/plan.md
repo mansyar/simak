@@ -7,7 +7,7 @@
 - [x] Task: Re-read `spec.md`, `workflow.md`, `docs/PRD.md`, and `docs/TDD.md` before implementation [commit: 5def3f6]
   - [x] Confirm the course + term + section model and individual-assignment compatibility requirements
   - [x] Confirm migration, transaction, testing, i18n, and file-size constraints
-- [x] Task: Write failing database schema and migration tests (Red)
+- [x] Task: Write failing database schema and migration tests (Red) [commit: 0629d14]
   - [x] Add `tests/unit/db/academic-context.test.ts`
   - [x] Assert academic term, course, section, and section-enrollment table contracts
   - [x] Assert unique course/term/section identity and membership constraints
