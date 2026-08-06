@@ -1,76 +1,23 @@
 // Server-only handlers (not imported by client code)
-import { eq, and, isNull, sql, inArray } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
 import { getDb } from '../db/index';
 import { assignments, assignmentStudents, checkpoints } from '../db/schema/assignments';
-import { assignmentTemplates, templateCheckpoints } from '../db/schema/templates';
-import { users } from '../db/schema/users';
+import { templateCheckpoints } from '../db/schema/templates';
 import { getSessionFromHeaders } from './auth';
 import { logAuditEvent } from '../lib/audit';
-import { serverError, ErrorCode, type ServerError } from '../lib/errors';
+import { serverError, ErrorCode } from '../lib/errors';
 import { translateKey } from '../lib/i18n-server';
 import { calculateDueDates, validateDueDates } from './due-dates.server';
 import { createDefaultGradeConfig } from './assignments-extras.server';
 import { isInstructor } from '../lib/session-guards';
+import {
+  getActiveSectionStudentIds,
+  getAuthorizedInstructorSection,
+} from './assignments-context.server';
 import type { z } from 'zod';
-import type {
-  CreateAssignmentSchema,
-  ListInstructorAssignmentsSchema,
-  AssignmentIdParamSchema,
-} from './assignments';
+import type { CreateAssignmentSchema } from './assignments';
 
 type CreateAssignmentInput = z.infer<typeof CreateAssignmentSchema>;
-type ListInstructorAssignmentsInput = z.infer<typeof ListInstructorAssignmentsSchema>;
-type AssignmentIdParam = z.infer<typeof AssignmentIdParamSchema>;
-
-export type InstructorAssignmentRow = {
-  id: number;
-  title: string;
-  description: string | null;
-  finalDeadline: string;
-  createdAt: string | null;
-  templateName: string;
-  templateType: string;
-  studentCount: number;
-};
-
-export type ListInstructorAssignmentsSuccess = {
-  assignments: InstructorAssignmentRow[];
-  total: number;
-};
-
-export type AssignmentDetailCheckpoint = {
-  id: number;
-  name: string;
-  order: number;
-  state: string;
-  studentId: string;
-  dueDate: string | null;
-  minConsultations: number | null;
-};
-
-export type AssignmentDetailStudent = {
-  id: string;
-  name: string;
-  email: string;
-  passedCount: number;
-  totalCheckpointsCount: number;
-  progressPercent: number;
-  activeCheckpoint: { id: number; name: string; state: string } | null;
-  effectiveDeadline: string | null;
-  checkpoints: AssignmentDetailCheckpoint[];
-};
-
-export type AssignmentDetailSuccess = {
-  id: number;
-  title: string;
-  description: string | null;
-  finalDeadline: string;
-  createdAt: string | null;
-  instructorId: string;
-  templateName: string;
-  templateType: string;
-  students: AssignmentDetailStudent[];
-};
 
 export async function createAssignmentHandler(args: { data: CreateAssignmentInput }) {
   const session = await getSessionFromHeaders();
@@ -78,16 +25,30 @@ export async function createAssignmentHandler(args: { data: CreateAssignmentInpu
     return serverError(ErrorCode.UNAUTHORIZED, 'Unauthorized');
   }
 
-  const { templateId, title, description, finalDeadline, studentIds, overrideDueDates } = args.data;
+  const {
+    templateId,
+    sectionId,
+    title,
+    description,
+    finalDeadline,
+    studentIds,
+    mode = 'individual',
+    status = 'draft',
+    overrideDueDates,
+  } = args.data;
   const db = getDb();
 
   try {
-    const validStudents = await db
-      .select({ id: users.id })
-      .from(users)
-      .where(
-        and(inArray(users.id, studentIds), eq(users.role, 'student'), isNull(users.deletedAt)),
-      );
+    if (mode !== 'individual') {
+      return serverError(ErrorCode.BAD_REQUEST, 'Group assignments are not supported yet');
+    }
+
+    const authorizedSection = await getAuthorizedInstructorSection(db, sectionId, session.user.id);
+    if (!authorizedSection) {
+      return serverError(ErrorCode.FORBIDDEN, 'Instructor is not authorized for this section');
+    }
+
+    const validStudents = await getActiveSectionStudentIds(db, sectionId, studentIds);
     if (validStudents.length !== studentIds.length) {
       const locale = (session.user.locale || 'en') as 'en' | 'id';
       return serverError(
@@ -100,10 +61,13 @@ export async function createAssignmentHandler(args: { data: CreateAssignmentInpu
         .insert(assignments)
         .values({
           templateId,
+          sectionId,
           title,
           description,
           finalDeadline,
           instructorId: session.user.id,
+          mode,
+          status,
         })
         .returning({ id: assignments.id });
 
@@ -183,7 +147,14 @@ export async function createAssignmentHandler(args: { data: CreateAssignmentInpu
       action: 'assignment.created',
       entityType: 'assignment',
       entityId: String(assignmentId),
-      details: { templateId, studentCount: studentIds.length, deadline: finalDeadline },
+      details: {
+        templateId,
+        sectionId,
+        mode,
+        status,
+        studentCount: studentIds.length,
+        deadline: finalDeadline,
+      },
     });
 
     return result;
@@ -198,223 +169,18 @@ export async function createAssignmentHandler(args: { data: CreateAssignmentInpu
   }
 }
 
-export async function listInstructorAssignmentsHandler(args: {
-  data: ListInstructorAssignmentsInput;
-}): Promise<ListInstructorAssignmentsSuccess | ServerError> {
-  const session = await getSessionFromHeaders();
-  if (!isInstructor(session)) {
-    return { assignments: [], total: 0 };
-  }
-
-  const { search, page, limit } = args.data;
-  const db = getDb();
-
-  try {
-    const conditions = [
-      eq(assignments.instructorId, session.user.id),
-      isNull(assignments.deletedAt),
-    ];
-
-    if (search) {
-      conditions.push(sql`${assignments.title} ILIKE ${'%' + search + '%'}`);
-    }
-
-    const [rawAssignments, [{ count }]] = await Promise.all([
-      db
-        .select({
-          id: assignments.id,
-          title: assignments.title,
-          description: assignments.description,
-          finalDeadline: assignments.finalDeadline,
-          createdAt: assignments.createdAt,
-          templateName: assignmentTemplates.name,
-          templateType: assignmentTemplates.type,
-        })
-        .from(assignments)
-        .innerJoin(assignmentTemplates, eq(assignments.templateId, assignmentTemplates.id))
-        .where(and(...conditions))
-        .orderBy(assignments.createdAt)
-        .limit(limit)
-        .offset((page - 1) * limit),
-      db
-        .select({ count: sql<number>`count(*)::int` })
-        .from(assignments)
-        .where(and(...conditions)),
-    ]);
-
-    // Fetch student counts for the assignments in a separate query
-    const assignmentIds = rawAssignments.map((a) => a.id);
-    let studentCounts: Map<number, number> = new Map();
-
-    if (assignmentIds.length > 0) {
-      const counts = await db
-        .select({
-          assignmentId: assignmentStudents.assignmentId,
-          count: sql<number>`count(*)::int`,
-        })
-        .from(assignmentStudents)
-        .where(inArray(assignmentStudents.assignmentId, assignmentIds))
-        .groupBy(assignmentStudents.assignmentId);
-
-      studentCounts = new Map(counts.map((c) => [c.assignmentId, c.count]));
-    }
-
-    const enrichedAssignments: InstructorAssignmentRow[] = rawAssignments.map((a) => ({
-      id: a.id,
-      title: a.title,
-      description: a.description,
-      finalDeadline: a.finalDeadline.toISOString(),
-      createdAt: a.createdAt ? a.createdAt.toISOString() : null,
-      templateName: a.templateName,
-      templateType: a.templateType,
-      studentCount: studentCounts.get(a.id) ?? 0,
-    }));
-
-    return {
-      assignments: enrichedAssignments,
-      total: Number(count),
-    };
-  } catch (err) {
-    return serverError(ErrorCode.INTERNAL, 'Internal Server Error', {
-      cause: err instanceof Error ? err.message : String(err),
-      handler: 'listInstructorAssignmentsHandler',
-    });
-  }
-}
-
-export async function getAssignmentDetailHandler(args: {
-  data: AssignmentIdParam;
-}): Promise<AssignmentDetailSuccess | ServerError | null> {
-  const session = await getSessionFromHeaders();
-  if (!isInstructor(session)) {
-    return null;
-  }
-
-  const { id } = args.data;
-  const db = getDb();
-
-  try {
-    const [assignment] = await db
-      .select({
-        id: assignments.id,
-        title: assignments.title,
-        description: assignments.description,
-        finalDeadline: assignments.finalDeadline,
-        createdAt: assignments.createdAt,
-        templateName: assignmentTemplates.name,
-        templateType: assignmentTemplates.type,
-      })
-      .from(assignments)
-      .innerJoin(assignmentTemplates, eq(assignments.templateId, assignmentTemplates.id))
-      .where(
-        and(
-          eq(assignments.id, id),
-          eq(assignments.instructorId, session.user.id),
-          isNull(assignments.deletedAt),
-        ),
-      )
-      .limit(1);
-
-    if (!assignment) {
-      return null;
-    }
-
-    const studentsList = await db
-      .select({
-        id: users.id,
-        name: users.name,
-        email: users.email,
-      })
-      .from(assignmentStudents)
-      .innerJoin(users, eq(assignmentStudents.studentId, users.id))
-      .where(eq(assignmentStudents.assignmentId, id))
-      .orderBy(users.name);
-
-    const studentIds = studentsList.map((s) => s.id);
-    const studentsWithProgress: AssignmentDetailStudent[] = [];
-
-    if (studentIds.length > 0) {
-      const allCheckpoints = await db
-        .select({
-          id: checkpoints.id,
-          name: checkpoints.name,
-          order: checkpoints.order,
-          state: checkpoints.state,
-          studentId: checkpoints.studentId,
-          dueDate: checkpoints.dueDate,
-          minConsultations: checkpoints.minConsultations,
-        })
-        .from(checkpoints)
-        .where(eq(checkpoints.assignmentId, id))
-        .orderBy(checkpoints.studentId, checkpoints.order);
-
-      // Group checkpoints by studentId
-      const checkpointsByStudent: Map<string, typeof allCheckpoints> = new Map();
-      allCheckpoints.forEach((cp) => {
-        if (!checkpointsByStudent.has(cp.studentId)) {
-          checkpointsByStudent.set(cp.studentId, []);
-        }
-        checkpointsByStudent.get(cp.studentId)!.push(cp);
-      });
-
-      studentsList.forEach((s) => {
-        const sCheckpoints = checkpointsByStudent.get(s.id) ?? [];
-        const totalCheckpointsCount = sCheckpoints.length;
-        const passedCount = sCheckpoints.filter((cp) => cp.state === 'passed').length;
-
-        const activeCheckpoint = sCheckpoints.find((cp) => cp.state !== 'passed') ?? null;
-        const effectiveCheckpoint =
-          sCheckpoints.length > 0
-            ? sCheckpoints.reduce((max, cp) => (cp.order > max.order ? cp : max), sCheckpoints[0])
-            : undefined;
-
-        studentsWithProgress.push({
-          ...s,
-          passedCount,
-          totalCheckpointsCount,
-          progressPercent:
-            totalCheckpointsCount > 0 ? Math.round((passedCount / totalCheckpointsCount) * 100) : 0,
-          activeCheckpoint: activeCheckpoint
-            ? {
-                id: activeCheckpoint.id,
-                name: activeCheckpoint.name,
-                state: activeCheckpoint.state,
-              }
-            : null,
-          effectiveDeadline: effectiveCheckpoint?.dueDate?.toISOString() ?? null,
-          checkpoints: sCheckpoints.map((cp) => ({
-            id: cp.id,
-            name: cp.name,
-            order: cp.order,
-            state: cp.state,
-            studentId: cp.studentId,
-            dueDate: cp.dueDate ? cp.dueDate.toISOString() : null,
-            minConsultations: cp.minConsultations,
-          })),
-        });
-      });
-    }
-
-    return {
-      ...assignment,
-      instructorId: session.user.id,
-      finalDeadline: assignment.finalDeadline.toISOString(),
-      createdAt: assignment.createdAt ? assignment.createdAt.toISOString() : null,
-      students: studentsWithProgress,
-    };
-  } catch (err) {
-    return serverError(ErrorCode.INTERNAL, 'Internal Server Error', {
-      cause: err instanceof Error ? err.message : String(err),
-      handler: 'getAssignmentDetailHandler',
-    });
-  }
-}
+export { unlockCheckpointHandler, extendDeadlineHandler } from './assignments-extras.server';
 
 export {
-  unlockCheckpointHandler,
-  extendDeadlineHandler,
   listStudentAssignmentsHandler,
   getStudentAssignmentDetailHandler,
-} from './assignments-extras.server';
+} from './assignments-student.server';
+
+export {
+  listInstructorAssignmentsHandler,
+  getAssignmentDetailHandler,
+} from './assignments-context-handlers.server';
+
+export { transitionAssignmentStatusHandler } from './assignments-lifecycle.server';
 
 export { reassignAssignmentHandler } from './assignments-admin.server';

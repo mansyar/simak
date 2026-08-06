@@ -258,7 +258,7 @@ describe('Client fetch error handling', () => {
       vi.mocked(templatesApi.getTemplate).mockResolvedValue(mockTemplateDetails as any);
       vi.mocked(assignmentsApi.createAssignment).mockRejectedValue(new Error('Network failure'));
 
-      render(<AssignmentWizard />, { wrapper: createWrapper() });
+      render(<AssignmentWizard sectionId={1} />, { wrapper: createWrapper() });
 
       await waitFor(() => {
         expect(screen.getByText('Thesis Template')).toBeDefined();

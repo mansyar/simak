@@ -53,6 +53,7 @@ export async function listPendingReviewsHandler(args: { data: ListPendingReviews
     // 1. Get instructor's assignment IDs
     const assignmentConditions = [
       eq(assignments.instructorId, session.user.id),
+      eq(assignments.status, 'active'),
       isNull(assignments.deletedAt),
     ];
     if (assignmentId) {
@@ -74,9 +75,11 @@ export async function listPendingReviewsHandler(args: { data: ListPendingReviews
     const [{ count }] = await db
       .select({ count: sql<number>`count(*)::int` })
       .from(checkpoints)
+      .innerJoin(assignments, eq(checkpoints.assignmentId, assignments.id))
       .where(
         and(
           inArray(checkpoints.assignmentId, assignmentIds),
+          eq(assignments.status, 'active'),
           sql`${checkpoints.state} IN ('submitted', 'under_review')`,
         ),
       );
@@ -198,6 +201,7 @@ export async function submitReviewHandler(args: { data: SubmitReviewInput }) {
           and(
             eq(submissions.id, submissionId),
             eq(assignments.instructorId, session.user.id),
+            eq(assignments.status, 'active'),
             isNull(assignments.deletedAt),
           ),
         )

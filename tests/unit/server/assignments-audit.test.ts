@@ -74,11 +74,15 @@ describe('Assignment & Review handlers audit logging', () => {
 
       // Mock returning to return inserted assignment id
       mockDb.returning.mockResolvedValue([{ id: 789 }]);
+      // Mock section authorization query.
+      mockDb.then.mockImplementationOnce((onfulfilled: any) =>
+        Promise.resolve([{ sectionId: 1 }]).then(onfulfilled),
+      );
       // Mock validation query: studentIds are valid active students
       mockDb.then.mockImplementationOnce((onfulfilled: any) =>
         Promise.resolve([{ id: 'student-1' }]).then(onfulfilled),
       );
-      // Mock then for select queries inside transaction
+      // Mock then for the assignment-student insert inside the transaction
       mockDb.then.mockImplementationOnce((onfulfilled: any) =>
         Promise.resolve([]).then(onfulfilled),
       );
@@ -87,10 +91,13 @@ describe('Assignment & Review handlers audit logging', () => {
       const result = await createAssignmentHandler({
         data: {
           templateId: 1,
+          sectionId: 1,
           title: 'Test Assignment',
           description: 'A test assignment',
           finalDeadline: new Date('2026-12-31'),
           studentIds: ['student-1'],
+          mode: 'individual',
+          status: 'draft',
         },
       });
 
@@ -100,7 +107,14 @@ describe('Assignment & Review handlers audit logging', () => {
         action: 'assignment.created',
         entityType: 'assignment',
         entityId: '789',
-        details: { templateId: 1, studentCount: 1, deadline: expect.any(Date) },
+        details: {
+          templateId: 1,
+          sectionId: 1,
+          mode: 'individual',
+          status: 'draft',
+          studentCount: 1,
+          deadline: expect.any(Date),
+        },
       });
     });
   });
@@ -212,7 +226,12 @@ describe('Assignment & Review handlers audit logging', () => {
 
       mockDb.then.mockImplementationOnce((onfulfilled: any) =>
         Promise.resolve([
-          { id: 100, assignmentInstructorId: 'instructor-1', assignmentId: 1 },
+          {
+            id: 100,
+            assignmentInstructorId: 'instructor-1',
+            assignmentId: 1,
+            assignmentStatus: 'active',
+          },
         ]).then(onfulfilled),
       );
 
@@ -253,7 +272,13 @@ describe('Assignment & Review handlers audit logging', () => {
 
       mockDb.then.mockImplementationOnce((onfulfilled: any) =>
         Promise.resolve([
-          { id: 100, state: 'locked', assignmentInstructorId: 'instructor-1', assignmentId: 1 },
+          {
+            id: 100,
+            state: 'locked',
+            assignmentInstructorId: 'instructor-1',
+            assignmentId: 1,
+            assignmentStatus: 'active',
+          },
         ]).then(onfulfilled),
       );
 

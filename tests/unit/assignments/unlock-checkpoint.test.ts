@@ -63,6 +63,7 @@ describe('unlockCheckpointHandler', () => {
         state: 'locked',
         assignmentInstructorId: 'instructor-1',
         assignmentId: 1,
+        assignmentStatus: 'active',
         ...overrides,
       },
     ];

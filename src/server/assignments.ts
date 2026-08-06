@@ -74,7 +74,7 @@ export const getAssignmentDetail = typedServerFn({
   });
 
 export const TransitionAssignmentStatusSchema = z.object({
-  id: z.coerce.number().int().positive('Assignment ID must be a positive integer'),
+  assignmentId: z.coerce.number().int().positive('Assignment ID must be a positive integer'),
   status: AssignmentStatusSchema,
 });
 

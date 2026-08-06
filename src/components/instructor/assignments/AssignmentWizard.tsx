@@ -35,7 +35,12 @@ interface DueDateOverride {
   dueDate: string;
 }
 
-export function AssignmentWizard() {
+interface AssignmentWizardProps {
+  /** Academic section selection is supplied by the context UI integration. */
+  sectionId?: number;
+}
+
+export function AssignmentWizard({ sectionId }: AssignmentWizardProps) {
   const { t } = useI18n();
   const navigate = useNavigate();
 
@@ -175,12 +180,18 @@ export function AssignmentWizard() {
       return;
     }
 
+    if (!sectionId) {
+      setErrors({ submit: t('errors.fetchFailed') });
+      return;
+    }
+
     try {
       setIsSubmitting(true);
       const overrideDueDates = dueDateOverrides.length > 0 ? dueDateOverrides : undefined;
       const res = await createAssignment({
         data: {
           templateId: selectedTemplate?.id,
+          sectionId,
           title,
           description,
           finalDeadline: new Date(finalDeadline).toISOString(),

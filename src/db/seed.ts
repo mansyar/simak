@@ -253,6 +253,8 @@ export async function seedTestTemplatesAndAssignments(): Promise<void> {
       finalDeadline,
       instructorId: instructorUser.id,
       sectionId: section.id,
+      mode: 'individual',
+      status: 'active',
     })
     .returning();
 

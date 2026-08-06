@@ -74,6 +74,7 @@ export async function logConsultationHandler(args: { data: LogConsultationInput 
           eq(checkpoints.id, checkpointId),
           eq(checkpoints.studentId, session.user.id),
           eq(assignmentStudents.studentId, session.user.id),
+          eq(assignments.status, 'active'),
           isNull(assignments.deletedAt),
         ),
       )
@@ -219,6 +220,7 @@ export async function getConsultationDetailHandler(args: { data: GetConsultation
         and(
           eq(consultations.id, consultationId),
           eq(assignments.instructorId, session.user.id),
+          eq(assignments.status, 'active'),
           isNull(assignments.deletedAt),
         ),
       )
@@ -257,6 +259,7 @@ export async function listPendingConsultationsHandler(args: {
         and(
           eq(assignments.id, assignmentId),
           eq(assignments.instructorId, session.user.id),
+          eq(assignments.status, 'active'),
           isNull(assignments.deletedAt),
         ),
       )
@@ -328,6 +331,7 @@ async function fetchConsultationForUpdate(tx: Tx, consultationId: number, instru
       and(
         eq(consultations.id, consultationId),
         eq(assignments.instructorId, instructorId),
+        eq(assignments.status, 'active'),
         isNull(assignments.deletedAt),
       ),
     )

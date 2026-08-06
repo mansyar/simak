@@ -64,10 +64,13 @@ describe('Assignment Server Functions', () => {
       const result = await createAssignmentHandler({
         data: {
           templateId: 1,
+          sectionId: 1,
           title: 'New Assignment',
           description: 'Description',
           finalDeadline: new Date(Date.now() + 86400000),
           studentIds: ['student-1'],
+          mode: 'individual',
+          status: 'draft',
         },
       });
       expect(result).toEqual({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } });
@@ -81,10 +84,13 @@ describe('Assignment Server Functions', () => {
       const result = await createAssignmentHandler({
         data: {
           templateId: 1,
+          sectionId: 1,
           title: 'New Assignment',
           description: 'Description',
           finalDeadline: new Date(Date.now() + 86400000),
           studentIds: ['student-1'],
+          mode: 'individual',
+          status: 'draft',
         },
       });
       expect(result).toEqual({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } });
@@ -92,6 +98,11 @@ describe('Assignment Server Functions', () => {
 
     it('should succeed and instantiate checkpoints for students', async () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(mockSession as any);
+
+      // Mock section authorization query.
+      mockDb.then.mockImplementationOnce((onfulfilled: any) => {
+        return Promise.resolve([{ sectionId: 1 }]).then(onfulfilled);
+      });
 
       // Mock validation query: all studentIds are valid active students
       mockDb.then.mockImplementationOnce((onfulfilled: any) => {
@@ -116,10 +127,13 @@ describe('Assignment Server Functions', () => {
       const result = await createAssignmentHandler({
         data: {
           templateId: 1,
+          sectionId: 1,
           title: 'New Assignment',
           description: 'Description',
           finalDeadline: new Date(Date.now() + 86400000),
           studentIds: ['student-1', 'student-2'],
+          mode: 'individual',
+          status: 'draft',
         },
       });
 
@@ -132,6 +146,10 @@ describe('Assignment Server Functions', () => {
     it('AC-13: rejects studentIds containing an admin userId', async () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(mockSession as any);
 
+      mockDb.then.mockImplementationOnce((onfulfilled: any) => {
+        return Promise.resolve([{ sectionId: 1 }]).then(onfulfilled);
+      });
+
       // Validation query returns only 1 valid student (admin userId is not a student)
       mockDb.then.mockImplementationOnce((onfulfilled: any) => {
         return Promise.resolve([{ id: 'student-1' }]).then(onfulfilled);
@@ -140,10 +158,13 @@ describe('Assignment Server Functions', () => {
       const result = await createAssignmentHandler({
         data: {
           templateId: 1,
+          sectionId: 1,
           title: 'New Assignment',
           description: 'Description',
           finalDeadline: new Date(Date.now() + 86400000),
           studentIds: ['student-1', 'admin-1'],
+          mode: 'individual',
+          status: 'draft',
         },
       });
 
@@ -159,6 +180,10 @@ describe('Assignment Server Functions', () => {
     it('AC-14: rejects studentIds containing a deleted student userId', async () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(mockSession as any);
 
+      mockDb.then.mockImplementationOnce((onfulfilled: any) => {
+        return Promise.resolve([{ sectionId: 1 }]).then(onfulfilled);
+      });
+
       // Validation query returns only 1 valid student (deleted student filtered out)
       mockDb.then.mockImplementationOnce((onfulfilled: any) => {
         return Promise.resolve([{ id: 'student-1' }]).then(onfulfilled);
@@ -167,10 +192,13 @@ describe('Assignment Server Functions', () => {
       const result = await createAssignmentHandler({
         data: {
           templateId: 1,
+          sectionId: 1,
           title: 'New Assignment',
           description: 'Description',
           finalDeadline: new Date(Date.now() + 86400000),
           studentIds: ['student-1', 'deleted-student-2'],
+          mode: 'individual',
+          status: 'draft',
         },
       });
 
@@ -186,6 +214,10 @@ describe('Assignment Server Functions', () => {
     it('rejects studentIds containing an instructor userId', async () => {
       vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(mockSession as any);
 
+      mockDb.then.mockImplementationOnce((onfulfilled: any) => {
+        return Promise.resolve([{ sectionId: 1 }]).then(onfulfilled);
+      });
+
       // Validation query returns only 1 valid student (instructor filtered out)
       mockDb.then.mockImplementationOnce((onfulfilled: any) => {
         return Promise.resolve([{ id: 'student-1' }]).then(onfulfilled);
@@ -194,10 +226,13 @@ describe('Assignment Server Functions', () => {
       const result = await createAssignmentHandler({
         data: {
           templateId: 1,
+          sectionId: 1,
           title: 'New Assignment',
           description: 'Description',
           finalDeadline: new Date(Date.now() + 86400000),
           studentIds: ['student-1', 'instructor-2'],
+          mode: 'individual',
+          status: 'draft',
         },
       });
 

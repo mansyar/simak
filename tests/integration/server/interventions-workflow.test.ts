@@ -86,6 +86,8 @@ describe('intervention workflow database acceptance', () => {
         finalDeadline: new Date(Date.now() + 86_400_000),
         instructorId,
         sectionId: academicFixture.sectionId,
+        mode: 'individual',
+        status: 'active',
       })
       .returning({ id: assignments.id });
     assignmentId = assignment.id;

@@ -112,6 +112,7 @@ export async function approveExtensionHandler(args: { data: ApproveExtensionInpu
           and(
             eq(extensionRequests.id, requestId),
             eq(assignments.instructorId, session.user.id),
+            eq(assignments.status, 'active'),
             isNull(assignments.deletedAt),
           ),
         )
@@ -248,6 +249,7 @@ export async function rejectExtensionHandler(args: { data: RejectExtensionInput 
           and(
             eq(extensionRequests.id, requestId),
             eq(assignments.instructorId, session.user.id),
+            eq(assignments.status, 'active'),
             isNull(assignments.deletedAt),
           ),
         )
@@ -347,7 +349,6 @@ export async function rejectExtensionHandler(args: { data: RejectExtensionInput 
     });
   }
 }
-
 /**
  * Bulk extend all unfinished checkpoints for a student by N days.
  * Adjusts per-student checkpoint dueDates only — does NOT modify the
@@ -372,6 +373,7 @@ export async function bulkExtendHandler(args: { data: BulkExtendInput }) {
         and(
           eq(assignments.id, assignmentId),
           eq(assignments.instructorId, session.user.id),
+          eq(assignments.status, 'active'),
           isNull(assignments.deletedAt),
         ),
       )

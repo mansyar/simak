@@ -45,6 +45,7 @@ export async function unlockCheckpointHandler(args: { data: UnlockCheckpointInpu
         state: checkpoints.state,
         assignmentInstructorId: assignments.instructorId,
         assignmentId: checkpoints.assignmentId,
+        assignmentStatus: assignments.status,
       })
       .from(checkpoints)
       .innerJoin(assignments, eq(checkpoints.assignmentId, assignments.id))
@@ -57,6 +58,10 @@ export async function unlockCheckpointHandler(args: { data: UnlockCheckpointInpu
 
     if (checkpoint.assignmentInstructorId !== session.user.id) {
       return serverError(ErrorCode.NOT_FOUND, 'Checkpoint not found');
+    }
+
+    if (checkpoint.assignmentStatus !== 'active') {
+      return serverError(ErrorCode.CONFLICT, 'Assignment is not active');
     }
 
     if (checkpoint.state !== 'locked') {
@@ -110,6 +115,7 @@ export async function extendDeadlineHandler(args: { data: ExtendDeadlineInput })
         assignmentId: checkpoints.assignmentId,
         studentId: checkpoints.studentId,
         order: checkpoints.order,
+        assignmentStatus: assignments.status,
       })
       .from(checkpoints)
       .innerJoin(assignments, eq(checkpoints.assignmentId, assignments.id))
@@ -122,6 +128,10 @@ export async function extendDeadlineHandler(args: { data: ExtendDeadlineInput })
 
     if (checkpoint.assignmentInstructorId !== session.user.id) {
       return serverError(ErrorCode.NOT_FOUND, 'Checkpoint not found');
+    }
+
+    if (checkpoint.assignmentStatus !== 'active') {
+      return serverError(ErrorCode.CONFLICT, 'Assignment is not active');
     }
 
     // FR-5.1: Validate newDueDate is in the future

@@ -140,7 +140,7 @@ describe('assignment academic-context integration', () => {
         sectionId: academicFixture.sectionId,
         title: 'Section Assignment',
         description: 'Assignment context integration test',
-        finalDeadline: new Date(Date.now() + 5_000_000),
+        finalDeadline: new Date(Date.now() + 60 * 86_400_000),
         studentIds: [studentId],
       } as any,
     });

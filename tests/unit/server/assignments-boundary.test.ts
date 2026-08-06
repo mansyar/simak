@@ -199,14 +199,20 @@ describe('Assignment handlers — boundary date serialization', () => {
 
   describe('BUG-26: instructorId ownership check in SQL WHERE', () => {
     it('AC-16: no JS post-query instructorId !== session.user.id check remains', () => {
-      const filePath = resolve(__dirname, '../../../src/server/assignments.server.ts');
-      const content = readFileSync(filePath, 'utf8');
+      const filePaths = [
+        resolve(__dirname, '../../../src/server/assignments.server.ts'),
+        resolve(__dirname, '../../../src/server/assignments-context-handlers.server.ts'),
+      ];
+      const content = filePaths.map((filePath) => readFileSync(filePath, 'utf8')).join('\n');
       expect(content).not.toContain('instructorId !== session.user.id');
     });
 
     it('AC-16: getAssignmentDetailHandler filters by instructorId in SQL WHERE', () => {
-      const filePath = resolve(__dirname, '../../../src/server/assignments.server.ts');
-      const content = readFileSync(filePath, 'utf8');
+      const filePaths = [
+        resolve(__dirname, '../../../src/server/assignments.server.ts'),
+        resolve(__dirname, '../../../src/server/assignments-context-handlers.server.ts'),
+      ];
+      const content = filePaths.map((filePath) => readFileSync(filePath, 'utf8')).join('\n');
       // Before fix: only 1 occurrence (in listInstructorAssignmentsHandler)
       // After fix: 2+ occurrences (listInstructorAssignmentsHandler + getAssignmentDetailHandler)
       const matches = content.match(/eq\(assignments\.instructorId, session\.user\.id\)/g);

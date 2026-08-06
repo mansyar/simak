@@ -89,6 +89,8 @@ describe('submitCheckpointHandler concurrent version race', () => {
         finalDeadline: new Date(Date.now() + 5000000),
         instructorId,
         sectionId: academicFixture.sectionId,
+        mode: 'individual',
+        status: 'active',
       })
       .returning({ id: assignments.id });
 

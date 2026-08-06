@@ -50,7 +50,7 @@ export async function getAdminDashboardDataHandler() {
       db
         .select({ activeAssignmentCount: sql<number>`count(*)::int` })
         .from(assignments)
-        .where(isNull(assignments.deletedAt)),
+        .where(and(eq(assignments.status, 'active'), isNull(assignments.deletedAt))),
       db
         .select({ pendingReviewCount: sql<number>`count(*)::int` })
         .from(checkpoints)
@@ -97,6 +97,7 @@ export async function getAdminDashboardDataHandler() {
           and(
             sql`${checkpoints.state} = 'submitted'`,
             lte(submissions.uploadedAt, slaThreshold),
+            eq(assignments.status, 'active'),
             isNull(assignments.deletedAt),
           ),
         )

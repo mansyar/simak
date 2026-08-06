@@ -2,6 +2,7 @@
 import { eq, and, desc, sql, inArray, isNull } from 'drizzle-orm';
 import { getDb } from '../db/index';
 import { assignments, assignmentStudents, checkpoints } from '../db/schema/assignments';
+import { sectionEnrollments } from '../db/schema/academic-context';
 import { interventions } from '../db/schema/interventions';
 import { submissions } from '../db/schema/submissions';
 import { users } from '../db/schema/users';
@@ -14,6 +15,8 @@ import { getLiveStudentRiskContexts } from './student-risk-context.server';
 type DashboardAssignmentOverview = {
   id: number;
   title: string;
+  sectionId: number;
+  status: 'draft' | 'active' | 'archived';
   finalDeadline: string | null;
   createdAt: string | null;
   studentCount: number;
@@ -79,12 +82,28 @@ export async function getInstructorDashboardDataHandler(): Promise<
   const instructorId = session.user.id;
 
   try {
+    const activeInstructorSection = and(
+      eq(sectionEnrollments.userId, instructorId),
+      eq(sectionEnrollments.role, 'instructor'),
+      eq(sectionEnrollments.isActive, true),
+    );
+
     // Group A (independent): active assignments, recent submissions, assignment overview
     const [instructorAssignments, recentSubmissions, assignmentOverview] = await Promise.all([
       db
         .select({ id: assignments.id })
         .from(assignments)
-        .where(and(eq(assignments.instructorId, instructorId), isNull(assignments.deletedAt))),
+        .innerJoin(
+          sectionEnrollments,
+          and(eq(sectionEnrollments.sectionId, assignments.sectionId), activeInstructorSection),
+        )
+        .where(
+          and(
+            eq(assignments.instructorId, instructorId),
+            eq(assignments.status, 'active'),
+            isNull(assignments.deletedAt),
+          ),
+        ),
       db
         .select({
           submissionId: submissions.id,
@@ -97,19 +116,41 @@ export async function getInstructorDashboardDataHandler(): Promise<
         .from(submissions)
         .innerJoin(checkpoints, eq(submissions.checkpointId, checkpoints.id))
         .innerJoin(assignments, eq(checkpoints.assignmentId, assignments.id))
+        .innerJoin(
+          sectionEnrollments,
+          and(eq(sectionEnrollments.sectionId, assignments.sectionId), activeInstructorSection),
+        )
         .innerJoin(users, eq(checkpoints.studentId, users.id))
-        .where(and(eq(assignments.instructorId, instructorId), isNull(assignments.deletedAt)))
+        .where(
+          and(
+            eq(assignments.instructorId, instructorId),
+            eq(assignments.status, 'active'),
+            isNull(assignments.deletedAt),
+          ),
+        )
         .orderBy(desc(submissions.uploadedAt))
         .limit(5),
       db
         .select({
           id: assignments.id,
           title: assignments.title,
+          sectionId: assignments.sectionId,
+          status: assignments.status,
           finalDeadline: assignments.finalDeadline,
           createdAt: assignments.createdAt,
         })
         .from(assignments)
-        .where(and(eq(assignments.instructorId, instructorId), isNull(assignments.deletedAt)))
+        .innerJoin(
+          sectionEnrollments,
+          and(eq(sectionEnrollments.sectionId, assignments.sectionId), activeInstructorSection),
+        )
+        .where(
+          and(
+            eq(assignments.instructorId, instructorId),
+            eq(assignments.status, 'active'),
+            isNull(assignments.deletedAt),
+          ),
+        )
         .orderBy(desc(assignments.createdAt))
         .limit(20),
     ]);
@@ -225,6 +266,8 @@ export async function getInstructorDashboardDataHandler(): Promise<
     const assignmentsWithDetails: DashboardAssignmentOverview[] = assignmentOverview.map((a) => ({
       id: a.id,
       title: a.title,
+      sectionId: a.sectionId,
+      status: a.status,
       finalDeadline: a.finalDeadline ? a.finalDeadline.toISOString() : null,
       createdAt: a.createdAt ? a.createdAt.toISOString() : null,
       studentCount: studentCountMap.get(a.id) ?? 0,

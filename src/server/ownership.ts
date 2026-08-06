@@ -24,10 +24,13 @@ export async function verifyAssignmentAccess(
       const [enrollment] = await db
         .select({ id: assignmentStudents.id })
         .from(assignmentStudents)
+        .innerJoin(assignments, eq(assignmentStudents.assignmentId, assignments.id))
         .where(
           and(
             eq(assignmentStudents.assignmentId, assignmentId),
             eq(assignmentStudents.studentId, session.user.id),
+            eq(assignments.status, 'active'),
+            isNull(assignments.deletedAt),
           ),
         )
         .limit(1);
@@ -41,6 +44,7 @@ export async function verifyAssignmentAccess(
           and(
             eq(assignments.id, assignmentId),
             eq(assignments.instructorId, session.user.id),
+            eq(assignments.status, 'active'),
             isNull(assignments.deletedAt),
           ),
         )
@@ -77,11 +81,14 @@ export async function verifyCheckpointAccess(
           assignmentStudents,
           eq(checkpoints.assignmentId, assignmentStudents.assignmentId),
         )
+        .innerJoin(assignments, eq(checkpoints.assignmentId, assignments.id))
         .where(
           and(
             eq(checkpoints.id, checkpointId),
             eq(checkpoints.studentId, session.user.id),
             eq(assignmentStudents.studentId, session.user.id),
+            eq(assignments.status, 'active'),
+            isNull(assignments.deletedAt),
           ),
         )
         .limit(1);
@@ -96,6 +103,7 @@ export async function verifyCheckpointAccess(
           and(
             eq(checkpoints.id, checkpointId),
             eq(assignments.instructorId, session.user.id),
+            eq(assignments.status, 'active'),
             isNull(assignments.deletedAt),
           ),
         )

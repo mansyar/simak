@@ -140,6 +140,9 @@ describe('assignment academic-context contracts', () => {
           Promise.resolve([]).then(onfulfilled),
         )
         .mockImplementationOnce((onfulfilled: (value: unknown) => unknown) =>
+          Promise.resolve([]).then(onfulfilled),
+        )
+        .mockImplementationOnce((onfulfilled: (value: unknown) => unknown) =>
           Promise.resolve([{ createdAt: new Date() }]).then(onfulfilled),
         );
 

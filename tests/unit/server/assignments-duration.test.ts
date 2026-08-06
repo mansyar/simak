@@ -41,6 +41,7 @@ describe('Assignment duration calculation', () => {
       returning: vi.fn().mockReturnThis(),
       select: vi.fn().mockReturnThis(),
       from: vi.fn().mockReturnThis(),
+      innerJoin: vi.fn().mockReturnThis(),
       where: vi.fn().mockReturnThis(),
       orderBy: vi.fn().mockReturnThis(),
       limit: vi.fn().mockReturnThis(),
@@ -68,19 +69,23 @@ describe('Assignment duration calculation', () => {
         { name: 'CP2', order: 2, minConsultations: 2, estimatedDuration: 14 },
         { name: 'CP3', order: 3, minConsultations: 1, estimatedDuration: 21 },
       ];
-      // 1st await mockDb: studentIds validation query (returns valid student)
+      // 1st await mockDb: section authorization query.
+      mockDb.then.mockImplementationOnce((onfulfilled: any) =>
+        Promise.resolve([{ sectionId: 1 }]).then(onfulfilled),
+      );
+      // 2nd await mockDb: studentIds validation query (returns valid student)
       mockDb.then.mockImplementationOnce((onfulfilled: any) =>
         Promise.resolve([{ id: 'student-1' }]).then(onfulfilled),
       );
-      // 2nd await mockDb: student insert (unused result)
+      // 3rd await mockDb: student insert (unused result)
+      mockDb.then.mockImplementationOnce((onfulfilled: any) =>
+        Promise.resolve([]).then(onfulfilled),
+      );
+      // 4th await mockDb: template checkpoints query
       mockDb.then.mockImplementationOnce((onfulfilled: any) =>
         Promise.resolve(checkpointsData).then(onfulfilled),
       );
-      // 3rd await mockDb: template checkpoints query
-      mockDb.then.mockImplementationOnce((onfulfilled: any) =>
-        Promise.resolve(checkpointsData).then(onfulfilled),
-      );
-      // 4th await mockDb: assignment createdAt query
+      // 5th await mockDb: assignment createdAt query
       mockDb.then.mockImplementationOnce((onfulfilled: any) =>
         Promise.resolve([{ createdAt: new Date('2026-07-01T00:00:00Z') }]).then(onfulfilled),
       );
@@ -89,10 +94,13 @@ describe('Assignment duration calculation', () => {
       const result = await createAssignmentHandler({
         data: {
           templateId: 1,
+          sectionId: 1,
           title: 'Thesis Assignment',
           description: 'Test',
           finalDeadline: new Date('2026-12-31'),
           studentIds: ['student-1'],
+          mode: 'individual',
+          status: 'draft',
         },
       });
 
@@ -103,7 +111,14 @@ describe('Assignment duration calculation', () => {
         action: 'assignment.created',
         entityType: 'assignment',
         entityId: '789',
-        details: { templateId: 1, studentCount: 1, deadline: expect.any(Date) },
+        details: {
+          templateId: 1,
+          sectionId: 1,
+          mode: 'individual',
+          status: 'draft',
+          studentCount: 1,
+          deadline: expect.any(Date),
+        },
       });
     });
   });

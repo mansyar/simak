@@ -2,6 +2,7 @@
 import { eq, and, asc, desc, sql, inArray, isNull } from 'drizzle-orm';
 import { getDb } from '../db/index';
 import { assignments, assignmentStudents, checkpoints } from '../db/schema/assignments';
+import { sectionEnrollments } from '../db/schema/academic-context';
 import { assignmentTemplates } from '../db/schema/templates';
 import { reviews, submissions } from '../db/schema/submissions';
 import { revisionActionItems } from '../db/schema/revision-action-items';
@@ -30,6 +31,11 @@ export async function getStudentDashboardDataHandler() {
 
   try {
     const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+    const activeStudentSection = and(
+      eq(sectionEnrollments.userId, studentId),
+      eq(sectionEnrollments.role, 'student'),
+      eq(sectionEnrollments.isActive, true),
+    );
 
     // Group A (independent): active assignments, upcoming deadlines, pending reviews, consultations
     const [activeAssignments, upcomingDeadlines, pendingReviews, consultationReminders] =
@@ -38,14 +44,26 @@ export async function getStudentDashboardDataHandler() {
           .select({
             id: assignments.id,
             title: assignments.title,
+            sectionId: assignments.sectionId,
+            status: assignments.status,
             finalDeadline: assignments.finalDeadline,
             templateName: assignmentTemplates.name,
             templateType: assignmentTemplates.type,
           })
           .from(assignmentStudents)
           .innerJoin(assignments, eq(assignmentStudents.assignmentId, assignments.id))
+          .innerJoin(
+            sectionEnrollments,
+            and(eq(sectionEnrollments.sectionId, assignments.sectionId), activeStudentSection),
+          )
           .innerJoin(assignmentTemplates, eq(assignments.templateId, assignmentTemplates.id))
-          .where(and(eq(assignmentStudents.studentId, studentId), isNull(assignments.deletedAt)))
+          .where(
+            and(
+              eq(assignmentStudents.studentId, studentId),
+              eq(assignments.status, 'active'),
+              isNull(assignments.deletedAt),
+            ),
+          )
           .orderBy(assignments.finalDeadline)
           .limit(20),
         db
@@ -60,9 +78,14 @@ export async function getStudentDashboardDataHandler() {
           })
           .from(checkpoints)
           .innerJoin(assignments, eq(checkpoints.assignmentId, assignments.id))
+          .innerJoin(
+            sectionEnrollments,
+            and(eq(sectionEnrollments.sectionId, assignments.sectionId), activeStudentSection),
+          )
           .where(
             and(
               eq(checkpoints.studentId, studentId),
+              eq(assignments.status, 'active'),
               isNull(assignments.deletedAt),
               sql`${checkpoints.state} != 'passed'`,
             ),
@@ -81,7 +104,17 @@ export async function getStudentDashboardDataHandler() {
           .from(submissions)
           .innerJoin(checkpoints, eq(submissions.checkpointId, checkpoints.id))
           .innerJoin(assignments, eq(checkpoints.assignmentId, assignments.id))
-          .where(and(eq(checkpoints.studentId, studentId), isNull(assignments.deletedAt)))
+          .innerJoin(
+            sectionEnrollments,
+            and(eq(sectionEnrollments.sectionId, assignments.sectionId), activeStudentSection),
+          )
+          .where(
+            and(
+              eq(checkpoints.studentId, studentId),
+              eq(assignments.status, 'active'),
+              isNull(assignments.deletedAt),
+            ),
+          )
           .orderBy(desc(submissions.uploadedAt)),
         db
           .select({
@@ -96,7 +129,17 @@ export async function getStudentDashboardDataHandler() {
           .from(consultations)
           .innerJoin(assignments, eq(consultations.assignmentId, assignments.id))
           .innerJoin(checkpoints, eq(consultations.checkpointId, checkpoints.id))
-          .where(and(eq(consultations.studentId, studentId), isNull(assignments.deletedAt)))
+          .innerJoin(
+            sectionEnrollments,
+            and(eq(sectionEnrollments.sectionId, assignments.sectionId), activeStudentSection),
+          )
+          .where(
+            and(
+              eq(consultations.studentId, studentId),
+              eq(assignments.status, 'active'),
+              isNull(assignments.deletedAt),
+            ),
+          )
           .orderBy(desc(consultations.createdAt)),
       ]);
 
@@ -153,10 +196,15 @@ export async function getStudentDashboardDataHandler() {
       .innerJoin(submissions, eq(reviews.submissionId, submissions.id))
       .innerJoin(checkpoints, eq(submissions.checkpointId, checkpoints.id))
       .innerJoin(assignments, eq(checkpoints.assignmentId, assignments.id))
+      .innerJoin(
+        sectionEnrollments,
+        and(eq(sectionEnrollments.sectionId, assignments.sectionId), activeStudentSection),
+      )
       .where(
         and(
           eq(checkpoints.studentId, studentId),
           eq(reviews.decision, 'revise'),
+          eq(assignments.status, 'active'),
           isNull(assignments.deletedAt),
         ),
       )
@@ -194,6 +242,8 @@ export async function getStudentDashboardDataHandler() {
       return {
         id: a.id,
         title: a.title,
+        sectionId: a.sectionId,
+        status: a.status,
         finalDeadline: a.finalDeadline,
         templateName: a.templateName,
         templateType: a.templateType,

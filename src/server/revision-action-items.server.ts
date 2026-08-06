@@ -197,6 +197,7 @@ export async function updateRevisionActionItemHandler({
           and(
             eq(revisionActionItems.id, data.itemId),
             eq(checkpoints.studentId, session.user.id),
+            eq(assignments.status, 'active'),
             isNull(assignments.deletedAt),
           ),
         )
