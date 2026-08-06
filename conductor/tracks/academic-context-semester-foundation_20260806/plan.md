@@ -103,7 +103,7 @@
 
 **Objective:** Add atomic, auditable, history-safe creation of independent assignments from existing configuration.
 
-- [x] Task: Write failing clone/rollover tests (Red)
+- [x] Task: Write failing clone/rollover tests (Red) [commit: 2c78620]
   - [x] Add `tests/unit/server/assignment-clone-rollover.test.ts`
   - [x] Test source ownership and target-section authorization
   - [x] Test configuration-only copying and explicit target context
