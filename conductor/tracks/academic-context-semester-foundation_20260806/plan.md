@@ -112,7 +112,7 @@
   - [x] Test source assignment remains unchanged
   - [x] Test invalid target terms/sections and archived/draft source behavior
   - [x] Add integration tests for rollback and concurrent clone requests
-- [ ] Task: Implement clone and rollover server contracts
+- [~] Task: Implement clone and rollover server contracts
   - [ ] Add validated inputs and typed stubs using the established assignment server split
   - [ ] Define explicit deadline/configuration input rules without relative-date inference
 - [ ] Task: Implement transactional clone/rollover handlers
