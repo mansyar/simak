@@ -14,6 +14,11 @@ import {
 } from '@/db/schema/index';
 import { submitCheckpointHandler } from '@/server/submissions.server';
 import * as auth from '@/server/auth';
+import {
+  createAcademicSectionFixture,
+  deleteAcademicSectionFixture,
+  type AcademicSectionFixture,
+} from '../helpers/academic-context';
 
 vi.mock('@/server/auth', () => ({
   getSessionFromHeaders: vi.fn(),
@@ -39,6 +44,7 @@ describe('submitCheckpointHandler fabricated-key rejection end-to-end', () => {
   const timestamp = Date.now();
   const instructorId = `intent-instructor-${timestamp}`;
   const studentId = `intent-student-${timestamp}`;
+  let academicFixture: AcademicSectionFixture;
   let templateId: number;
   let assignmentId: number;
   let checkpointId: number;
@@ -59,6 +65,10 @@ describe('submitCheckpointHandler fabricated-key rejection end-to-end', () => {
       },
     ]);
 
+    academicFixture = await createAcademicSectionFixture(db, `intent-${timestamp}`, instructorId, [
+      studentId,
+    ]);
+
     const [template] = await db
       .insert(assignmentTemplates)
       .values({
@@ -77,6 +87,7 @@ describe('submitCheckpointHandler fabricated-key rejection end-to-end', () => {
         title: 'Intent Test Assignment',
         finalDeadline: new Date(Date.now() + 5000000),
         instructorId,
+        sectionId: academicFixture.sectionId,
       })
       .returning({ id: assignments.id });
 
@@ -113,6 +124,7 @@ describe('submitCheckpointHandler fabricated-key rejection end-to-end', () => {
     await db.delete(checkpoints).where(eq(checkpoints.id, checkpointId));
     await db.delete(assignmentStudents).where(eq(assignmentStudents.assignmentId, assignmentId));
     await db.delete(assignments).where(eq(assignments.id, assignmentId));
+    await deleteAcademicSectionFixture(db, academicFixture);
     await db.delete(templateCheckpoints).where(eq(templateCheckpoints.templateId, templateId));
     await db.delete(assignmentTemplates).where(eq(assignmentTemplates.id, templateId));
     await db.delete(users).where(eq(users.id, studentId));

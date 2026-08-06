@@ -29,6 +29,10 @@ import {
   checkpoints,
   consultations,
   feedbackSnippets,
+  academicTerms,
+  courses,
+  courseSections,
+  sectionEnrollments,
 } from '../src/db/schema/index';
 import { hashPassword } from 'better-auth/crypto';
 import crypto from 'node:crypto';
@@ -142,6 +146,41 @@ async function seedTemplateAndAssignment(): Promise<void> {
     throw new Error('E2E instructor or student not found. Run seedE2EUsers() first.');
   }
 
+  const [term] = await db
+    .insert(academicTerms)
+    .values({
+      code: 'E2E-2026-1',
+      name: 'E2E Academic Term',
+      startDate: '2026-01-01',
+      endDate: '2026-06-30',
+      status: 'active',
+    })
+    .returning({ id: academicTerms.id });
+  const [course] = await db
+    .insert(courses)
+    .values({ code: 'E2E-THESIS', name: 'E2E Thesis Course' })
+    .returning({ id: courses.id });
+  const [section] = await db
+    .insert(courseSections)
+    .values({
+      termId: term.id,
+      courseId: course.id,
+      code: 'A',
+      name: 'E2E Thesis Section',
+    })
+    .returning({ id: courseSections.id });
+
+  await db
+    .insert(sectionEnrollments)
+    .values([
+      { sectionId: section.id, userId: instructorUser.id, role: 'instructor' },
+      { sectionId: section.id, userId: studentUser.id, role: 'student' },
+      ...(student2User
+        ? [{ sectionId: section.id, userId: student2User.id, role: 'student' as const }]
+        : []),
+    ]);
+  console.log('[E2E Seed] Academic term, course, section, and enrollments created.');
+
   await db.insert(feedbackSnippets).values([
     {
       instructorId: instructorUser.id,
@@ -206,6 +245,7 @@ async function seedTemplateAndAssignment(): Promise<void> {
       description: 'Assignment for E2E testing — file submission and review flows.',
       finalDeadline,
       instructorId: instructorUser.id,
+      sectionId: section.id,
     })
     .returning();
 

@@ -20,16 +20,16 @@
   - [x] Add assignment `sectionId`/academic-context association and explicit `mode` defaulting to `individual`
   - [x] Register schema exports and Drizzle relations
   - [x] Add only justified indexes for term/section lookup, active membership, and assignment context filters
-- [ ] Task: Implement and review the next Drizzle migration plus rollback
-  - [ ] Generate or author the forward migration using the repository’s migration conventions
-  - [ ] Add the matching rollback migration
-  - [ ] Make the prelaunch empty-production assumption explicit and non-destructive
-  - [ ] Update development, integration, and E2E fixture setup to recreate classified context data
-- [ ] Task: Run Phase 1 Red/Green and database verification
-  - [ ] Run focused schema tests and confirm they pass
-  - [ ] Apply the migration to a disposable database
-  - [ ] Verify forward, rollback, and re-apply behavior
-- [ ] Task: Phase Verification & Checkpoint (Refer to `workflow.md`)
+- [x] Task: Implement and review the next Drizzle migration plus rollback
+  - [x] Generate or author the forward migration using the repository’s migration conventions
+  - [x] Add the matching rollback migration
+  - [x] Make the prelaunch empty-production assumption explicit and non-destructive
+  - [x] Update development, integration, and E2E fixture setup to recreate classified context data
+- [x] Task: Run Phase 1 Red/Green and database verification
+  - [x] Run focused schema tests and confirm they pass
+  - [x] Apply the migration to a disposable database
+  - [x] Verify forward, rollback, and re-apply behavior
+- [~] Task: Phase Verification & Checkpoint (Refer to `workflow.md`)
 
 ## Phase 2: Academic Context Administration Server Functions
 

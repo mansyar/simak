@@ -22,6 +22,11 @@ import {
   validateRevisionActionItems,
 } from '@/server/revision-action-items.server';
 import * as auth from '@/server/auth';
+import {
+  createAcademicSectionFixture,
+  deleteAcademicSectionFixture,
+  type AcademicSectionFixture,
+} from '../helpers/academic-context';
 
 vi.mock('@/server/auth', () => ({
   getSessionFromHeaders: vi.fn(),
@@ -33,6 +38,7 @@ describe('revision action items against PostgreSQL', () => {
   const instructorId = `revision-plan-instructor-${suffix}`;
   const studentId = `revision-plan-student-${suffix}`;
   const otherStudentId = `revision-plan-other-${suffix}`;
+  let academicFixture: AcademicSectionFixture;
   let assignmentId: number;
   let templateId: number;
   let rubricTemplateCheckpointId: number;
@@ -66,6 +72,13 @@ describe('revision action items against PostgreSQL', () => {
       },
     ]);
 
+    academicFixture = await createAcademicSectionFixture(
+      db,
+      `revision-plan-${suffix}`,
+      instructorId,
+      [studentId, otherStudentId],
+    );
+
     const [template] = await db
       .insert(assignmentTemplates)
       .values({ name: 'Revision Plan Template', type: 'thesis', createdBy: instructorId })
@@ -98,6 +111,7 @@ describe('revision action items against PostgreSQL', () => {
         title: 'Revision Plan Assignment',
         finalDeadline: new Date(Date.now() + 86_400_000),
         instructorId,
+        sectionId: academicFixture.sectionId,
       })
       .returning({ id: assignments.id });
     assignmentId = assignment.id;
@@ -171,6 +185,7 @@ describe('revision action items against PostgreSQL', () => {
       .where(inArray(checkpoints.id, [rubricCheckpointId, plainCheckpointId]));
     await db.delete(assignmentStudents).where(eq(assignmentStudents.assignmentId, assignmentId));
     await db.delete(assignments).where(eq(assignments.id, assignmentId));
+    await deleteAcademicSectionFixture(db, academicFixture);
     await db
       .delete(rubricCriteria)
       .where(eq(rubricCriteria.templateCheckpointId, rubricTemplateCheckpointId));
