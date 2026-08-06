@@ -82,7 +82,7 @@
   - [ ] Keep explicit `assignment_students` participation for individual assignments
   - [ ] Reject invalid section, term, instructor, student, and mode combinations before mutation
   - [ ] Return explicit course/term/section projections rather than broad row spreads
-- [ ] Task: Implement lifecycle transitions
+- [~] Task: Implement lifecycle transitions
   - [ ] Add server-validated `draft`, `active`, and `archived` transitions
   - [ ] Use `db.transaction` plus `FOR UPDATE` and a post-lock status re-check
   - [ ] Prevent student visibility and workflow writes for drafts/archived assignments as specified
