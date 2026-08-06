@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { getTableConfig } from 'drizzle-orm/pg-core';
-import { basename, existsSync, readdirSync, readFileSync } from 'node:fs';
-import { resolve } from 'node:path';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
+import { basename, resolve } from 'node:path';
 
 const migrationsDir = resolve(process.cwd(), 'drizzle/migrations');
 const rollbackDir = resolve(migrationsDir, 'rollback');

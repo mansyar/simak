@@ -11,6 +11,11 @@ import {
 import { sql } from 'drizzle-orm';
 import { users } from './users';
 import { assignmentTemplates, templateCheckpoints } from './templates';
+import { courseSections } from './academic-context';
+
+export const assignmentMode = pgEnum('assignment_mode', ['individual', 'group']);
+
+export const assignmentStatus = pgEnum('assignment_status', ['draft', 'active', 'archived']);
 
 export const checkpointState = pgEnum('checkpoint_state', [
   'locked',
@@ -34,6 +39,11 @@ export const assignments = pgTable(
     instructorId: text('instructor_id')
       .notNull()
       .references(() => users.id),
+    sectionId: integer('section_id')
+      .notNull()
+      .references(() => courseSections.id),
+    mode: assignmentMode('mode').notNull().default('individual'),
+    status: assignmentStatus('status').notNull().default('draft'),
     createdAt: timestamp('created_at').defaultNow(),
     updatedAt: timestamp('updated_at').defaultNow(),
     deletedAt: timestamp('deleted_at'),
@@ -42,6 +52,7 @@ export const assignments = pgTable(
   },
   (table) => [
     index('assignments_instructor_id_idx').on(table.instructorId),
+    index('assignments_section_id_status_idx').on(table.sectionId, table.status),
     index('assignments_title_trgm_idx').using('gin', table.title.op('gin_trgm_ops')),
     check(
       'assignments_max_extension_days_range',
