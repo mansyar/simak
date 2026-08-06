@@ -65,14 +65,14 @@
 
 **Objective:** Integrate academic context into existing assignment creation, authorization, listing, dashboards, and lifecycle transitions without changing individual checkpoint semantics.
 
-- [~] Task: Write failing assignment integration and regression tests (Red)
-  - [ ] Extend assignment server tests for required section selection and individual default mode
-  - [ ] Test instructor authorization through section membership
-  - [ ] Test student selection is limited to active students in the selected section
-  - [ ] Test unauthorized cross-section list/detail access
-  - [ ] Test draft visibility, activation, archival, and archived mutation rejection
-  - [ ] Test existing deadline, submission, review, grade-release, notification, and calendar behavior remains unchanged
-  - [ ] Add transaction/concurrency tests for lifecycle transitions and enrollment races
+- [x] Task: Write failing assignment integration and regression tests (Red)
+  - [x] Extend assignment server tests for required section selection and individual default mode
+  - [x] Test instructor authorization through section membership
+  - [x] Test student selection is limited to active students in the selected section
+  - [x] Test unauthorized cross-section list/detail access
+  - [x] Test draft visibility, activation, archival, and archived mutation rejection
+  - [x] Test existing deadline, submission, review, grade-release, notification, and calendar behavior remains unchanged
+  - [x] Add transaction/concurrency tests for lifecycle transitions and enrollment races
 - [ ] Task: Extend assignment server contracts
   - [ ] Update `src/server/assignments.ts` schemas and response types
   - [ ] Add context filters and lifecycle inputs while preserving existing callers
