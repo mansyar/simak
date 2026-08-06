@@ -1,4 +1,4 @@
-import { and, eq, inArray, isNull, notInArray } from 'drizzle-orm';
+import { and, eq, inArray, isNull } from 'drizzle-orm';
 import { getDb } from '../db/index';
 import { academicTerms, courseSections, sectionEnrollments } from '../db/schema/academic-context';
 import { assignments, assignmentStudents, checkpoints } from '../db/schema/assignments';
@@ -97,13 +97,7 @@ async function createIndependentAssignment(
             eq(sectionEnrollments.isActive, true),
           ),
         )
-        .where(
-          and(
-            eq(courseSections.id, targetSectionId),
-            eq(courseSections.status, 'active'),
-            notInArray(academicTerms.status, ['closed', 'archived']),
-          ),
-        )
+        .where(and(eq(courseSections.id, targetSectionId), eq(courseSections.status, 'active')))
         .limit(1)
         .for('update', { of: courseSections });
 
