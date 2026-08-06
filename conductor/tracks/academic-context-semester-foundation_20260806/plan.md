@@ -73,7 +73,7 @@
   - [x] Test draft visibility, activation, archival, and archived mutation rejection
   - [x] Test existing deadline, submission, review, grade-release, notification, and calendar behavior remains unchanged
   - [x] Add transaction/concurrency tests for lifecycle transitions and enrollment races
-- [ ] Task: Extend assignment server contracts
+- [~] Task: Extend assignment server contracts
   - [ ] Update `src/server/assignments.ts` schemas and response types
   - [ ] Add context filters and lifecycle inputs while preserving existing callers
   - [ ] Add lifecycle/administrative stubs in the existing assignment split or a dedicated handler-only extras file as required
