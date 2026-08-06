@@ -88,6 +88,40 @@ export const transitionAssignmentStatus = typedServerFn({
     return transitionAssignmentStatusHandler({ data });
   });
 
+export const CloneAssignmentSchema = z.object({
+  sourceAssignmentId: z.coerce
+    .number()
+    .int()
+    .positive('Source assignment ID must be a positive integer'),
+  targetSectionId: z.coerce.number().int().positive('Target course section is required'),
+  title: z.string().min(3, 'Title must be at least 3 characters').max(100).optional(),
+  description: z.string().max(5000).nullable().optional(),
+  finalDeadline: z.coerce.date().refine((date) => date > new Date(), {
+    message: 'Final deadline must be in the future',
+  }),
+  studentIds: z.array(z.string().min(1)).default([]),
+});
+
+export const cloneAssignment = typedServerFn({
+  method: 'POST',
+})
+  .middleware(serverFnMiddlewares(RATE_LIMITS.destructive))
+  .inputValidator(CloneAssignmentSchema)
+  .handler(async ({ data }) => {
+    const { cloneAssignmentHandler } = await import('./assignments.server');
+    return cloneAssignmentHandler({ data });
+  });
+
+export const rolloverAssignment = typedServerFn({
+  method: 'POST',
+})
+  .middleware(serverFnMiddlewares(RATE_LIMITS.destructive))
+  .inputValidator(CloneAssignmentSchema)
+  .handler(async ({ data }) => {
+    const { rolloverAssignmentHandler } = await import('./assignments.server');
+    return rolloverAssignmentHandler({ data });
+  });
+
 // ---- Student Assignment Schemas ----
 
 export const ListStudentAssignmentsSchema = z.object({
