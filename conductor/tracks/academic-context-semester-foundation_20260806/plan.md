@@ -77,7 +77,7 @@
   - [x] Update `src/server/assignments.ts` schemas and response types
   - [x] Add context filters and lifecycle inputs while preserving existing callers
   - [x] Add lifecycle/administrative stubs in the existing assignment split or a dedicated handler-only extras file as required
-- [ ] Task: Implement assignment context enforcement
+- [~] Task: Implement assignment context enforcement
   - [ ] Update `src/server/assignments.server.ts` and related assignment handlers with section ownership and enrollment checks
   - [ ] Keep explicit `assignment_students` participation for individual assignments
   - [ ] Reject invalid section, term, instructor, student, and mode combinations before mutation
