@@ -61,7 +61,7 @@
   - [x] Confirm authorization tests do not query protected data before rejection
 - [x] Task: Phase Verification & Checkpoint (Refer to `workflow.md`) [checkpoint: 5e3c1bb]
 
-## Phase 3: Assignment Context Association & Lifecycle
+## Phase 3: Assignment Context Association & Lifecycle [checkpoint: c39cd2d]
 
 **Objective:** Integrate academic context into existing assignment creation, authorization, listing, dashboards, and lifecycle transitions without changing individual checkpoint semantics.
 
@@ -77,27 +77,27 @@
   - [x] Update `src/server/assignments.ts` schemas and response types
   - [x] Add context filters and lifecycle inputs while preserving existing callers
   - [x] Add lifecycle/administrative stubs in the existing assignment split or a dedicated handler-only extras file as required
-- [~] Task: Implement assignment context enforcement
-  - [ ] Update `src/server/assignments.server.ts` and related assignment handlers with section ownership and enrollment checks
-  - [ ] Keep explicit `assignment_students` participation for individual assignments
-  - [ ] Reject invalid section, term, instructor, student, and mode combinations before mutation
-  - [ ] Return explicit course/term/section projections rather than broad row spreads
-- [~] Task: Implement lifecycle transitions
-  - [ ] Add server-validated `draft`, `active`, and `archived` transitions
-  - [ ] Use `db.transaction` plus `FOR UPDATE` and a post-lock status re-check
-  - [ ] Prevent student visibility and workflow writes for drafts/archived assignments as specified
-  - [ ] Preserve `deletedAt` as a separate destructive soft-delete concept
-  - [ ] Write assignment lifecycle audit events
-- [ ] Task: Update assignment list/detail/dashboard data paths
-  - [ ] Add authorized context filters to instructor and student assignment queries
-  - [ ] Include context and lifecycle fields in existing DTOs
-  - [ ] Preserve pagination, effective deadlines, authorization, and existing dashboard behavior
-  - [ ] Add query-key factory entries for new context filters where client caching is used
-- [ ] Task: Run Phase 3 Green and regression verification
-  - [ ] Run assignment unit and integration tests
-  - [ ] Run affected dashboard, calendar, gradebook, notification, submission, and review tests
-  - [ ] Confirm no existing individual-assignment state transition changed
-- [ ] Task: Phase Verification & Checkpoint (Refer to `workflow.md`)
+- [x] Task: Implement assignment context enforcement [commit: c39cd2d]
+  - [x] Update `src/server/assignments.server.ts` and related assignment handlers with section ownership and enrollment checks
+  - [x] Keep explicit `assignment_students` participation for individual assignments
+  - [x] Reject invalid section, term, instructor, student, and mode combinations before mutation
+  - [x] Return explicit course/term/section projections rather than broad row spreads
+- [x] Task: Implement lifecycle transitions [commit: c39cd2d]
+  - [x] Add server-validated `draft`, `active`, and `archived` transitions
+  - [x] Use `db.transaction` plus `FOR UPDATE` and a post-lock status re-check
+  - [x] Prevent student visibility and workflow writes for drafts/archived assignments as specified
+  - [x] Preserve `deletedAt` as a separate destructive soft-delete concept
+  - [x] Write assignment lifecycle audit events
+- [x] Task: Update assignment list/detail/dashboard data paths [commit: c39cd2d]
+  - [x] Add authorized context filters to instructor and student assignment queries
+  - [x] Include context and lifecycle fields in existing DTOs
+  - [x] Preserve pagination, effective deadlines, authorization, and existing dashboard behavior
+  - [x] Add query-key factory entries for new context filters where client caching is used
+- [x] Task: Run Phase 3 Green and regression verification [commit: c39cd2d]
+  - [x] Run assignment unit and integration tests
+  - [x] Run affected dashboard, calendar, gradebook, notification, submission, and review tests
+  - [x] Confirm no existing individual-assignment state transition changed
+- [x] Task: Phase Verification & Checkpoint (Refer to `workflow.md`) [checkpoint: c39cd2d]
 
 ## Phase 4: Clone & Semester Rollover
 
