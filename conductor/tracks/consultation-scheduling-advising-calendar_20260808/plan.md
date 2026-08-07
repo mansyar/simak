@@ -29,8 +29,8 @@
   - **Deviation:** None from the approved specification.
   - **Completion commit:** `24355e70` (`chore(track-058): confirm task 1.1 boundaries`)
 
-- [ ] **Task 1.2: Define appointment schema and migration (RED → GREEN)**
-  - [ ] Write schema/integration tests for assignment and optional checkpoint foreign keys, nullable student before booking, UTC timestamps, valid status values, 15–120 minute duration, indexes, and state-preserving cancellation.
+- [~] **Task 1.2: Define appointment schema and migration (RED → GREEN)**
+  - [~] Write schema/integration tests for assignment and optional checkpoint foreign keys, nullable student before booking, UTC timestamps, valid status values, 15–120 minute duration, indexes, and state-preserving cancellation.
   - [ ] Confirm the RED tests fail against the current schema.
   - [ ] Add the Drizzle appointment schema with database constraints and participant/time indexes.
   - [ ] Generate the forward migration and add the required companion rollback SQL.
