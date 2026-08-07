@@ -2,7 +2,7 @@
 import { eq, and, desc, sql, inArray, isNull } from 'drizzle-orm';
 import { getDb } from '../db/index';
 import { assignments, assignmentStudents, checkpoints } from '../db/schema/assignments';
-import { sectionEnrollments } from '../db/schema/academic-context';
+import { academicTerms, courseSections, sectionEnrollments } from '../db/schema/academic-context';
 import { interventions } from '../db/schema/interventions';
 import { submissions } from '../db/schema/submissions';
 import { users } from '../db/schema/users';
@@ -87,6 +87,10 @@ export async function getInstructorDashboardDataHandler(): Promise<
       eq(sectionEnrollments.role, 'instructor'),
       eq(sectionEnrollments.isActive, true),
     );
+    const activeAcademicContext = and(
+      eq(courseSections.status, 'active'),
+      eq(academicTerms.status, 'active'),
+    );
 
     // Group A (independent): active assignments, recent submissions, assignment overview
     const [instructorAssignments, recentSubmissions, assignmentOverview] = await Promise.all([
@@ -97,11 +101,14 @@ export async function getInstructorDashboardDataHandler(): Promise<
           sectionEnrollments,
           and(eq(sectionEnrollments.sectionId, assignments.sectionId), activeInstructorSection),
         )
+        .innerJoin(courseSections, eq(assignments.sectionId, courseSections.id))
+        .innerJoin(academicTerms, eq(courseSections.termId, academicTerms.id))
         .where(
           and(
             eq(assignments.instructorId, instructorId),
             eq(assignments.status, 'active'),
             isNull(assignments.deletedAt),
+            activeAcademicContext,
           ),
         ),
       db
@@ -120,12 +127,15 @@ export async function getInstructorDashboardDataHandler(): Promise<
           sectionEnrollments,
           and(eq(sectionEnrollments.sectionId, assignments.sectionId), activeInstructorSection),
         )
+        .innerJoin(courseSections, eq(assignments.sectionId, courseSections.id))
+        .innerJoin(academicTerms, eq(courseSections.termId, academicTerms.id))
         .innerJoin(users, eq(checkpoints.studentId, users.id))
         .where(
           and(
             eq(assignments.instructorId, instructorId),
             eq(assignments.status, 'active'),
             isNull(assignments.deletedAt),
+            activeAcademicContext,
           ),
         )
         .orderBy(desc(submissions.uploadedAt))
@@ -144,11 +154,14 @@ export async function getInstructorDashboardDataHandler(): Promise<
           sectionEnrollments,
           and(eq(sectionEnrollments.sectionId, assignments.sectionId), activeInstructorSection),
         )
+        .innerJoin(courseSections, eq(assignments.sectionId, courseSections.id))
+        .innerJoin(academicTerms, eq(courseSections.termId, academicTerms.id))
         .where(
           and(
             eq(assignments.instructorId, instructorId),
             eq(assignments.status, 'active'),
             isNull(assignments.deletedAt),
+            activeAcademicContext,
           ),
         )
         .orderBy(desc(assignments.createdAt))

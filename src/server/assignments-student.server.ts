@@ -37,6 +37,8 @@ export async function listStudentAssignmentsHandler(args: { data: ListStudentAss
       eq(assignmentStudents.studentId, session.user.id),
       eq(assignments.status, 'active'),
       isNull(assignments.deletedAt),
+      eq(courseSections.status, 'active'),
+      eq(academicTerms.status, 'active'),
     ];
 
     if (termId) conditions.push(eq(courseSections.termId, termId));
@@ -237,6 +239,8 @@ export async function getStudentAssignmentDetailHandler(args: { data: StudentAss
           eq(assignments.id, id),
           eq(assignments.status, 'active'),
           isNull(assignments.deletedAt),
+          eq(courseSections.status, 'active'),
+          eq(academicTerms.status, 'active'),
         ),
       )
       .limit(1);

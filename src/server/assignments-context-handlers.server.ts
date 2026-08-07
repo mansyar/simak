@@ -92,6 +92,8 @@ export async function listInstructorAssignmentsHandler(args: {
     const conditions = [
       eq(assignments.instructorId, session.user.id),
       isNull(assignments.deletedAt),
+      eq(courseSections.status, 'active'),
+      eq(academicTerms.status, 'active'),
     ];
 
     if (termId) conditions.push(eq(courseSections.termId, termId));
@@ -144,6 +146,7 @@ export async function listInstructorAssignmentsHandler(args: {
         .select({ count: sql<number>`count(*)::int` })
         .from(assignments)
         .innerJoin(courseSections, eq(assignments.sectionId, courseSections.id))
+        .innerJoin(academicTerms, eq(courseSections.termId, academicTerms.id))
         .innerJoin(
           sectionEnrollments,
           and(
@@ -265,6 +268,8 @@ export async function getAssignmentDetailHandler(args: {
           eq(assignments.id, id),
           eq(assignments.instructorId, session.user.id),
           isNull(assignments.deletedAt),
+          eq(courseSections.status, 'active'),
+          eq(academicTerms.status, 'active'),
         ),
       )
       .limit(1);

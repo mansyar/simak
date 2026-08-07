@@ -98,7 +98,7 @@ test.describe('Academic context cross-role surfaces', () => {
     await expect(page.getByText('E2E-2026-1', { exact: true })).toBeVisible();
     await expect(page.getByText('E2E-THESIS', { exact: true })).toBeVisible();
     await expect(page.getByText('E2E Thesis Section', { exact: true })).toBeVisible();
-    await expect(page.getByText('Student', { exact: true })).toBeVisible();
+    await expect(page.getByText('Student', { exact: true }).first()).toBeVisible();
     await expect(page.getByRole('button', { name: /Archive/ })).toHaveCount(4);
     await expect(page.getByText('E2E Negative Fixture Section', { exact: true })).toBeVisible();
   });
@@ -115,6 +115,7 @@ test.describe('Academic context cross-role surfaces', () => {
     await expect(page.getByText('E2E Thesis Section', { exact: true })).toBeVisible();
 
     await page.getByRole('link', { name: 'E2E Test Assignment' }).click();
+    await page.waitForLoadState('networkidle');
     await expect(page.getByRole('button', { name: 'Archive' })).toBeVisible();
     await expect(page.getByRole('button', { name: 'Clone' })).toBeVisible();
     await expect(page.getByRole('button', { name: 'Rollover' })).toBeVisible();

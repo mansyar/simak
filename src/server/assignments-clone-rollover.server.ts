@@ -79,7 +79,7 @@ async function createIndependentAssignment(
           ),
         )
         .limit(1)
-        .for('update', { of: assignments });
+        .for('update');
 
       if (!source || source.deletedAt) {
         return serverError(ErrorCode.FORBIDDEN, 'Source assignment is not authorized');
@@ -110,7 +110,7 @@ async function createIndependentAssignment(
         )
         .where(and(eq(courseSections.id, targetSectionId), eq(courseSections.status, 'active')))
         .limit(1)
-        .for('update', { of: courseSections });
+        .for('update');
 
       if (!targetSection || targetSection.sectionStatus !== 'active') {
         return serverError(ErrorCode.FORBIDDEN, 'Target section is not authorized');

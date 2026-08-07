@@ -235,12 +235,21 @@ describe('academic context mutation branches', () => {
   });
 
   it('updates sections and rejects missing or archived records', async () => {
-    useDb([{ id: 3, status: 'active' }], [{ id: 3, code: 'A' }]);
+    useDb(
+      [{ id: 3, status: 'active' }],
+      [{ termStatus: 'active', courseArchivedAt: null }],
+      [{ id: 3, code: 'A' }],
+    );
     expect(
       await updateCourseSectionHandler({ data: { id: 3, ...sectionInput } as any }),
     ).toMatchObject({ section: { id: 3 } });
 
-    useDb([]);
+    useDb([{ id: 3, status: 'active' }], [{ termStatus: 'archived', courseArchivedAt: null }]);
+    expect(
+      errorCode(await updateCourseSectionHandler({ data: { id: 3, ...sectionInput } as any })),
+    ).toBe('CONFLICT');
+
+    useDb([{ id: 3, status: 'active' }], []);
     expect(
       errorCode(await updateCourseSectionHandler({ data: { id: 3, ...sectionInput } as any })),
     ).toBe('NOT_FOUND');

@@ -66,6 +66,7 @@ describe('AcademicContextPage', () => {
     expect(screen.getByText('CS101')).toBeDefined();
     expect(screen.getByText('Section A')).toBeDefined();
     expect(screen.getByText('Ada Lovelace')).toBeDefined();
+    expect(screen.getByText('adminAcademicContext.roles.student')).toBeDefined();
     expect(
       screen.getAllByRole('button', { name: 'adminAcademicContext.actions.archive' })[0],
     ).toBeDefined();

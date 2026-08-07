@@ -194,10 +194,13 @@ export async function updateAcademicTermHandler(args: { data: UpdateAcademicTerm
         startDate: dateValue(startDate),
         endDate: dateValue(endDate),
         status,
+        archivedAt: status === 'archived' ? new Date() : null,
         updatedAt: new Date(),
       })
       .where(eq(academicTerms.id, id))
       .returning(termProjection);
+    if (!term)
+      return internalError('Academic term update returned no row', 'updateAcademicTermHandler');
     await safeAuditLog('updateAcademicTermHandler', {
       actorId: auth.user.id,
       action: 'academic_term.updated',
@@ -300,6 +303,7 @@ export async function updateCourseHandler(args: { data: CreateCourseInput & Cour
       .set({ code, name, description, updatedAt: new Date() })
       .where(eq(courses.id, id))
       .returning(courseProjection);
+    if (!course) return internalError('Course update returned no row', 'updateCourseHandler');
     await safeAuditLog('updateCourseHandler', {
       actorId: auth.user.id,
       action: 'course.updated',
@@ -427,11 +431,30 @@ export async function updateCourseSectionHandler(args: { data: UpdateCourseSecti
     if (!existing) return serverError(ErrorCode.NOT_FOUND, 'Course section not found');
     if (existing.status === 'archived')
       return serverError(ErrorCode.CONFLICT, 'Archived section is immutable');
+    const [context] = await getDb()
+      .select({ termStatus: academicTerms.status, courseArchivedAt: courses.archivedAt })
+      .from(academicTerms)
+      .innerJoin(courses, eq(courses.id, courseId))
+      .where(eq(academicTerms.id, termId))
+      .limit(1);
+    if (!context) return serverError(ErrorCode.NOT_FOUND, 'Term or course not found');
+    if (context.termStatus === 'archived' || context.courseArchivedAt)
+      return serverError(ErrorCode.CONFLICT, 'Archived context cannot receive sections');
     const [section] = await getDb()
       .update(courseSections)
-      .set({ termId, courseId, code, name, status, updatedAt: new Date() })
+      .set({
+        termId,
+        courseId,
+        code,
+        name,
+        status,
+        archivedAt: status === 'archived' ? new Date() : null,
+        updatedAt: new Date(),
+      })
       .where(eq(courseSections.id, id))
       .returning(sectionProjection);
+    if (!section)
+      return internalError('Course section update returned no row', 'updateCourseSectionHandler');
     await safeAuditLog('updateCourseSectionHandler', {
       actorId: auth.user.id,
       action: 'course_section.updated',

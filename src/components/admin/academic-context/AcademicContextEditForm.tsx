@@ -118,7 +118,7 @@ export function AcademicContextEditForm({
             name="status"
             label={t('adminAcademicContext.forms.status')}
             value={target.row.status}
-            options={['draft', 'active', 'closed', 'archived']}
+            options={['draft', 'active', 'closed']}
           />
         </>
       )}
@@ -165,7 +165,7 @@ export function AcademicContextEditForm({
             name="status"
             label={t('adminAcademicContext.forms.status')}
             value={target.row.status}
-            options={['active', 'inactive', 'archived']}
+            options={['active', 'inactive']}
           />
         </>
       )}

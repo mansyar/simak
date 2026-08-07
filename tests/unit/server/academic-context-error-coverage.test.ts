@@ -197,11 +197,21 @@ describe('academic context authorization and failure branches', () => {
       ),
     ).toBe('INTERNAL');
 
-    setDb([{ id: 1, status: 'active' }], []);
-    expect(await updateCourseSectionHandler({ data: section } as any)).toEqual({ section: null });
+    setDb([{ id: 1, status: 'active' }], [{ termStatus: 'active', courseArchivedAt: null }], []);
+    expect(code(await updateCourseSectionHandler({ data: section } as any))).toBe('INTERNAL');
 
-    const sectionDb = setDb([{ id: 1, status: 'active' }]);
-    rejectNext(sectionDb, { code: '23505' });
+    const sectionDb = setDb();
+    sectionDb.then
+      .mockImplementationOnce((resolve: (value: unknown[]) => unknown) =>
+        resolve([{ id: 1, status: 'active' }]),
+      )
+      .mockImplementationOnce((resolve: (value: unknown[]) => unknown) =>
+        resolve([{ termStatus: 'active', courseArchivedAt: null }]),
+      )
+      .mockImplementationOnce(
+        (_resolve: (value: unknown[]) => unknown, reject?: (error: unknown) => unknown) =>
+          reject?.({ code: '23505' }),
+      );
     expect(code(await updateCourseSectionHandler({ data: section } as any))).toBe('CONFLICT');
 
     const courseDb = setDb([{ id: 1, archivedAt: null }]);

@@ -413,7 +413,7 @@ export function AcademicContextPage({
               <span className="min-w-0 truncate">{enrollment.userName}</span>
               <div className="flex shrink-0 items-center gap-2">
                 <Badge variant={enrollment.isActive ? 'secondary' : 'outline'}>
-                  {enrollment.role}
+                  {t(`adminAcademicContext.roles.${enrollment.role}` as never)}
                 </Badge>
                 <Button
                   type="button"
