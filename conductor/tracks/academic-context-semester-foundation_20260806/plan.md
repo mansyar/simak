@@ -146,7 +146,7 @@
   - [x] Provide responsive list/detail/forms for terms, courses, sections, and enrollments [commit: bc2004e]
   - [x] Add accessible archive and enrollment confirmation flows [commit: bc2004e]
   - [ ] Use TanStack Query factories and mutation invalidation consistently
-- [ ] Task: Integrate context into instructor assignment surfaces
+- [~] Task: Integrate context into instructor assignment surfaces
   - [ ] Add section selection and authorized student filtering to the assignment wizard
   - [ ] Add lifecycle controls and status feedback
   - [ ] Add clone/rollover flow with explicit target section and configuration review
