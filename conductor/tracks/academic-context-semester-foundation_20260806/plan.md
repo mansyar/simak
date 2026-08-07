@@ -125,7 +125,7 @@
   - [x] Run focused unit and database integration tests
   - [x] Verify rollback leaves no partial assignment, enrollment, or checkpoint rows
   - [x] Verify clone output is independently mutable
-- [~] Task: Phase Verification & Checkpoint (Refer to `workflow.md`)
+- [x] Task: Phase Verification & Checkpoint (Refer to `workflow.md`) [checkpoint: 1637ba3]
 
 ## Phase 5: Bilingual Admin, Instructor, and Student UI
 
