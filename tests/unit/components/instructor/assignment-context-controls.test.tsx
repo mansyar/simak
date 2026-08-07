@@ -40,16 +40,16 @@ describe('AssignmentContextControls', () => {
       />,
     );
 
-    expect(screen.getByLabelText('instructorAssignments.context.section')).toBeInTheDocument();
-    expect(screen.getByLabelText('instructorAssignments.context.students')).toBeInTheDocument();
-    expect(screen.getByLabelText('instructorAssignments.context.mode')).toBeInTheDocument();
-    expect(screen.getByLabelText('instructorAssignments.context.status')).toBeInTheDocument();
+    expect(screen.getByLabelText('instructorAssignments.context.section')).toBeDefined();
+    expect(screen.getByLabelText('instructorAssignments.context.students')).toBeDefined();
+    expect(screen.getByLabelText('instructorAssignments.context.mode')).toBeDefined();
+    expect(screen.getByLabelText('instructorAssignments.context.status')).toBeDefined();
     expect(
       screen.getByRole('button', { name: 'instructorAssignments.actions.clone' }),
-    ).toBeInTheDocument();
+    ).toBeDefined();
     expect(
       screen.getByRole('button', { name: 'instructorAssignments.actions.rollover' }),
-    ).toBeInTheDocument();
+    ).toBeDefined();
   });
 
   it('emits context, lifecycle, and clone actions', () => {

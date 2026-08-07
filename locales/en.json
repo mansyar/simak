@@ -648,6 +648,7 @@
         "deadlineRequired": "Deadline is required",
         "deadlineInvalid": "Invalid deadline date",
         "deadlineInPast": "Final deadline must be in the future",
+        "sectionRequired": "Please select a course section",
         "studentsRequired": "Please select at least one student",
         "dueDatesInPast": "Override due dates must be in the future. Please check checkpoint dates.",
         "submitFailed": "Failed to create assignment",

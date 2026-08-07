@@ -653,6 +653,7 @@ export type Translation = {
         deadlineRequired: string
         deadlineInvalid: string
         deadlineInPast: string
+        sectionRequired: string
         studentsRequired: string
         dueDatesInPast: string
         submitFailed: string

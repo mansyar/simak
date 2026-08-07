@@ -648,6 +648,7 @@
         "deadlineRequired": "Tenggat waktu wajib diisi",
         "deadlineInvalid": "Tanggal tenggat tidak valid",
         "deadlineInPast": "Tenggat akhir harus di masa depan",
+        "sectionRequired": "Silakan pilih kelas mata kuliah",
         "studentsRequired": "Silakan pilih minimal satu mahasiswa",
         "dueDatesInPast": "Tenggat waktu yang diubah harus di masa depan. Silakan periksa tanggal tahapan.",
         "submitFailed": "Gagal membuat tugas",
