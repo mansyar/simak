@@ -189,4 +189,4 @@
   - [x] Run `pnpm build`
   - [x] Run focused Playwright projects, including accessibility checks (academic context: Chromium 9/9 and mobile 9/9; instructor regression: Chromium 3/3); the full matrix also exposed 15 unrelated browser/environment failures among 298 passes
   - [x] Run modularity validation on all changed source, test, and script files
-- [ ] Task: Phase Verification & Checkpoint (Refer to `workflow.md`)
+- [~] Task: Phase Verification & Checkpoint (Refer to `workflow.md`)
