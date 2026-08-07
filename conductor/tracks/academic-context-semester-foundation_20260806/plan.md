@@ -137,7 +137,7 @@
   - [x] Add student/instructor list and detail tests for context visibility and lifecycle states
   - [x] Add tests for loading, empty, validation, authorization, server-error, and confirmation states
   - [x] Add i18n parity/source-contract tests for all new keys
-- [x] Task: Add bilingual translation keys and generated types [commit: pending]
+- [x] Task: Add bilingual translation keys and generated types [commit: ab876a5]
   - [x] Add English and Indonesian keys for academic context, lifecycle, filters, forms, clone/rollover, and errors
   - [x] Run `pnpm generate:i18n`
   - [x] Run `pnpm check:i18n` and `pnpm check:i18n:unused`
