@@ -190,3 +190,10 @@
   - [x] Run focused Playwright projects, including accessibility checks (academic context: Chromium 9/9 and mobile 9/9; instructor regression: Chromium 3/3); the full matrix also exposed 15 unrelated browser/environment failures among 298 passes
   - [x] Run modularity validation on all changed source, test, and script files
 - [x] Task: Phase Verification & Checkpoint (Refer to `workflow.md`) [checkpoint: c99b9a3]
+
+## Phase: Review Fixes
+
+- [~] Task: Apply review suggestions
+  - [ ] Add admin update and enrollment-removal controls with typed error feedback
+  - [ ] Enforce active source-section authorization for clone and rollover
+  - [ ] Add regression tests and rerun required quality gates
