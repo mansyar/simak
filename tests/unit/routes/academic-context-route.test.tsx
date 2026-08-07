@@ -35,4 +35,34 @@ describe('Academic context admin route', () => {
     expect(result).toHaveProperty('sections');
     expect(result).toHaveProperty('enrollments');
   });
+
+  it('normalizes server term date fields for edit forms', async () => {
+    const academicContext = await import('@/server/academic-context');
+    vi.mocked(academicContext.listAcademicTerms).mockResolvedValue({
+      terms: [
+        {
+          id: 1,
+          code: '2026-FALL',
+          name: 'Fall 2026',
+          startDate: '2026-08-01',
+          endDate: '2026-12-20',
+          status: 'active',
+        },
+      ],
+      total: 1,
+    } as never);
+    vi.mocked(academicContext.listCourses).mockResolvedValue({ courses: [], total: 0 } as never);
+    vi.mocked(academicContext.listCourseSections).mockResolvedValue({
+      sections: [],
+      total: 0,
+    } as never);
+
+    const { Route } = await import('@/routes/_authenticated/admin/academic-context');
+    const result = await (Route as any).loader?.({} as never);
+
+    expect(result.terms[0]).toMatchObject({
+      startsOn: '2026-08-01',
+      endsOn: '2026-12-20',
+    });
+  });
 });

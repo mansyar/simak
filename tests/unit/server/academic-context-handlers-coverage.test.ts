@@ -394,12 +394,20 @@ describe('academic context enrollment branches', () => {
       ),
     ).toBe('BAD_REQUEST');
 
-    useDb([{ id: 7 }]);
+    useDb([{ id: 1, status: 'active' }], [{ id: 7 }]);
     expect(
       await removeSectionEnrollmentHandler({ data: { sectionId: 1, userId: 'student-1' } as any }),
     ).toEqual({
       success: true,
     });
+    useDb([{ id: 1, status: 'archived' }]);
+    expect(
+      errorCode(
+        await removeSectionEnrollmentHandler({
+          data: { sectionId: 1, userId: 'student-1' } as any,
+        }),
+      ),
+    ).toBe('CONFLICT');
     useDb([]);
     expect(
       errorCode(

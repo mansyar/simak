@@ -37,7 +37,7 @@ export async function listInstructorAssignmentSectionsHandler() {
           eq(sectionEnrollments.isActive, true),
         ),
       )
-      .where(eq(courseSections.status, 'active'))
+      .where(and(eq(courseSections.status, 'active'), eq(academicTerms.status, 'active')))
       .orderBy(asc(academicTerms.startDate), asc(courses.code), asc(courseSections.code));
 
     const sections = await Promise.all(

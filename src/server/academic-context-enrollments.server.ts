@@ -204,6 +204,16 @@ export async function removeSectionEnrollmentHandler(args: { data: RemoveSection
   const db = getDb();
   try {
     const result = await db.transaction(async (tx) => {
+      const [section] = await tx
+        .select({ id: courseSections.id, status: courseSections.status })
+        .from(courseSections)
+        .where(eq(courseSections.id, sectionId))
+        .limit(1)
+        .for('update');
+      if (!section) return serverError(ErrorCode.NOT_FOUND, 'Course section not found');
+      if (section.status === 'archived')
+        return serverError(ErrorCode.CONFLICT, 'Archived section is immutable');
+
       const [existing] = await tx
         .select({ id: sectionEnrollments.id })
         .from(sectionEnrollments)

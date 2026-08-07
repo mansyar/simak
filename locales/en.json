@@ -530,6 +530,8 @@
       "enrollmentSection": "Section ID",
       "enrollmentUser": "User ID",
       "enrollmentRole": "Enrollment role",
+      "status": "Status",
+      "active": "Active enrollment",
       "submit": "Save",
       "cancel": "Cancel"
     },
@@ -542,8 +544,11 @@
       "createCourse": "Create course",
       "createSection": "Create section",
       "addEnrollment": "Add enrollment",
+      "edit": "Edit context",
       "archive": "Archive context"
-    }
+    },
+    "removeEnrollment": "Remove enrollment",
+    "removeConfirm": "Remove this enrollment? Its history will be preserved."
   },
   "instructorAssignments": {
     "title": "Assignments",

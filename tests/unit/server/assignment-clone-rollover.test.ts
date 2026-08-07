@@ -298,6 +298,12 @@ describe('assignment clone and rollover handlers', () => {
       ErrorCode.BAD_REQUEST,
     );
 
+    configureHandlerDb({ targetTermStatus: 'draft' });
+    expectHandlerError(
+      await (cloneAssignmentHandler as HandlerLike)({ data: cloneInput() }),
+      ErrorCode.BAD_REQUEST,
+    );
+
     const { inserted } = configureHandlerDb({ activeStudents: [] });
     expectHandlerError(
       await (cloneAssignmentHandler as HandlerLike)({

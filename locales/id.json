@@ -530,6 +530,8 @@
       "enrollmentSection": "ID kelas",
       "enrollmentUser": "ID pengguna",
       "enrollmentRole": "Peran pendaftaran",
+      "status": "Status",
+      "active": "Pendaftaran aktif",
       "submit": "Simpan",
       "cancel": "Batal"
     },
@@ -542,8 +544,11 @@
       "createCourse": "Buat mata kuliah",
       "createSection": "Buat kelas",
       "addEnrollment": "Tambah pendaftaran",
+      "edit": "Edit konteks",
       "archive": "Arsipkan konteks"
-    }
+    },
+    "removeEnrollment": "Hapus pendaftaran",
+    "removeConfirm": "Hapus pendaftaran ini? Riwayatnya akan dipertahankan."
   },
   "instructorAssignments": {
     "title": "Tugas",

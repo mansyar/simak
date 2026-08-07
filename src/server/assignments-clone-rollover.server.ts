@@ -60,10 +60,21 @@ async function createIndependentAssignment(
           deletedAt: assignments.deletedAt,
         })
         .from(assignments)
+        .innerJoin(courseSections, eq(assignments.sectionId, courseSections.id))
+        .innerJoin(
+          sectionEnrollments,
+          and(
+            eq(sectionEnrollments.sectionId, assignments.sectionId),
+            eq(sectionEnrollments.userId, session.user.id),
+            eq(sectionEnrollments.role, 'instructor'),
+            eq(sectionEnrollments.isActive, true),
+          ),
+        )
         .where(
           and(
             eq(assignments.id, sourceAssignmentId),
             eq(assignments.instructorId, session.user.id),
+            eq(courseSections.status, 'active'),
             isNull(assignments.deletedAt),
           ),
         )
@@ -104,7 +115,7 @@ async function createIndependentAssignment(
       if (!targetSection || targetSection.sectionStatus !== 'active') {
         return serverError(ErrorCode.FORBIDDEN, 'Target section is not authorized');
       }
-      if (targetSection.termStatus === 'closed' || targetSection.termStatus === 'archived') {
+      if (targetSection.termStatus !== 'active') {
         return serverError(ErrorCode.BAD_REQUEST, 'Target academic term is not available');
       }
 

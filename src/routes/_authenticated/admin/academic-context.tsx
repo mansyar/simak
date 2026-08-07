@@ -1,5 +1,6 @@
 import { createFileRoute, useRouter } from '@tanstack/react-router';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useState } from 'react';
 import {
   addSectionEnrollment,
   archiveAcademicTerm,
@@ -8,6 +9,11 @@ import {
   createAcademicTerm,
   createCourse,
   createCourseSection,
+  removeSectionEnrollment,
+  updateAcademicTerm,
+  updateCourse,
+  updateCourseSection,
+  updateSectionEnrollment,
   listAcademicTerms,
   listCourseSections,
   listCourses,
@@ -44,15 +50,17 @@ async function loadAcademicContext() {
       }),
     ),
   );
+  const enrollmentError = enrollmentResults.map(getError).find((error) => error !== null) ?? null;
 
   return {
-    terms: getRows<AcademicTermRow>(termResult, 'terms'),
+    terms: getTermRows(termResult),
     courses: getRows<CourseRow>(courseResult, 'courses'),
     sections,
     enrollments: enrollmentResults.flatMap((result) =>
       getRows<SectionEnrollmentRow>(result, 'enrollments'),
     ),
-    error: getError(termResult) ?? getError(courseResult) ?? getError(sectionResult),
+    error:
+      getError(termResult) ?? getError(courseResult) ?? getError(sectionResult) ?? enrollmentError,
   };
 }
 
@@ -60,6 +68,9 @@ function AcademicContextRoute() {
   const data = Route.useLoaderData();
   const router = useRouter();
   const queryClient = useQueryClient();
+  const [mutationError, setMutationError] = useState<{ code: ErrorCode; message: string } | null>(
+    null,
+  );
   const contextQuery = useQuery({
     queryKey: academicContextKeys.all(),
     queryFn: loadAcademicContext,
@@ -72,38 +83,77 @@ function AcademicContextRoute() {
     await router.invalidate();
   };
 
+  const runMutation = async (operation: () => Promise<unknown>) => {
+    try {
+      const result = await operation();
+      if (isServerError(result)) {
+        setMutationError({ code: result.error.code, message: result.error.message });
+        return;
+      }
+      setMutationError(null);
+      await refresh();
+    } catch {
+      setMutationError({ code: 'INTERNAL', message: 'Internal Server Error' });
+    }
+  };
+
   return (
     <AcademicContextPage
       {...contextQuery.data}
+      error={mutationError ?? contextQuery.data.error}
       loading={contextQuery.isLoading}
       onCreateTerm={async (input) => {
-        await createAcademicTerm({
-          data: {
-            ...input,
-            status: 'draft',
-            startDate: new Date(input.startDate),
-            endDate: new Date(input.endDate),
-          },
-        });
-        await refresh();
+        await runMutation(() =>
+          createAcademicTerm({
+            data: {
+              ...input,
+              status: 'draft',
+              startDate: new Date(input.startDate),
+              endDate: new Date(input.endDate),
+            },
+          }),
+        );
       }}
       onCreateCourse={async (input) => {
-        await createCourse({ data: input });
-        await refresh();
+        await runMutation(() => createCourse({ data: input }));
       }}
       onCreateSection={async (input) => {
-        await createCourseSection({
-          data: { ...input, status: 'active', name: input.name || null },
-        });
-        await refresh();
+        await runMutation(() =>
+          createCourseSection({
+            data: { ...input, status: 'active', name: input.name || null },
+          }),
+        );
       }}
       onAddEnrollment={async (input) => {
-        await addSectionEnrollment({ data: { ...input, isActive: true } });
-        await refresh();
+        await runMutation(() => addSectionEnrollment({ data: { ...input, isActive: true } }));
+      }}
+      onUpdateTerm={async (input) => {
+        await runMutation(() =>
+          updateAcademicTerm({
+            data: {
+              ...input,
+              startDate: new Date(input.startDate),
+              endDate: new Date(input.endDate),
+            },
+          }),
+        );
+      }}
+      onUpdateCourse={async (input) => {
+        await runMutation(() => updateCourse({ data: input }));
+      }}
+      onUpdateSection={async (input) => {
+        await runMutation(() =>
+          updateCourseSection({ data: { ...input, name: input.name || null } }),
+        );
+      }}
+      onUpdateEnrollment={async (input) => {
+        await runMutation(() => updateSectionEnrollment({ data: input }));
+      }}
+      onRemoveEnrollment={async (input) => {
+        await runMutation(() => removeSectionEnrollment({ data: input }));
       }}
       onArchive={async (target) => {
-        await archiveTarget(target);
-        await refresh();
+        await runMutation(() => archiveTarget(target));
       }}
     />
   );
@@ -119,6 +169,23 @@ function getRows<T>(result: unknown, key: string): T[] {
   if (isServerError(result) || !result || typeof result !== 'object') return [];
   const rows = (result as Record<string, unknown>)[key];
   return Array.isArray(rows) ? (rows as T[]) : [];
+}
+
+type AcademicTermResultRow = Omit<AcademicTermRow, 'startsOn' | 'endsOn'> & {
+  startsOn?: string;
+  endsOn?: string;
+  startDate?: string;
+  endDate?: string;
+};
+
+function getTermRows(result: unknown): AcademicTermRow[] {
+  return getRows<AcademicTermResultRow>(result, 'terms').map(
+    ({ startsOn, endsOn, startDate, endDate, ...term }) => ({
+      ...term,
+      startsOn: startsOn ?? startDate ?? '',
+      endsOn: endsOn ?? endDate ?? '',
+    }),
+  );
 }
 
 function getError(result: unknown): { code: ErrorCode; message: string } | null {

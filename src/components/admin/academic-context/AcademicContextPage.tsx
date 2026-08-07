@@ -1,8 +1,10 @@
-import { useState, type FormEvent, type ReactNode } from 'react';
+import { useState, type FormEvent } from 'react';
 import { useI18n } from '../../../routes/__root';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { AcademicContextEditForm, type AcademicEditTarget } from './AcademicContextEditForm';
+import { CollectionCard, CollectionRow, Field } from './AcademicContextParts';
 
 type TermStatus = 'draft' | 'active' | 'closed' | 'archived';
 type SectionStatus = 'active' | 'inactive' | 'archived';
@@ -72,6 +74,30 @@ interface AcademicContextPageProps {
     userId: string;
     role: EnrollmentRole;
   }) => void | Promise<void>;
+  onUpdateTerm?: (input: {
+    id: number;
+    code: string;
+    name: string;
+    startDate: string;
+    endDate: string;
+    status: TermStatus;
+  }) => void | Promise<void>;
+  onUpdateCourse?: (input: { id: number; code: string; name: string }) => void | Promise<void>;
+  onUpdateSection?: (input: {
+    id: number;
+    termId: number;
+    courseId: number;
+    code: string;
+    name: string;
+    status: SectionStatus;
+  }) => void | Promise<void>;
+  onUpdateEnrollment?: (input: {
+    id: number;
+    sectionId: number;
+    role: EnrollmentRole;
+    isActive: boolean;
+  }) => void | Promise<void>;
+  onRemoveEnrollment?: (input: { sectionId: number; userId: string }) => void | Promise<void>;
   onArchive?: (target: AcademicArchiveTarget) => void | Promise<void>;
 }
 
@@ -88,10 +114,16 @@ export function AcademicContextPage({
   onCreateCourse,
   onCreateSection,
   onAddEnrollment,
+  onUpdateTerm,
+  onUpdateCourse,
+  onUpdateSection,
+  onUpdateEnrollment,
+  onRemoveEnrollment,
   onArchive,
 }: AcademicContextPageProps) {
   const { t } = useI18n();
   const [openForm, setOpenForm] = useState<FormKind>(null);
+  const [editTarget, setEditTarget] = useState<AcademicEditTarget | null>(null);
 
   const statusLabel = (status: TermStatus | SectionStatus) => {
     const labels: Record<TermStatus | SectionStatus, string> = {
@@ -107,6 +139,12 @@ export function AcademicContextPage({
   const archive = (target: AcademicArchiveTarget) => {
     if (window.confirm(t('adminAcademicContext.archiveConfirm'))) {
       void onArchive?.(target);
+    }
+  };
+
+  const removeEnrollment = (sectionId: number, userId: string) => {
+    if (window.confirm(t('adminAcademicContext.removeConfirm'))) {
+      void onRemoveEnrollment?.({ sectionId, userId });
     }
   };
 
@@ -287,6 +325,24 @@ export function AcademicContextPage({
         </Card>
       )}
 
+      {editTarget && (
+        <Card>
+          <CardHeader>
+            <CardTitle>{t('adminAcademicContext.actions.edit')}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <AcademicContextEditForm
+              target={editTarget}
+              onUpdateTerm={async (input) => onUpdateTerm?.(input)}
+              onUpdateCourse={async (input) => onUpdateCourse?.(input)}
+              onUpdateSection={async (input) => onUpdateSection?.(input)}
+              onUpdateEnrollment={async (input) => onUpdateEnrollment?.(input)}
+              onCancel={() => setEditTarget(null)}
+            />
+          </CardContent>
+        </Card>
+      )}
+
       {isEmpty && (
         <p className="rounded-lg border border-dashed p-8 text-center text-muted-foreground">
           {t('adminAcademicContext.empty')}
@@ -306,6 +362,7 @@ export function AcademicContextPage({
                 </>
               }
               status={statusLabel(term.status)}
+              onEdit={() => setEditTarget({ type: 'term', row: term })}
               onArchive={() => archive({ type: 'term', id: term.id })}
             />
           ))}
@@ -321,6 +378,7 @@ export function AcademicContextPage({
                   <span>{course.name}</span>
                 </>
               }
+              onEdit={() => setEditTarget({ type: 'course', row: course })}
               onArchive={() => archive({ type: 'course', id: course.id })}
             />
           ))}
@@ -341,6 +399,7 @@ export function AcademicContextPage({
                 </>
               }
               status={statusLabel(section.status)}
+              onEdit={() => setEditTarget({ type: 'section', row: section })}
               onArchive={() => archive({ type: 'section', id: section.id })}
             />
           ))}
@@ -352,70 +411,30 @@ export function AcademicContextPage({
               className="flex items-center justify-between gap-3 rounded-md border p-3 text-sm"
             >
               <span className="min-w-0 truncate">{enrollment.userName}</span>
-              <Badge variant={enrollment.isActive ? 'secondary' : 'outline'}>
-                {enrollment.role}
-              </Badge>
+              <div className="flex shrink-0 items-center gap-2">
+                <Badge variant={enrollment.isActive ? 'secondary' : 'outline'}>
+                  {enrollment.role}
+                </Badge>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setEditTarget({ type: 'enrollment', row: enrollment })}
+                >
+                  {t('adminAcademicContext.actions.edit')}
+                </Button>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => removeEnrollment(enrollment.sectionId, enrollment.userId)}
+                >
+                  {t('adminAcademicContext.removeEnrollment')}
+                </Button>
+              </div>
             </div>
           ))}
         </CollectionCard>
-      </div>
-    </div>
-  );
-}
-
-function Field({
-  name,
-  label,
-  type = 'text',
-  required = false,
-}: {
-  name: string;
-  label: ReactNode;
-  type?: string;
-  required?: boolean;
-}) {
-  return (
-    <label className="grid gap-1.5 text-sm font-medium text-foreground">
-      {label}
-      <input
-        name={name}
-        type={type}
-        required={required}
-        className="h-10 rounded-md border bg-background px-3"
-      />
-    </label>
-  );
-}
-
-function CollectionCard({ title, children }: { title: string; children: ReactNode }) {
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-lg">{title}</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-2">{children}</CardContent>
-    </Card>
-  );
-}
-
-function CollectionRow({
-  label,
-  status,
-  onArchive,
-}: {
-  label: ReactNode;
-  status?: string;
-  onArchive: () => void;
-}) {
-  const { t } = useI18n();
-  return (
-    <div className="flex items-center justify-between gap-3 rounded-md border p-3 text-sm">
-      <span className="min-w-0 truncate font-medium">{label}</span>
-      <div className="flex shrink-0 items-center gap-2">
-        {status && <Badge variant="outline">{status}</Badge>}
-        <Button type="button" variant="ghost" size="sm" onClick={onArchive}>
-          {t('adminAcademicContext.actions.archive')}
-        </Button>
       </div>
     </div>
   );

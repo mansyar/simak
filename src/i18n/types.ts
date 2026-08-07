@@ -535,6 +535,8 @@ export type Translation = {
       enrollmentSection: string
       enrollmentUser: string
       enrollmentRole: string
+      status: string
+      active: string
       submit: string
       cancel: string
     }
@@ -547,8 +549,11 @@ export type Translation = {
       createCourse: string
       createSection: string
       addEnrollment: string
+      edit: string
       archive: string
     }
+    removeEnrollment: string
+    removeConfirm: string
   }
   instructorAssignments: {
     title: string

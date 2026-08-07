@@ -11,6 +11,7 @@ import {
   checkpoints,
   finalGrades,
   gradeReleaseSnapshots,
+  sectionEnrollments,
   templateCheckpoints,
   users,
 } from '@/db/schema';
@@ -420,6 +421,33 @@ describe('assignment clone and semester rollover', () => {
       .from(assignments)
       .where(and(eq(assignments.templateId, templateId), ne(assignments.id, sourceAssignmentId)));
     expect(createdForTemplate).toHaveLength(0);
+  });
+
+  it('rejects cloning after source-section instructor access is removed', async () => {
+    vi.mocked(auth.getSessionFromHeaders).mockResolvedValue({
+      user: { id: instructorId, role: 'instructor' },
+      session: {} as any,
+    } as any);
+
+    await db
+      .update(sectionEnrollments)
+      .set({ isActive: false, endedAt: new Date() })
+      .where(
+        and(
+          eq(sectionEnrollments.sectionId, sourceFixture.sectionId),
+          eq(sectionEnrollments.userId, instructorId),
+        ),
+      );
+
+    const result = await getHandler('cloneAssignmentHandler')?.({
+      data: {
+        sourceAssignmentId,
+        targetSectionId: targetFixture.sectionId,
+        finalDeadline: new Date('2031-01-15T00:00:00.000Z'),
+      },
+    });
+
+    expectError(result, ErrorCode.FORBIDDEN);
   });
 
   it('creates independent targets for concurrent clone requests', async () => {

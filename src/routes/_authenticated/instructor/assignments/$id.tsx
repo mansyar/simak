@@ -79,6 +79,7 @@ function AssignmentDetailPage() {
   const [copyOperation, setCopyOperation] = useState<AssignmentCopyOperation>('clone');
   const [copySubmitting, setCopySubmitting] = useState(false);
   const [copyError, setCopyError] = useState(false);
+  const [lifecycleError, setLifecycleError] = useState<string | null>(null);
   const [assignmentStatus, setAssignmentStatus] = useState<'draft' | 'active' | 'archived'>(
     assignment?.status ?? 'draft',
   );
@@ -142,11 +143,19 @@ function AssignmentDetailPage() {
         : t('instructorAssignments.lifecycle.confirmArchive');
     if (!window.confirm(confirmation)) return;
 
-    const result = await transitionAssignmentStatus({
-      data: { assignmentId: assignmentData.id, status: nextStatus },
-    });
-    if (isServerError(result)) return;
-    setAssignmentStatus(nextStatus);
+    try {
+      const result = await transitionAssignmentStatus({
+        data: { assignmentId: assignmentData.id, status: nextStatus },
+      });
+      if (isServerError(result)) {
+        setLifecycleError(t(getErrorTranslationKey(result.error.code)));
+        return;
+      }
+      setLifecycleError(null);
+      setAssignmentStatus(nextStatus);
+    } catch {
+      setLifecycleError(t('errors.fetchFailed'));
+    }
   };
 
   const openCopyDialog = (operation: AssignmentCopyOperation) => {
@@ -163,28 +172,33 @@ function AssignmentDetailPage() {
     setCopySubmitting(true);
     setCopyError(false);
 
-    const copyHandler = copyOperation === 'clone' ? cloneAssignment : rolloverAssignment;
-    const result = await copyHandler({
-      data: {
-        sourceAssignmentId: assignmentData.id,
-        targetSectionId: input.targetSectionId,
-        finalDeadline: input.finalDeadline,
-        title: input.title,
-        studentIds: [],
-      },
-    });
+    try {
+      const copyHandler = copyOperation === 'clone' ? cloneAssignment : rolloverAssignment;
+      const result = await copyHandler({
+        data: {
+          sourceAssignmentId: assignmentData.id,
+          targetSectionId: input.targetSectionId,
+          finalDeadline: input.finalDeadline,
+          title: input.title,
+          studentIds: [],
+        },
+      });
 
-    setCopySubmitting(false);
-    if (isServerError(result)) {
+      if (isServerError(result)) {
+        setCopyError(true);
+        return;
+      }
+
+      setCopyDialogOpen(false);
+      navigate({
+        to: '/instructor/assignments/$id',
+        params: { id: String(result.assignmentId) },
+      });
+    } catch {
       setCopyError(true);
-      return;
+    } finally {
+      setCopySubmitting(false);
     }
-
-    setCopyDialogOpen(false);
-    navigate({
-      to: '/instructor/assignments/$id',
-      params: { id: String(result.assignmentId) },
-    });
   };
 
   const isOnGradebookChild = matchRoute({
@@ -279,6 +293,14 @@ function AssignmentDetailPage() {
           {t(`instructorAssignments.status.${assignmentStatus}`)}
         </span>
       </div>
+      {lifecycleError && (
+        <p
+          className="rounded-lg border border-destructive/30 bg-destructive/5 p-3 text-sm"
+          role="alert"
+        >
+          {lifecycleError}
+        </p>
+      )}
       <AssignmentCloneDialog
         open={copyDialogOpen}
         operation={copyOperation}

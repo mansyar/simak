@@ -44,7 +44,13 @@ export async function getAuthorizedInstructorSection(
         eq(sectionEnrollments.isActive, true),
       ),
     )
-    .where(and(eq(courseSections.id, sectionId), eq(courseSections.status, 'active')))
+    .where(
+      and(
+        eq(courseSections.id, sectionId),
+        eq(courseSections.status, 'active'),
+        eq(academicTerms.status, 'active'),
+      ),
+    )
     .limit(1);
 
   return section ?? null;
