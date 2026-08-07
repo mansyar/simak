@@ -43,8 +43,9 @@
   - **Completion commits:** `048e4745` (schema, migration, rollback, and tests), `2bb4b6ea` (Drizzle migration journal and snapshot).
 
 - [~] **Task 1.3: Define pure appointment policies (RED → GREEN)**
-  - [~] Write unit tests for duration validation, future-time validation, valid/invalid lifecycle transitions, overlap detection, and timezone-safe display conversion.
-  - [~] Confirm RED behavior.
+  - [x] Write unit tests for duration validation, future-time validation, valid/invalid lifecycle transitions, overlap detection, and timezone-safe display conversion.
+  - [x] Confirm RED behavior.
+  - **RED evidence:** `pnpm vitest run tests/unit/lib/appointment-policies.test.ts` failed during Vite import analysis because `@/lib/appointment-policies` does not exist; no assertions ran.
   - [~] Implement dependency-light policy helpers and shared Zod contracts.
   - [~] Verify boundary cases, including DST transitions and cancelled appointments excluded from conflicts.
 
