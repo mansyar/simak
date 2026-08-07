@@ -5,6 +5,7 @@ export * from './users';
 export * from './auth';
 export * from './templates';
 export * from './assignments';
+export * from './academic-context';
 export * from './submissions';
 export * from './rubrics';
 export * from './consultations';
@@ -25,6 +26,7 @@ import { users } from './users';
 import { session, account, verification, twoFactor } from './auth';
 import { assignmentTemplates, templateCheckpoints } from './templates';
 import { assignments, assignmentStudents, checkpoints } from './assignments';
+import { academicTerms, courses, courseSections, sectionEnrollments } from './academic-context';
 import { submissions, reviews } from './submissions';
 import { rubricCriteria, rubricLevels, reviewScores } from './rubrics';
 import { consultations } from './consultations';
@@ -77,6 +79,39 @@ export const usersRelations = relations(users, ({ many }) => ({
   interventions: many(interventions),
   feedbackSnippets: many(feedbackSnippets),
   calendarFeedTokens: many(calendarFeedTokens),
+  sectionEnrollments: many(sectionEnrollments),
+}));
+
+export const academicTermsRelations = relations(academicTerms, ({ many }) => ({
+  courseSections: many(courseSections),
+}));
+
+export const coursesRelations = relations(courses, ({ many }) => ({
+  courseSections: many(courseSections),
+}));
+
+export const courseSectionsRelations = relations(courseSections, ({ one, many }) => ({
+  academicTerm: one(academicTerms, {
+    fields: [courseSections.termId],
+    references: [academicTerms.id],
+  }),
+  course: one(courses, {
+    fields: [courseSections.courseId],
+    references: [courses.id],
+  }),
+  enrollments: many(sectionEnrollments),
+  assignments: many(assignments),
+}));
+
+export const sectionEnrollmentsRelations = relations(sectionEnrollments, ({ one }) => ({
+  section: one(courseSections, {
+    fields: [sectionEnrollments.sectionId],
+    references: [courseSections.id],
+  }),
+  user: one(users, {
+    fields: [sectionEnrollments.userId],
+    references: [users.id],
+  }),
 }));
 
 export const calendarFeedTokensRelations = relations(calendarFeedTokens, ({ one }) => ({
@@ -119,6 +154,10 @@ export const assignmentsRelations = relations(assignments, ({ many, one }) => ({
   instructor: one(users, {
     fields: [assignments.instructorId],
     references: [users.id],
+  }),
+  section: one(courseSections, {
+    fields: [assignments.sectionId],
+    references: [courseSections.id],
   }),
   assignmentStudents: many(assignmentStudents),
   checkpoints: many(checkpoints),

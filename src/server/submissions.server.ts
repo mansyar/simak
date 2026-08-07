@@ -62,11 +62,13 @@ export async function submitCheckpointHandler(args: { data: SubmitCheckpointInpu
           id: checkpoints.id,
           assignmentId: checkpoints.assignmentId,
           studentId: checkpoints.studentId,
+          assignmentStatus: assignments.status,
           name: checkpoints.name,
           state: checkpoints.state,
           minConsultations: checkpoints.minConsultations,
         })
         .from(checkpoints)
+        .innerJoin(assignments, eq(checkpoints.assignmentId, assignments.id))
         .innerJoin(
           assignmentStudents,
           eq(checkpoints.assignmentId, assignmentStudents.assignmentId),
@@ -76,6 +78,7 @@ export async function submitCheckpointHandler(args: { data: SubmitCheckpointInpu
             eq(checkpoints.id, checkpointId),
             eq(checkpoints.studentId, session.user.id),
             eq(assignmentStudents.studentId, session.user.id),
+            eq(assignments.status, 'active'),
           ),
         )
         .limit(1)
@@ -283,12 +286,14 @@ export async function listSubmissionsHandler(args: { data: ListSubmissionsInput 
     const [checkpoint] = await db
       .select({ id: checkpoints.id, studentId: checkpoints.studentId })
       .from(checkpoints)
+      .innerJoin(assignments, eq(checkpoints.assignmentId, assignments.id))
       .innerJoin(assignmentStudents, eq(checkpoints.assignmentId, assignmentStudents.assignmentId))
       .where(
         and(
           eq(checkpoints.id, checkpointId),
           eq(checkpoints.studentId, session.user.id),
           eq(assignmentStudents.studentId, session.user.id),
+          eq(assignments.status, 'active'),
         ),
       )
       .limit(1);

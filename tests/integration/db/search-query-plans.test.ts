@@ -135,13 +135,33 @@ describe('search query plans', () => {
         FROM generate_series(1, 100000) AS series
       `);
         await transaction.execute(sql`
-        INSERT INTO "assignments" ("template_id", "title", "final_deadline", "instructor_id")
+        WITH term AS (
+          INSERT INTO "academic_terms" ("code", "name", "start_date", "end_date", "status")
+          VALUES ('QUERY_PLAN_TERM', 'Query Plan Term', CURRENT_DATE, CURRENT_DATE + INTERVAL '365 days', 'active')
+          ON CONFLICT ("code") DO UPDATE SET "name" = EXCLUDED."name"
+          RETURNING "id"
+        ), course AS (
+          INSERT INTO "courses" ("code", "name")
+          VALUES ('QUERY_PLAN_COURSE', 'Query Plan Course')
+          ON CONFLICT ("code") DO UPDATE SET "name" = EXCLUDED."name"
+          RETURNING "id"
+        ), section AS (
+          INSERT INTO "course_sections" ("term_id", "course_id", "code", "name", "status")
+          SELECT term."id", course."id", 'QUERY_PLAN_SECTION', 'Query Plan Section', 'active'
+          FROM term CROSS JOIN course
+          ON CONFLICT ("term_id", "course_id", "code") DO UPDATE SET "name" = EXCLUDED."name"
+          RETURNING "id"
+        )
+        INSERT INTO "assignments" ("template_id", "title", "final_deadline", "instructor_id", "section_id", "mode", "status")
         SELECT
           (SELECT "id" FROM "assignment_templates" WHERE "name" LIKE 'performance template %' LIMIT 1),
           CASE WHEN series % 100 = 0 THEN 'performance assignment ' || series ELSE 'ordinary assignment ' || series END,
           NOW() + INTERVAL '30 days',
-          'query-plan-instructor'
-        FROM generate_series(1, 100000) AS series
+          'query-plan-instructor',
+          section."id",
+          'individual',
+          'active'
+        FROM generate_series(1, 100000) AS series CROSS JOIN section
       `);
         await transaction.execute(sql`
         INSERT INTO "feedback_snippets" ("id", "instructor_id", "title", "category", "body")

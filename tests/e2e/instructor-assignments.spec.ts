@@ -31,6 +31,9 @@ test.describe('Instructor Assignment Management', () => {
     await page.getByRole('button', { name: 'Next' }).click();
 
     // Step 2: Fill assignment details
+    const sectionSelect = page.getByLabel('Section');
+    const sectionOption = sectionSelect.locator('option').filter({ hasText: 'E2E-THESIS' }).first();
+    await sectionSelect.selectOption((await sectionOption.getAttribute('value')) ?? '');
     await page.fill('#assignment-title', 'E2E Wizard Assignment');
     await page.fill('#assignment-desc', 'Assignment created via E2E test wizard.');
 

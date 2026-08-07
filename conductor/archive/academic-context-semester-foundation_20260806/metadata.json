@@ -1,0 +1,12 @@
+{
+  "track_id": "academic-context-semester-foundation_20260806",
+  "roadmap_id": "TRACK-057",
+  "type": "feature",
+  "status": "complete",
+  "title": "Academic Context & Semester Foundation",
+  "branch": "track-057/academic-context-semester-foundation",
+  "created_at": "2026-08-06T00:00:00Z",
+  "updated_at": "2026-08-08T00:00:00Z",
+  "dependencies": [],
+  "description": "Establish normalized academic terms, courses, sections, role-aware enrollments, explicit assignment lifecycle, and history-safe assignment clone/semester rollover while preserving individual assignment behavior."
+}

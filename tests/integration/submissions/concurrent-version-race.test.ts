@@ -15,6 +15,11 @@ import {
 } from '@/db/schema/index';
 import { submitCheckpointHandler } from '@/server/submissions.server';
 import * as auth from '@/server/auth';
+import {
+  createAcademicSectionFixture,
+  deleteAcademicSectionFixture,
+  type AcademicSectionFixture,
+} from '../helpers/academic-context';
 
 vi.mock('@/server/auth', () => ({
   getSessionFromHeaders: vi.fn(),
@@ -40,6 +45,7 @@ describe('submitCheckpointHandler concurrent version race', () => {
   const timestamp = Date.now();
   const instructorId = `race-instructor-${timestamp}`;
   const studentId = `race-student-${timestamp}`;
+  let academicFixture: AcademicSectionFixture;
   let templateId: number;
   let assignmentId: number;
   let checkpointId: number;
@@ -60,6 +66,10 @@ describe('submitCheckpointHandler concurrent version race', () => {
       },
     ]);
 
+    academicFixture = await createAcademicSectionFixture(db, `race-${timestamp}`, instructorId, [
+      studentId,
+    ]);
+
     const [template] = await db
       .insert(assignmentTemplates)
       .values({
@@ -78,6 +88,9 @@ describe('submitCheckpointHandler concurrent version race', () => {
         title: 'Race Test Assignment',
         finalDeadline: new Date(Date.now() + 5000000),
         instructorId,
+        sectionId: academicFixture.sectionId,
+        mode: 'individual',
+        status: 'active',
       })
       .returning({ id: assignments.id });
 
@@ -125,6 +138,7 @@ describe('submitCheckpointHandler concurrent version race', () => {
     await db.delete(checkpoints).where(eq(checkpoints.id, checkpointId));
     await db.delete(assignmentStudents).where(eq(assignmentStudents.assignmentId, assignmentId));
     await db.delete(assignments).where(eq(assignments.id, assignmentId));
+    await deleteAcademicSectionFixture(db, academicFixture);
     await db.delete(templateCheckpoints).where(eq(templateCheckpoints.templateId, templateId));
     await db.delete(auditLog).where(eq(auditLog.actorId, studentId));
     await db.delete(assignmentTemplates).where(eq(assignmentTemplates.id, templateId));

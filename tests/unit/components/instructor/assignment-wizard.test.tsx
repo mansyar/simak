@@ -432,7 +432,7 @@ describe('AssignmentWizard', () => {
     });
 
     it('should call createAssignment and navigate on successful submit', async () => {
-      render(<AssignmentWizard />, { wrapper: createWrapper() });
+      render(<AssignmentWizard sectionId={1} />, { wrapper: createWrapper() });
       navigateToStep5();
       await waitFor(() => expect(screen.getByText('Create Assignment')).toBeDefined());
       fireEvent.click(screen.getByText('Create Assignment'));
@@ -445,7 +445,7 @@ describe('AssignmentWizard', () => {
     });
 
     it('should show override button on due date step and submit without overrideDueDates when none set', async () => {
-      render(<AssignmentWizard />, { wrapper: createWrapper() });
+      render(<AssignmentWizard sectionId={1} />, { wrapper: createWrapper() });
       // Navigate to step 4
       fireEvent.click(screen.getByTestId('select-thesis-template'));
       fireEvent.click(screen.getByText('Next'));
@@ -475,7 +475,7 @@ describe('AssignmentWizard', () => {
       vi.mocked(assignmentsApi.createAssignment).mockResolvedValue({
         error: { code: 'INTERNAL', message: 'Template is no longer available' },
       } as any);
-      render(<AssignmentWizard />, { wrapper: createWrapper() });
+      render(<AssignmentWizard sectionId={1} />, { wrapper: createWrapper() });
       navigateToStep5();
       await waitFor(() => expect(screen.getByText('Create Assignment')).toBeDefined());
       fireEvent.click(screen.getByText('Create Assignment'));
@@ -485,7 +485,7 @@ describe('AssignmentWizard', () => {
 
     it('should show network error message on exception', async () => {
       vi.mocked(assignmentsApi.createAssignment).mockRejectedValue(new Error('Network failure'));
-      render(<AssignmentWizard />, { wrapper: createWrapper() });
+      render(<AssignmentWizard sectionId={1} />, { wrapper: createWrapper() });
       navigateToStep5();
       await waitFor(() => expect(screen.getByText('Create Assignment')).toBeDefined());
       fireEvent.click(screen.getByText('Create Assignment'));

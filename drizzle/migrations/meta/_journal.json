@@ -162,6 +162,13 @@
       "when": 1785816706198,
       "tag": "0022_search_trigram_indexes",
       "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "7",
+      "when": 1786007826900,
+      "tag": "0023_sloppy_anthem",
+      "breakpoints": true
     }
   ]
 }

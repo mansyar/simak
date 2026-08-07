@@ -39,6 +39,14 @@ describe('AssignmentCard', () => {
     templateName: 'Thesis Template',
     templateType: 'Thesis',
     studentCount: 15,
+    sectionId: 10,
+    mode: 'individual' as const,
+    status: 'draft' as const,
+    context: {
+      term: { name: 'Fall 2026' },
+      course: { code: 'CS101', name: 'Foundations of Computing' },
+      section: { code: 'A', name: 'Section A' },
+    },
   };
 
   it('should render assignment card metadata', () => {
@@ -65,5 +73,15 @@ describe('AssignmentCard', () => {
     expect(titleLink.getAttribute('href')).toBe('/instructor/assignments/1');
     expect(titleLink.className).toContain('min-h-11');
     expect(titleLink.className).toContain('focus-visible');
+  });
+
+  it('should render context, mode, and lifecycle status', () => {
+    render(<AssignmentCard assignment={assignment} />);
+
+    expect(screen.getByText('CS101')).toBeDefined();
+    expect(screen.getByText('Section A')).toBeDefined();
+    expect(screen.getByText('Fall 2026')).toBeDefined();
+    expect(screen.getByText('instructorAssignments.mode.individual')).toBeDefined();
+    expect(screen.getByText('instructorAssignments.status.draft')).toBeDefined();
   });
 });

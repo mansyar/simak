@@ -1,4 +1,4 @@
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 import { getDb } from './index';
 import {
   users,
@@ -8,6 +8,10 @@ import {
   assignments,
   assignmentStudents,
   checkpoints,
+  academicTerms,
+  courses,
+  courseSections,
+  sectionEnrollments,
 } from './schema/index';
 import { hashPassword } from 'better-auth/crypto';
 import crypto from 'node:crypto';
@@ -138,6 +142,61 @@ export async function seedTestTemplatesAndAssignments(): Promise<void> {
     return;
   }
 
+  const [existingTerm] = await db
+    .select()
+    .from(academicTerms)
+    .where(eq(academicTerms.code, 'DEV-2026-1'));
+  const [term] = existingTerm
+    ? [existingTerm]
+    : await db
+        .insert(academicTerms)
+        .values({
+          code: 'DEV-2026-1',
+          name: 'Development Academic Term',
+          startDate: '2026-01-01',
+          endDate: '2026-06-30',
+          status: 'active',
+        })
+        .returning();
+
+  const [existingCourse] = await db.select().from(courses).where(eq(courses.code, 'DEV-THESIS'));
+  const [course] = existingCourse
+    ? [existingCourse]
+    : await db
+        .insert(courses)
+        .values({ code: 'DEV-THESIS', name: 'Development Thesis' })
+        .returning();
+
+  const [existingSection] = await db
+    .select()
+    .from(courseSections)
+    .where(
+      and(
+        eq(courseSections.termId, term.id),
+        eq(courseSections.courseId, course.id),
+        eq(courseSections.code, 'A'),
+      ),
+    );
+  const [section] = existingSection
+    ? [existingSection]
+    : await db
+        .insert(courseSections)
+        .values({
+          termId: term.id,
+          courseId: course.id,
+          code: 'A',
+          name: 'Development Thesis Section',
+        })
+        .returning();
+
+  await db
+    .insert(sectionEnrollments)
+    .values([
+      { sectionId: section.id, userId: instructorUser.id, role: 'instructor' },
+      { sectionId: section.id, userId: studentUser.id, role: 'student' },
+    ])
+    .onConflictDoNothing();
+
   // Idempotency: skip if template already exists
   const existingTemplate = await db
     .select()
@@ -193,6 +252,9 @@ export async function seedTestTemplatesAndAssignments(): Promise<void> {
       description: 'A test assignment for development and testing purposes.',
       finalDeadline,
       instructorId: instructorUser.id,
+      sectionId: section.id,
+      mode: 'individual',
+      status: 'active',
     })
     .returning();
 

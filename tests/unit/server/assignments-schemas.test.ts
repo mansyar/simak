@@ -28,6 +28,7 @@ describe('Assignment Schemas', () => {
     it('should accept valid input', () => {
       const result = CreateAssignmentSchema.safeParse({
         templateId: 1,
+        sectionId: 1,
         title: 'Test Assignment',
         description: 'A test assignment',
         finalDeadline: new Date(Date.now() + 86400000).toISOString(), // tomorrow
@@ -58,6 +59,7 @@ describe('Assignment Schemas', () => {
     it('should reject empty studentIds', () => {
       const result = CreateAssignmentSchema.safeParse({
         templateId: 1,
+        sectionId: 1,
         title: 'Test Assignment',
         finalDeadline: new Date(Date.now() + 86400000).toISOString(),
         studentIds: [],
@@ -68,6 +70,7 @@ describe('Assignment Schemas', () => {
     it('should use default empty description', () => {
       const result = CreateAssignmentSchema.safeParse({
         templateId: 1,
+        sectionId: 1,
         title: 'Test Assignment',
         finalDeadline: new Date(Date.now() + 86400000).toISOString(),
         studentIds: ['student-1'],

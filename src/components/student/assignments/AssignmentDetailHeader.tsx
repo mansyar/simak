@@ -11,6 +11,12 @@ export interface AssignmentDetail {
   instructorName: string;
   templateName: string;
   templateType: string;
+  status?: 'draft' | 'active' | 'archived';
+  context?: {
+    term: { name: string };
+    course: { code: string; name: string };
+    section: { code: string; name: string | null };
+  } | null;
 }
 
 interface AssignmentDetailHeaderProps {
@@ -25,6 +31,11 @@ export function AssignmentDetailHeader({ detail }: AssignmentDetailHeaderProps) 
     <div className="space-y-4">
       <div className="flex items-start gap-2">
         <Badge variant="outline">{detail.templateType}</Badge>
+        {detail.status && (
+          <Badge variant="secondary">
+            {t(`studentAssignments.status.${detail.status}` as never)}
+          </Badge>
+        )}
       </div>
 
       <div>
@@ -56,6 +67,17 @@ export function AssignmentDetailHeader({ detail }: AssignmentDetailHeaderProps) 
           </span>
         </div>
       </div>
+
+      {detail.context && (
+        <div
+          className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-muted-foreground"
+          aria-label={t('studentAssignments.context.section')}
+        >
+          <span>{detail.context.course.code}</span>
+          <span>{detail.context.section.name ?? detail.context.section.code}</span>
+          <span>{detail.context.term.name}</span>
+        </div>
+      )}
     </div>
   );
 }

@@ -13,6 +13,12 @@ export interface StudentAssignmentRow {
   templateName: string;
   templateType: string;
   progressPercent: number;
+  status?: 'draft' | 'active' | 'archived';
+  context?: {
+    term: { name: string };
+    course: { code: string; name: string };
+    section: { code: string; name: string | null };
+  } | null;
 }
 
 interface StudentAssignmentCardProps {
@@ -41,6 +47,23 @@ export function StudentAssignmentCard({ assignment }: StudentAssignmentCardProps
             <span className="font-medium text-foreground">{assignment.templateName}</span>
           </div>
         </div>
+
+        {assignment.context && (
+          <div
+            className="mt-3 flex flex-wrap gap-2 text-xs text-muted-foreground"
+            aria-label={t('studentAssignments.context.section')}
+          >
+            <span>{assignment.context.course.code}</span>
+            <span>{assignment.context.section.name ?? assignment.context.section.code}</span>
+            <span>{assignment.context.term.name}</span>
+          </div>
+        )}
+
+        {assignment.status && (
+          <Badge className="mt-3 w-fit" variant="secondary">
+            {t(`studentAssignments.status.${assignment.status}` as never)}
+          </Badge>
+        )}
       </div>
 
       {/* Progress bar */}

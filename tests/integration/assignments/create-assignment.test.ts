@@ -14,6 +14,11 @@ import { createAssignmentHandler } from '@/server/assignments.server';
 import * as auth from '@/server/auth';
 import { vi } from 'vitest';
 import { eq } from 'drizzle-orm';
+import {
+  createAcademicSectionFixture,
+  deleteAcademicSectionFixture,
+  type AcademicSectionFixture,
+} from '../helpers/academic-context';
 
 vi.mock('@/server/auth', () => ({
   getSessionFromHeaders: vi.fn(),
@@ -36,6 +41,7 @@ describe('Assignment Creation Integration Flow', () => {
   const student1Id = 'test-student-1-' + Date.now();
   const student2Id = 'test-student-2-' + Date.now();
   let templateId: number;
+  let academicFixture: AcademicSectionFixture;
 
   beforeEach(async () => {
     // Seed template and users in real DB
@@ -48,6 +54,11 @@ describe('Assignment Creation Integration Flow', () => {
       },
       { id: student1Id, name: 'Student 1', email: `${student1Id}@test.com`, role: 'student' },
       { id: student2Id, name: 'Student 2', email: `${student2Id}@test.com`, role: 'student' },
+    ]);
+
+    academicFixture = await createAcademicSectionFixture(db, String(Date.now()), instructorId, [
+      student1Id,
+      student2Id,
     ]);
 
     const [tpl] = await db
@@ -80,6 +91,7 @@ describe('Assignment Creation Integration Flow', () => {
     await db.delete(assignments).where(eq(assignments.templateId, templateId));
     await db.delete(templateCheckpoints).where(eq(templateCheckpoints.templateId, templateId));
     await db.delete(assignmentTemplates).where(eq(assignmentTemplates.id, templateId));
+    await deleteAcademicSectionFixture(db, academicFixture);
     // Delete audit log entries first to avoid FK violations
     await db.delete(auditLog).where(eq(auditLog.actorId, instructorId));
     await db.delete(auditLog).where(eq(auditLog.actorId, student1Id));
@@ -98,10 +110,13 @@ describe('Assignment Creation Integration Flow', () => {
     const result = await createAssignmentHandler({
       data: {
         templateId,
+        sectionId: academicFixture.sectionId,
         title: 'Real DB Integration Assignment',
         description: 'Integration test description',
-        finalDeadline: new Date(Date.now() + 5000000),
+        finalDeadline: new Date(Date.now() + 60 * 86_400_000),
         studentIds: [student1Id, student2Id],
+        mode: 'individual',
+        status: 'draft',
       },
     });
 
@@ -113,6 +128,9 @@ describe('Assignment Creation Integration Flow', () => {
     const [ass] = await db.select().from(assignments).where(eq(assignments.id, assId));
     expect(ass).toBeDefined();
     expect(ass.title).toBe('Real DB Integration Assignment');
+    expect(ass.sectionId).toBe(academicFixture.sectionId);
+    expect(ass.mode).toBe('individual');
+    expect(ass.status).toBe('draft');
 
     // 2. Verify students mapped
     const studentsMapped = await db

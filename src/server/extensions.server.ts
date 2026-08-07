@@ -106,7 +106,13 @@ export async function requestExtensionHandler(args: { data: RequestExtensionInpu
         instructorId: assignments.instructorId,
       })
       .from(assignments)
-      .where(and(eq(assignments.id, assignmentId), isNull(assignments.deletedAt)))
+      .where(
+        and(
+          eq(assignments.id, assignmentId),
+          eq(assignments.status, 'active'),
+          isNull(assignments.deletedAt),
+        ),
+      )
       .limit(1);
 
     if (!assignment) {

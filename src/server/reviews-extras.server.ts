@@ -52,6 +52,7 @@ export async function openForReviewHandler(args: { data: OpenForReviewInput }) {
           and(
             eq(submissions.id, submissionId),
             eq(assignments.instructorId, session.user.id),
+            eq(assignments.status, 'active'),
             isNull(assignments.deletedAt),
           ),
         )

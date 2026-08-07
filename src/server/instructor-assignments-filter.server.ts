@@ -2,6 +2,7 @@
 import { and, eq, isNull, desc } from 'drizzle-orm';
 import { getDb } from '../db/index';
 import { assignments } from '../db/schema/assignments';
+import { courseSections, sectionEnrollments } from '../db/schema/academic-context';
 import { getSessionFromHeaders } from './auth';
 import { isInstructor } from '../lib/session-guards';
 import { serverError, ErrorCode } from '../lib/errors';
@@ -18,7 +19,24 @@ export async function listInstructorAssignmentsForFilterHandler() {
     const results = await db
       .select({ id: assignments.id, title: assignments.title })
       .from(assignments)
-      .where(and(eq(assignments.instructorId, session.user.id), isNull(assignments.deletedAt)))
+      .innerJoin(courseSections, eq(assignments.sectionId, courseSections.id))
+      .innerJoin(
+        sectionEnrollments,
+        and(
+          eq(sectionEnrollments.sectionId, assignments.sectionId),
+          eq(sectionEnrollments.userId, session.user.id),
+          eq(sectionEnrollments.role, 'instructor'),
+          eq(sectionEnrollments.isActive, true),
+        ),
+      )
+      .where(
+        and(
+          eq(assignments.instructorId, session.user.id),
+          eq(courseSections.status, 'active'),
+          eq(assignments.status, 'active'),
+          isNull(assignments.deletedAt),
+        ),
+      )
       .orderBy(desc(assignments.createdAt));
 
     return { success: true, assignments: results };

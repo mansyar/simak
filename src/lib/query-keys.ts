@@ -25,7 +25,22 @@ export const extensionKeys = {
 
 export const assignmentKeys = {
   all: () => ['assignments'] as const,
+  list: (filters?: {
+    page?: number;
+    limit?: number;
+    search?: string;
+    termId?: number;
+    courseId?: number;
+    sectionId?: number;
+    status?: 'draft' | 'active' | 'archived';
+  }) => ['assignments', 'list', filters ?? {}] as const,
   detail: (assignmentId: number) => ['assignments', 'detail', assignmentId] as const,
+};
+
+export const academicContextKeys = {
+  all: () => ['academic-context'] as const,
+  lists: () => ['academic-context', 'list'] as const,
+  enrollments: (sectionId: number) => ['academic-context', 'enrollments', sectionId] as const,
 };
 
 export const userKeys = {

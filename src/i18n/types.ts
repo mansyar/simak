@@ -506,12 +506,90 @@ export type Translation = {
       restore: string
     }
   }
+  adminAcademicContext: {
+    title: string
+    terms: string
+    courses: string
+    sections: string
+    enrollments: string
+    empty: string
+    archiveConfirm: string
+    status: {
+      draft: string
+      active: string
+      closed: string
+      inactive: string
+      archived: string
+    }
+    forms: {
+      termCode: string
+      termName: string
+      startsOn: string
+      endsOn: string
+      courseCode: string
+      courseName: string
+      sectionTerm: string
+      sectionCourse: string
+      sectionCode: string
+      sectionName: string
+      enrollmentSection: string
+      enrollmentUser: string
+      enrollmentRole: string
+      status: string
+      active: string
+      submit: string
+      cancel: string
+    }
+    roles: {
+      student: string
+      instructor: string
+    }
+    actions: {
+      createTerm: string
+      createCourse: string
+      createSection: string
+      addEnrollment: string
+      edit: string
+      archive: string
+    }
+    removeEnrollment: string
+    removeConfirm: string
+  }
   instructorAssignments: {
     title: string
     subtitle: string
     newAssignmentSubtitle: string
     averageProgress: string
     newAssignment: string
+    actions: {
+      clone: string
+      rollover: string
+      activate: string
+      archive: string
+    }
+    cloneDialog: {
+      cloneTitle: string
+      rolloverTitle: string
+      description: string
+      targetSection: string
+      deadline: string
+      title: string
+    }
+    lifecycle: {
+      confirmActivate: string
+      confirmArchive: string
+    }
+    context: {
+      section: string
+      selectSection: string
+      students: string
+      mode: string
+      status: string
+    }
+    mode: {
+      individual: string
+      group: string
+    }
     searchPlaceholder: string
     searchLabel: string
     studentCount: string
@@ -539,6 +617,10 @@ export type Translation = {
       effectiveDeadline: string
     }
     status: {
+      all: string
+      draft: string
+      active: string
+      archived: string
       passed: string
       under_review: string
       submitted: string
@@ -591,6 +673,7 @@ export type Translation = {
         deadlineRequired: string
         deadlineInvalid: string
         deadlineInPast: string
+        sectionRequired: string
         studentsRequired: string
         dueDatesInPast: string
         submitFailed: string
@@ -649,7 +732,15 @@ export type Translation = {
     progress: string
     empty: string
     emptyPrompt: string
+    context: {
+      term: string
+      course: string
+      section: string
+    }
     status: {
+      draft: string
+      active: string
+      archived: string
       passed: string
       under_review: string
       submitted: string

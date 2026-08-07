@@ -13,6 +13,11 @@ import { AssignmentDetailsForm } from './AssignmentDetailsForm';
 import { StudentPicker } from './StudentPicker';
 import { DueDatePreview } from './DueDatePreview';
 import { ReviewStep } from './ReviewStep';
+import {
+  AssignmentContextControls,
+  type AssignmentSectionOption,
+  type AssignmentStudentOption,
+} from './AssignmentContextControls';
 import { Button } from '@/components/ui/button';
 import { ErrorState } from '@/components/ui/error-state';
 import { CheckCircle2, ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
@@ -35,7 +40,18 @@ interface DueDateOverride {
   dueDate: string;
 }
 
-export function AssignmentWizard() {
+interface AssignmentWizardProps {
+  /** Academic section selection is supplied by the context UI integration. */
+  sectionId?: number;
+  sections?: AssignmentSectionOption[];
+  authorizedStudents?: AssignmentStudentOption[];
+}
+
+export function AssignmentWizard({
+  sectionId,
+  sections = [],
+  authorizedStudents,
+}: AssignmentWizardProps) {
   const { t } = useI18n();
   const navigate = useNavigate();
 
@@ -46,6 +62,8 @@ export function AssignmentWizard() {
   const [description, setDescription] = useState('');
   const [finalDeadline, setFinalDeadline] = useState('');
   const [selectedStudentIds, setSelectedStudentIds] = useState<string[]>([]);
+  const [selectedSectionId, setSelectedSectionId] = useState<number | null>(sectionId ?? null);
+  const [mode, setMode] = useState<'individual' | 'group'>('individual');
 
   // Template checkpoint details (contains estimated_duration)
   const [checkpointDetails, setCheckpointDetails] = useState<CheckpointDetail[]>([]);
@@ -126,6 +144,9 @@ export function AssignmentWizard() {
         newErrors.templateId = t('instructorAssignments.wizard.errors.templateRequired');
       }
     } else if (step === 2) {
+      if (sections.length > 0 && !selectedSectionId) {
+        newErrors.sectionId = t('instructorAssignments.wizard.errors.sectionRequired');
+      }
       if (!title.trim()) {
         newErrors.title = t('instructorAssignments.wizard.errors.titleRequired');
       } else if (title.length < 3) {
@@ -175,16 +196,25 @@ export function AssignmentWizard() {
       return;
     }
 
+    const effectiveSectionId = selectedSectionId ?? sectionId;
+    if (!effectiveSectionId) {
+      setErrors({ submit: t('errors.fetchFailed') });
+      return;
+    }
+
     try {
       setIsSubmitting(true);
       const overrideDueDates = dueDateOverrides.length > 0 ? dueDateOverrides : undefined;
       const res = await createAssignment({
         data: {
           templateId: selectedTemplate?.id,
+          sectionId: effectiveSectionId,
           title,
           description,
           finalDeadline: new Date(finalDeadline).toISOString(),
           studentIds: selectedStudentIds,
+          mode,
+          status: 'draft',
           overrideDueDates,
         },
       });
@@ -204,7 +234,12 @@ export function AssignmentWizard() {
   };
 
   // Find student details for selected IDs to display in Review step
-  const students = studentsData?.users ?? [];
+  const students = authorizedStudents ?? studentsData?.users ?? [];
+  const contextStudents = students.map((student) => ({
+    id: student.id,
+    name: student.name,
+    email: student.email,
+  }));
   const assignedStudents = students.filter((s) => selectedStudentIds.includes(s.id));
 
   // Step definitions
@@ -307,15 +342,38 @@ export function AssignmentWizard() {
         )}
 
         {currentStep === 2 && (
-          <AssignmentDetailsForm
-            title={title}
-            onChangeTitle={setTitle}
-            description={description}
-            onChangeDescription={setDescription}
-            finalDeadline={finalDeadline}
-            onChangeDeadline={setFinalDeadline}
-            errors={errors}
-          />
+          <div className="space-y-4">
+            <AssignmentDetailsForm
+              title={title}
+              onChangeTitle={setTitle}
+              description={description}
+              onChangeDescription={setDescription}
+              finalDeadline={finalDeadline}
+              onChangeDeadline={setFinalDeadline}
+              errors={errors}
+            />
+            {sections.length > 0 && (
+              <AssignmentContextControls
+                sections={sections}
+                students={contextStudents}
+                selectedSectionId={selectedSectionId}
+                selectedStudentIds={selectedStudentIds}
+                mode={mode}
+                status="draft"
+                onSectionChange={(nextSectionId) => {
+                  setSelectedSectionId(nextSectionId);
+                  setSelectedStudentIds([]);
+                }}
+                onStudentChange={setSelectedStudentIds}
+                onModeChange={setMode}
+                onStatusChange={() => undefined}
+                onClone={() => undefined}
+                onRollover={() => undefined}
+                showLifecycleControls={false}
+                showCloneActions={false}
+              />
+            )}
+          </div>
         )}
 
         {currentStep === 3 && (

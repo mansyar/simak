@@ -7,7 +7,7 @@
  *   - Instructor (instructor@e2e.test)
  *   - Student (student@e2e.test) — enrolled in E2E assignment
  *   - Student Two (student2@e2e.test) — enrolled in E2E assignment (multi-student scenarios)
- *   - Student Three (student3@e2e.test) — NOT enrolled (cross-student access denial tests)
+ *   - Student Three (student3@e2e.test) — inactive in the isolated negative-fixture section
  *   All with password: TestPass123!
  *
  *   - Assignment template: "E2E Thesis Template" (3 checkpoints, type thesis, minConsultations: 1)
@@ -29,6 +29,10 @@ import {
   checkpoints,
   consultations,
   feedbackSnippets,
+  academicTerms,
+  courses,
+  courseSections,
+  sectionEnrollments,
 } from '../src/db/schema/index';
 import { hashPassword } from 'better-auth/crypto';
 import crypto from 'node:crypto';
@@ -137,10 +141,75 @@ async function seedTemplateAndAssignment(): Promise<void> {
 
   const [studentUser] = await db.select().from(users).where(eq(users.email, 'student@e2e.test'));
   const [student2User] = await db.select().from(users).where(eq(users.email, 'student2@e2e.test'));
+  const [student3User] = await db.select().from(users).where(eq(users.email, 'student3@e2e.test'));
 
   if (!instructorUser || !studentUser) {
     throw new Error('E2E instructor or student not found. Run seedE2EUsers() first.');
   }
+
+  const [term] = await db
+    .insert(academicTerms)
+    .values({
+      code: 'E2E-2026-1',
+      name: 'E2E Academic Term',
+      startDate: '2026-01-01',
+      endDate: '2026-06-30',
+      status: 'active',
+    })
+    .returning({ id: academicTerms.id });
+  const [course] = await db
+    .insert(courses)
+    .values({ code: 'E2E-THESIS', name: 'E2E Thesis Course' })
+    .returning({ id: courses.id });
+  const [section] = await db
+    .insert(courseSections)
+    .values({
+      termId: term.id,
+      courseId: course.id,
+      code: 'A',
+      name: 'E2E Thesis Section',
+    })
+    .returning({ id: courseSections.id });
+
+  await db
+    .insert(sectionEnrollments)
+    .values([
+      { sectionId: section.id, userId: instructorUser.id, role: 'instructor' },
+      { sectionId: section.id, userId: studentUser.id, role: 'student' },
+      ...(student2User
+        ? [{ sectionId: section.id, userId: student2User.id, role: 'student' as const }]
+        : []),
+    ]);
+
+  const [negativeSection] = await db
+    .insert(courseSections)
+    .values({
+      termId: term.id,
+      courseId: course.id,
+      code: 'B',
+      name: 'E2E Negative Fixture Section',
+    })
+    .returning({ id: courseSections.id });
+
+  if (instructorTwoUser) {
+    await db.insert(sectionEnrollments).values({
+      sectionId: negativeSection.id,
+      userId: instructorTwoUser.id,
+      role: 'instructor',
+    });
+  }
+
+  if (student3User) {
+    await db.insert(sectionEnrollments).values({
+      sectionId: negativeSection.id,
+      userId: student3User.id,
+      role: 'student',
+      isActive: false,
+    });
+  }
+
+  console.log('[E2E Seed] Academic term, course, section, and enrollments created.');
+  console.log('[E2E Seed] Cross-section and inactive-enrollment fixtures created.');
 
   await db.insert(feedbackSnippets).values([
     {
@@ -206,6 +275,9 @@ async function seedTemplateAndAssignment(): Promise<void> {
       description: 'Assignment for E2E testing — file submission and review flows.',
       finalDeadline,
       instructorId: instructorUser.id,
+      sectionId: section.id,
+      mode: 'individual',
+      status: 'active',
     })
     .returning();
 

@@ -9,14 +9,21 @@ export const OverrideDueDateSchema = z.object({
   dueDate: z.coerce.date(),
 });
 
+export const AssignmentModeSchema = z.enum(['individual', 'group']);
+
+export const AssignmentStatusSchema = z.enum(['draft', 'active', 'archived']);
+
 export const CreateAssignmentSchema = z.object({
   templateId: z.coerce.number().int().positive('Template is required'),
+  sectionId: z.coerce.number().int().positive('Course section is required'),
   title: z.string().min(3, 'Title must be at least 3 characters').max(100, 'Title is too long'),
   description: z.string().optional().default(''),
   finalDeadline: z.coerce.date().refine((d) => d > new Date(), {
     message: 'Final deadline must be in the future',
   }),
   studentIds: z.array(z.string().min(1)).min(1, 'At least one student must be selected'),
+  mode: AssignmentModeSchema.default('individual'),
+  status: z.literal('draft').default('draft'),
   overrideDueDates: z.array(OverrideDueDateSchema).optional(),
 });
 
@@ -24,6 +31,10 @@ export const ListInstructorAssignmentsSchema = z.object({
   page: z.coerce.number().int().min(1).default(1),
   limit: z.coerce.number().int().min(1).max(100).default(20),
   search: z.string().optional().default(''),
+  termId: z.coerce.number().int().positive().optional(),
+  courseId: z.coerce.number().int().positive().optional(),
+  sectionId: z.coerce.number().int().positive().optional(),
+  status: AssignmentStatusSchema.optional(),
 });
 
 export const AssignmentIdParamSchema = z.object({
@@ -62,12 +73,65 @@ export const getAssignmentDetail = typedServerFn({
     return getAssignmentDetailHandler({ data });
   });
 
+export const TransitionAssignmentStatusSchema = z.object({
+  assignmentId: z.coerce.number().int().positive('Assignment ID must be a positive integer'),
+  status: AssignmentStatusSchema,
+});
+
+export const transitionAssignmentStatus = typedServerFn({
+  method: 'POST',
+})
+  .middleware(serverFnMiddlewares(RATE_LIMITS.destructive))
+  .inputValidator(TransitionAssignmentStatusSchema)
+  .handler(async ({ data }) => {
+    const { transitionAssignmentStatusHandler } = await import('./assignments.server');
+    return transitionAssignmentStatusHandler({ data });
+  });
+
+export const CloneAssignmentSchema = z.object({
+  sourceAssignmentId: z.coerce
+    .number()
+    .int()
+    .positive('Source assignment ID must be a positive integer'),
+  targetSectionId: z.coerce.number().int().positive('Target course section is required'),
+  title: z.string().min(3, 'Title must be at least 3 characters').max(100).optional(),
+  description: z.string().max(5000).nullable().optional(),
+  finalDeadline: z.coerce.date().refine((date) => date > new Date(), {
+    message: 'Final deadline must be in the future',
+  }),
+  studentIds: z.array(z.string().min(1)).default([]),
+});
+
+export const cloneAssignment = typedServerFn({
+  method: 'POST',
+})
+  .middleware(serverFnMiddlewares(RATE_LIMITS.destructive))
+  .inputValidator(CloneAssignmentSchema)
+  .handler(async ({ data }) => {
+    const { cloneAssignmentHandler } = await import('./assignments.server');
+    return cloneAssignmentHandler({ data });
+  });
+
+export const rolloverAssignment = typedServerFn({
+  method: 'POST',
+})
+  .middleware(serverFnMiddlewares(RATE_LIMITS.destructive))
+  .inputValidator(CloneAssignmentSchema)
+  .handler(async ({ data }) => {
+    const { rolloverAssignmentHandler } = await import('./assignments.server');
+    return rolloverAssignmentHandler({ data });
+  });
+
 // ---- Student Assignment Schemas ----
 
 export const ListStudentAssignmentsSchema = z.object({
   page: z.coerce.number().int().min(1).default(1),
   limit: z.coerce.number().int().min(1).max(100).default(20),
   search: z.string().optional().default(''),
+  termId: z.coerce.number().int().positive().optional(),
+  courseId: z.coerce.number().int().positive().optional(),
+  sectionId: z.coerce.number().int().positive().optional(),
+  status: AssignmentStatusSchema.optional(),
 });
 
 export const StudentAssignmentIdParamSchema = z.object({

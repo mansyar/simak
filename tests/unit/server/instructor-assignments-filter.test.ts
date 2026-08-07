@@ -43,6 +43,7 @@ describe('listInstructorAssignmentsForFilterHandler', () => {
     mockDb = {
       select: vi.fn().mockReturnThis(),
       from: vi.fn().mockReturnThis(),
+      innerJoin: vi.fn().mockReturnThis(),
       where: vi.fn().mockReturnThis(),
       orderBy: vi.fn().mockReturnThis(),
       then: vi.fn((onfulfilled: any) => Promise.resolve([]).then(onfulfilled)),

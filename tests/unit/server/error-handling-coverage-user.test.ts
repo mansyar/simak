@@ -29,7 +29,7 @@ import { getDb } from '@/db/index';
 import {
   listStudentAssignmentsHandler,
   getStudentAssignmentDetailHandler,
-} from '@/server/assignments-extras.server';
+} from '@/server/assignments-student.server';
 import { logConsultationHandler } from '@/server/consultations.server';
 import { listVerifiedCountsHandler } from '@/server/consultations-extras.server';
 import { getStudentDashboardDataHandler } from '@/server/dashboard-student.server';
@@ -130,13 +130,13 @@ const throwingDb = new Proxy(
 
 const cases: TestCase[] = [
   {
-    label: 'assignments-extras.listStudentAssignmentsHandler',
+    label: 'assignments-student.listStudentAssignmentsHandler',
     handler: listStudentAssignmentsHandler,
     role: 'student',
     input: { page: 1, limit: 10, status: 'active' },
   },
   {
-    label: 'assignments-extras.getStudentAssignmentDetailHandler',
+    label: 'assignments-student.getStudentAssignmentDetailHandler',
     handler: getStudentAssignmentDetailHandler,
     role: 'student',
     input: { id: 1 },

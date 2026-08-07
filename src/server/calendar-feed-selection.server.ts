@@ -86,6 +86,7 @@ export async function getCalendarFeedEvents(db: Db, studentId: string) {
     .where(
       and(
         eq(checkpoints.studentId, studentId),
+        eq(assignments.status, 'active'),
         isNull(assignments.deletedAt),
         sql`${checkpoints.state} <> 'passed'`,
       ),

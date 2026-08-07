@@ -11,6 +11,11 @@ import {
   interventions,
   users,
 } from '@/db/schema/index';
+import {
+  createAcademicSectionFixture,
+  deleteAcademicSectionFixture,
+  type AcademicSectionFixture,
+} from '../helpers/academic-context';
 import * as auth from '@/server/auth';
 import {
   getInterventionContextHandler,
@@ -28,6 +33,7 @@ describe('intervention workflow database acceptance', () => {
   const instructorId = `intervention-instructor-${suffix}`;
   const replacementInstructorId = `intervention-replacement-${suffix}`;
   const studentId = `intervention-student-${suffix}`;
+  let academicFixture: AcademicSectionFixture;
   let assignmentId: number;
   let checkpointId: number;
 
@@ -56,6 +62,13 @@ describe('intervention workflow database acceptance', () => {
       },
     ]);
 
+    academicFixture = await createAcademicSectionFixture(
+      db,
+      `intervention-${suffix}`,
+      instructorId,
+      [studentId],
+    );
+
     const [template] = await db
       .insert(assignmentTemplates)
       .values({
@@ -72,6 +85,9 @@ describe('intervention workflow database acceptance', () => {
         title: `Intervention Assignment ${suffix}`,
         finalDeadline: new Date(Date.now() + 86_400_000),
         instructorId,
+        sectionId: academicFixture.sectionId,
+        mode: 'individual',
+        status: 'active',
       })
       .returning({ id: assignments.id });
     assignmentId = assignment.id;
@@ -105,6 +121,7 @@ describe('intervention workflow database acceptance', () => {
     await db.delete(checkpoints).where(eq(checkpoints.id, checkpointId));
     await db.delete(assignmentStudents).where(eq(assignmentStudents.assignmentId, assignmentId));
     await db.delete(assignments).where(eq(assignments.id, assignmentId));
+    await deleteAcademicSectionFixture(db, academicFixture);
     await db
       .delete(assignmentTemplates)
       .where(eq(assignmentTemplates.name, `Intervention Template ${suffix}`));

@@ -42,6 +42,7 @@ async function lockOwnedAssignment(db: QueryDb, assignmentId: number, instructor
       and(
         eq(assignments.id, assignmentId),
         eq(assignments.instructorId, instructorId),
+        eq(assignments.status, 'active'),
         isNull(assignments.deletedAt),
       ),
     )
@@ -82,6 +83,7 @@ async function lockOwnedIntervention(db: QueryDb, interventionId: number, instru
         and(
           eq(interventions.id, interventionId),
           eq(assignments.instructorId, instructorId),
+          eq(assignments.status, 'active'),
           isNull(assignments.deletedAt),
         ),
       )
@@ -192,7 +194,11 @@ export async function listInterventionsHandler(args: { data: ListInterventionsIn
 
   const { assignmentId, studentId, status, overdue, page, limit } = args.data;
   const db = getDb();
-  const conditions = [eq(assignments.instructorId, session.user.id), isNull(assignments.deletedAt)];
+  const conditions = [
+    eq(assignments.instructorId, session.user.id),
+    eq(assignments.status, 'active'),
+    isNull(assignments.deletedAt),
+  ];
 
   if (assignmentId !== undefined) conditions.push(eq(interventions.assignmentId, assignmentId));
   if (studentId !== undefined) conditions.push(eq(interventions.studentId, studentId));
