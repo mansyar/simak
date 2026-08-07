@@ -13,14 +13,16 @@ import {
   UpdateAcademicTermSchema,
 } from '@/server/academic-context';
 import {
-  addSectionEnrollmentHandler,
-  archiveCourseSectionHandler,
   createAcademicTermHandler,
   createCourseSectionHandler,
   listAcademicTermsHandler,
   listCourseSectionsHandler,
-  updateSectionEnrollmentHandler,
 } from '@/server/academic-context.server';
+import { archiveCourseSectionHandler } from '@/server/academic-context-archive.server';
+import {
+  addSectionEnrollmentHandler,
+  updateSectionEnrollmentHandler,
+} from '@/server/academic-context-enrollments.server';
 import * as auth from '@/server/auth';
 import * as dbMod from '@/db/index';
 
