@@ -193,7 +193,7 @@
 
 ## Phase: Review Fixes
 
-- [~] Task: Apply review suggestions
-  - [ ] Add admin update and enrollment-removal controls with typed error feedback
-  - [ ] Enforce active source-section authorization for clone and rollover
-  - [ ] Add regression tests and rerun required quality gates
+- [x] Task: Apply review suggestions [commit: 08d4e9e, e9ec220a]
+  - [x] Add admin update and enrollment-removal controls with typed error feedback
+  - [x] Enforce active source-section authorization for clone and rollover
+  - [x] Add regression tests and rerun required quality gates
