@@ -141,11 +141,11 @@
   - [x] Add English and Indonesian keys for academic context, lifecycle, filters, forms, clone/rollover, and errors
   - [x] Run `pnpm generate:i18n`
   - [x] Run `pnpm check:i18n` and `pnpm check:i18n:unused`
-- [~] Task: Implement admin context-management UI
+- [x] Task: Implement admin context-management UI
   - [x] Add routes/components following existing admin users/templates patterns [commit: bc2004e]
   - [x] Provide responsive list/detail/forms for terms, courses, sections, and enrollments [commit: bc2004e]
   - [x] Add accessible archive and enrollment confirmation flows [commit: bc2004e]
-  - [ ] Use TanStack Query factories and mutation invalidation consistently
+   - [x] Use TanStack Query factories and mutation invalidation consistently [commit pending]
 - [~] Task: Integrate context into instructor assignment surfaces
   - [ ] Add section selection and authorized student filtering to the assignment wizard
   - [ ] Add lifecycle controls and status feedback

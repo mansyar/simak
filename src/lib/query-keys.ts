@@ -37,6 +37,12 @@ export const assignmentKeys = {
   detail: (assignmentId: number) => ['assignments', 'detail', assignmentId] as const,
 };
 
+export const academicContextKeys = {
+  all: () => ['academic-context'] as const,
+  lists: () => ['academic-context', 'list'] as const,
+  enrollments: (sectionId: number) => ['academic-context', 'enrollments', sectionId] as const,
+};
+
 export const userKeys = {
   all: () => ['users'] as const,
   list: (filters?: { page?: number; limit?: number; search?: string; role?: string }) =>

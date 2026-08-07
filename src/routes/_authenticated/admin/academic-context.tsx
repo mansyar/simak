@@ -1,4 +1,5 @@
 import { createFileRoute, useRouter } from '@tanstack/react-router';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   addSectionEnrollment,
   archiveAcademicTerm,
@@ -21,49 +22,60 @@ import {
   type SectionEnrollmentRow,
 } from '@/components/admin/academic-context/AcademicContextPage';
 import { isServerError, type ErrorCode } from '@/lib/errors';
+import { academicContextKeys } from '@/lib/query-keys';
 
 export const Route = createFileRoute('/_authenticated/admin/academic-context')({
-  loader: async () => {
-    const [termResult, courseResult, sectionResult] = await Promise.all([
-      listAcademicTerms({ data: { page: 1, limit: 100, search: '', status: '' } }),
-      listCourses({ data: { page: 1, limit: 100, search: '' } }),
-      listCourseSections({ data: { page: 1, limit: 100, search: '', status: '' } }),
-    ]);
-
-    const sections = getRows<CourseSectionRow>(sectionResult, 'sections');
-    const enrollmentResults = await Promise.all(
-      sections.map((section) =>
-        listSectionEnrollments({
-          data: { sectionId: section.id, page: 1, limit: 100, role: '' },
-        }),
-      ),
-    );
-
-    return {
-      terms: getRows<AcademicTermRow>(termResult, 'terms'),
-      courses: getRows<CourseRow>(courseResult, 'courses'),
-      sections,
-      enrollments: enrollmentResults.flatMap((result) =>
-        getRows<SectionEnrollmentRow>(result, 'enrollments'),
-      ),
-      error: getError(termResult) ?? getError(courseResult) ?? getError(sectionResult),
-    };
-  },
+  loader: loadAcademicContext,
   component: AcademicContextRoute,
 });
+
+async function loadAcademicContext() {
+  const [termResult, courseResult, sectionResult] = await Promise.all([
+    listAcademicTerms({ data: { page: 1, limit: 100, search: '', status: '' } }),
+    listCourses({ data: { page: 1, limit: 100, search: '' } }),
+    listCourseSections({ data: { page: 1, limit: 100, search: '', status: '' } }),
+  ]);
+
+  const sections = getRows<CourseSectionRow>(sectionResult, 'sections');
+  const enrollmentResults = await Promise.all(
+    sections.map((section) =>
+      listSectionEnrollments({
+        data: { sectionId: section.id, page: 1, limit: 100, role: '' },
+      }),
+    ),
+  );
+
+  return {
+    terms: getRows<AcademicTermRow>(termResult, 'terms'),
+    courses: getRows<CourseRow>(courseResult, 'courses'),
+    sections,
+    enrollments: enrollmentResults.flatMap((result) =>
+      getRows<SectionEnrollmentRow>(result, 'enrollments'),
+    ),
+    error: getError(termResult) ?? getError(courseResult) ?? getError(sectionResult),
+  };
+}
 
 function AcademicContextRoute() {
   const data = Route.useLoaderData();
   const router = useRouter();
+  const queryClient = useQueryClient();
+  const contextQuery = useQuery({
+    queryKey: academicContextKeys.all(),
+    queryFn: loadAcademicContext,
+    initialData: data,
+    staleTime: 30_000,
+  });
 
   const refresh = async () => {
+    await queryClient.invalidateQueries({ queryKey: academicContextKeys.all() });
     await router.invalidate();
   };
 
   return (
     <AcademicContextPage
-      {...data}
-      loading={false}
+      {...contextQuery.data}
+      loading={contextQuery.isLoading}
       onCreateTerm={async (input) => {
         await createAcademicTerm({
           data: {
