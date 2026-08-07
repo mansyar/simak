@@ -6,7 +6,7 @@ import {
   listInstructorAssignmentsHandler,
   getAssignmentDetailHandler,
 } from '@/server/assignments.server';
-import { listStudentAssignmentsHandler } from '@/server/assignments-extras.server';
+import { listStudentAssignmentsHandler } from '@/server/assignments-student.server';
 import * as auth from '@/server/auth';
 import * as dbMod from '@/db/index';
 

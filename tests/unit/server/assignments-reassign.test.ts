@@ -2,7 +2,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { serverError, ErrorCode } from '@/lib/errors';
 import * as auth from '@/server/auth';
-import { reassignAssignmentHandler } from '@/server/assignments.server';
+import * as audit from '@/lib/audit';
+import { reassignAssignmentHandler } from '@/server/assignments-admin.server';
 
 vi.mock('@/server/auth', () => ({ getSessionFromHeaders: vi.fn() }));
 vi.mock('@/db/index', () => ({ getDb: vi.fn() }));
@@ -119,5 +120,40 @@ describe('reassignAssignmentHandler', () => {
       expect.objectContaining({ of: expect.anything() }),
     );
     expect(mockDb.update).toHaveBeenCalledWith(expect.anything());
+  });
+
+  it('should preserve success when advisory audit logging fails', async () => {
+    vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(adminSession as any);
+    mockDb.then
+      .mockImplementationOnce((onfulfilled: any) =>
+        Promise.resolve([{ id: 1, deletedAt: null }]).then(onfulfilled),
+      )
+      .mockImplementationOnce((onfulfilled: any) =>
+        Promise.resolve([{ id: 'instructor-2', role: 'instructor', deletedAt: null }]).then(
+          onfulfilled,
+        ),
+      )
+      .mockImplementationOnce((onfulfilled: any) => Promise.resolve([]).then(onfulfilled))
+      .mockImplementationOnce((onfulfilled: any) => Promise.resolve([]).then(onfulfilled));
+    vi.mocked(audit.logAuditEvent).mockRejectedValueOnce(new Error('audit unavailable'));
+
+    await expect(
+      reassignAssignmentHandler({
+        data: { assignmentId: 1, newInstructorId: 'instructor-2' },
+      }),
+    ).resolves.toEqual({ success: true });
+  });
+
+  it('should map transaction failures to an internal error', async () => {
+    vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(adminSession as any);
+    mockDb.transaction.mockRejectedValueOnce(new Error('database unavailable'));
+
+    const result = await reassignAssignmentHandler({
+      data: { assignmentId: 1, newInstructorId: 'instructor-2' },
+    });
+
+    expect(result).toEqual({
+      error: { code: ErrorCode.INTERNAL, message: 'Internal Server Error' },
+    });
   });
 });
