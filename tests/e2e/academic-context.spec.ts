@@ -43,6 +43,19 @@ async function getAssignmentSnapshot(id: number) {
   }
 }
 
+async function getAssignmentIdByTitle(title: string) {
+  const sql = postgres(getDatabaseUrl());
+
+  try {
+    const [assignment] = await sql<{ id: number }[]>`
+      SELECT id FROM assignments WHERE title = ${title} AND deleted_at IS NULL LIMIT 1
+    `;
+    return assignment?.id ?? null;
+  } finally {
+    await sql.end();
+  }
+}
+
 async function getLatestAssignmentIdAfter(id: number) {
   const sql = postgres(getDatabaseUrl());
 
@@ -86,7 +99,8 @@ test.describe('Academic context cross-role surfaces', () => {
     await expect(page.getByText('E2E-THESIS', { exact: true })).toBeVisible();
     await expect(page.getByText('E2E Thesis Section', { exact: true })).toBeVisible();
     await expect(page.getByText('Student', { exact: true })).toBeVisible();
-    await expect(page.getByRole('button', { name: /Archive/ })).toHaveCount(3);
+    await expect(page.getByRole('button', { name: /Archive/ })).toHaveCount(4);
+    await expect(page.getByText('E2E Negative Fixture Section', { exact: true })).toBeVisible();
   });
 
   test('instructor sees authorized sections and lifecycle-aware assignment controls', async ({
@@ -244,5 +258,32 @@ test.describe('Academic context cross-role surfaces', () => {
     await loginAsRole(page, 'student');
     await page.goto('/instructor/assignments');
     await expect(page).toHaveURL(/\/student\/dashboard/);
+  });
+
+  test('negative section fixtures block cross-section and inactive membership access', async ({
+    browser,
+  }) => {
+    const sourceId = await getAssignmentIdByTitle('E2E Test Assignment');
+    expect(sourceId).not.toBeNull();
+
+    const instructorTwoPage = await browser.newPage();
+    const studentThreePage = await browser.newPage();
+
+    try {
+      await loginAsRole(instructorTwoPage, 'instructor2');
+      await instructorTwoPage.goto(`/instructor/assignments/${sourceId}`);
+      await expect(
+        instructorTwoPage.getByRole('heading', { name: 'Page not found' }),
+      ).toBeVisible();
+
+      await loginAsRole(studentThreePage, 'student3');
+      await studentThreePage.goto('/student/assignments');
+      await expect(studentThreePage.getByText('E2E Test Assignment', { exact: true })).toHaveCount(
+        0,
+      );
+    } finally {
+      await instructorTwoPage.close();
+      await studentThreePage.close();
+    }
   });
 });

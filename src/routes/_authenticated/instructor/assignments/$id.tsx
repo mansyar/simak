@@ -39,6 +39,7 @@ export const Route = createFileRoute('/_authenticated/instructor/assignments/$id
     ]);
 
     if (isServerError(assignmentResult)) return assignmentResult;
+    if (assignmentResult === null) return null;
 
     return {
       ...assignmentResult,
