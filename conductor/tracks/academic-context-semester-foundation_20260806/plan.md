@@ -146,11 +146,11 @@
   - [x] Provide responsive list/detail/forms for terms, courses, sections, and enrollments [commit: bc2004e]
   - [x] Add accessible archive and enrollment confirmation flows [commit: bc2004e]
    - [x] Use TanStack Query factories and mutation invalidation consistently [commit: c37da29]
-- [x] Task: Integrate context into instructor assignment surfaces [commit: 6b9c4df]
+- [x] Task: Integrate context into instructor assignment surfaces [commit: 6b9c4df, b1817ad]
   - [x] Add section selection and authorized student filtering to the assignment wizard [commit: 6b9c4df]
-  - [x] Add lifecycle controls and status feedback [commit: pending]
-  - [x] Add clone/rollover flow with explicit target section and configuration review [commit: pending]
-  - [x] Display course, term, and section context on assignment list/detail surfaces [commit: pending]
+  - [x] Add lifecycle controls and status feedback [commit: b1817ad]
+  - [x] Add clone/rollover flow with explicit target section and configuration review [commit: b1817ad]
+  - [x] Display course, term, and section context on assignment list/detail surfaces [commit: b1817ad]
 - [ ] Task: Update student and shared surfaces
   - [ ] Display authorized academic context on student assignments and relevant dashboard cards
   - [ ] Add context-aware empty and archived states
