@@ -365,7 +365,13 @@ Core entities:
 
 - **User** — with role (SuperAdmin, Admin, Instructor, Student) and optional `settings` jsonb column for storing profile, theme, accessibility preferences (e.g., reduced motion), notification preferences (per-type, per-channel opt-out), and an optional validated IANA timezone for student deadline presentation.
 - **AssignmentTemplate** — defines type + ordered checkpoint names.
-- **Assignment** — ties template to one or more students + final deadline + title + description.
+- **AcademicTerm** — reusable academic period with a unique code, valid date range, and explicit draft/active/closed/archived lifecycle.
+- **Course** — reusable course identity with a unique code and display name.
+- **CourseSection** — term-specific course offering with a unique term/course/code identity and active/inactive/archived lifecycle.
+- **SectionEnrollment** — role-aware instructor/student membership in a course section, with active/inactive history-safe state.
+- **Assignment** — ties a reusable template to exactly one course section, an explicit individual/group mode (individual is the supported default), one or more explicitly selected students, a draft/active/archived lifecycle, final deadline, title, and description.
+- **Assignment context policy** — instructors may operate only in active sections where they have an active instructor enrollment; students see only active assignments in sections where they have active student enrollment. Assignment lifecycle is separate from `deletedAt`, which remains the destructive soft-delete boundary.
+- **Academic foundation migration policy** — the prelaunch migration refuses to run when existing assignment rows would require fabricated term/course/section facts. Development and E2E environments reset and recreate deterministic academic fixtures; any future production import requires an explicit legacy mapping before it can proceed.
 - **AssignmentGroupMember** `[v2]` — maps students to group assignments.
 - **Checkpoint** — one per assignment stage; tracks state, due date, description, and required consultations.
 - **Submission** — files uploaded by student per checkpoint (`.docx` or `.pdf`). Append-only log: each resubmission creates a new row with an auto-incremented version number.

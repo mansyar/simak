@@ -174,11 +174,11 @@
   - [x] Extend isolated test database seed/reset helpers with terms, courses, sections, and memberships
   - [x] Keep test data deterministic and role-specific
   - [x] Add negative fixtures for cross-section and inactive-user authorization
-- [ ] Task: Update project documentation
-  - [ ] Update `docs/TDD.md` with the final schema, relations, indexes, and server-function boundaries
-  - [ ] Update relevant `docs/PRD.md` data-model and assignment-context sections
-  - [ ] Document the prelaunch migration/reset assumption and future legacy-import requirement
-  - [ ] Record implementation outcomes and downstream coordination in `docs/roadmap.md`
+- [x] Task: Update project documentation [commit pending]
+  - [x] Update `docs/TDD.md` with the final schema, relations, indexes, and server-function boundaries
+  - [x] Update relevant `docs/PRD.md` data-model and assignment-context sections
+  - [x] Document the prelaunch migration/reset assumption and future legacy-import requirement
+  - [x] Record implementation outcomes and downstream coordination in `docs/roadmap.md`
 - [ ] Task: Run complete verification
   - [ ] Run `pnpm test`
   - [ ] Run `pnpm test:integration`
