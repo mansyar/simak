@@ -10,7 +10,4 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ## Active Tracks
 
-- [x] **TRACK-057: Academic Context & Semester Foundation**
-  - **Status:** Complete
-  - **Branch:** `track-057/academic-context-semester-foundation`
-  - **Link:** [Track Context](./tracks/academic-context-semester-foundation_20260806/index.md)
+No active tracks.
