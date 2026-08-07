@@ -142,9 +142,9 @@
   - [x] Run `pnpm generate:i18n`
   - [x] Run `pnpm check:i18n` and `pnpm check:i18n:unused`
 - [~] Task: Implement admin context-management UI
-  - [ ] Add routes/components following existing admin users/templates patterns
-  - [ ] Provide responsive list/detail/forms for terms, courses, sections, and enrollments
-  - [ ] Add accessible archive and enrollment confirmation flows
+  - [x] Add routes/components following existing admin users/templates patterns [commit: bc2004e]
+  - [x] Provide responsive list/detail/forms for terms, courses, sections, and enrollments [commit: bc2004e]
+  - [x] Add accessible archive and enrollment confirmation flows [commit: bc2004e]
   - [ ] Use TanStack Query factories and mutation invalidation consistently
 - [ ] Task: Integrate context into instructor assignment surfaces
   - [ ] Add section selection and authorized student filtering to the assignment wizard
