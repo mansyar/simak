@@ -165,7 +165,7 @@
 
 **Objective:** Verify cross-role behavior, migration safety, and complete repository quality gates.
 
-- [x] Task: Write failing E2E coverage (Red) [commit pending]
+- [x] Task: Write failing E2E coverage (Red) [commit: 72adba7]
   - [x] Add an academic-context E2E spec covering admin setup, enrollment, instructor assignment creation, and student visibility
   - [x] Cover draft/active/archive transitions and unauthorized access
   - [x] Cover clone and semester rollover with source-history preservation
