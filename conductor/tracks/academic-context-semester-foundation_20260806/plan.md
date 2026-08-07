@@ -151,10 +151,10 @@
   - [x] Add lifecycle controls and status feedback [commit: b1817ad]
   - [x] Add clone/rollover flow with explicit target section and configuration review [commit: b1817ad]
   - [x] Display course, term, and section context on assignment list/detail surfaces [commit: b1817ad]
-- [ ] Task: Update student and shared surfaces
-  - [ ] Display authorized academic context on student assignments and relevant dashboard cards
-  - [ ] Add context-aware empty and archived states
-  - [ ] Preserve mobile layouts, keyboard navigation, focus states, semantic labels, and reduced-motion behavior
+- [x] Task: Update student and shared surfaces [commit: pending]
+  - [x] Display authorized academic context on student assignments and relevant dashboard cards [commit: pending]
+  - [x] Add context-aware empty and archived states [commit: pending]
+  - [x] Preserve mobile layouts, keyboard navigation, focus states, semantic labels, and reduced-motion behavior [commit: pending]
 - [ ] Task: Run Phase 5 Green verification
   - [ ] Run focused route/component tests
   - [ ] Run i18n checks and accessibility-focused component tests

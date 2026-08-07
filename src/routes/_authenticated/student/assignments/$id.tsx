@@ -190,6 +190,8 @@ function AssignmentDetailPage() {
     instructorName: assignment.instructorName,
     templateName: assignment.templateName,
     templateType: assignment.templateType,
+    status: assignment.status,
+    context: assignment.context,
   };
 
   const assignmentTabs = [

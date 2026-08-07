@@ -19,6 +19,12 @@ interface ActiveAssignment {
   templateType: string;
   progressPercent: number;
   currentState: string;
+  context?: {
+    termName: string;
+    courseCode: string;
+    sectionCode: string;
+    sectionName: string | null;
+  };
 }
 
 interface UpcomingDeadline {
@@ -118,6 +124,18 @@ export function StudentDashboard({ data }: Props) {
                     </span>
                   </div>
                   <h2 className="font-medium text-foreground truncate mb-2">{assignment.title}</h2>
+                  {assignment.context && (
+                    <div
+                      className="mb-2 flex flex-wrap gap-1.5 text-xs text-muted-foreground"
+                      aria-label={t('studentAssignments.context.section')}
+                    >
+                      <span>{assignment.context.courseCode}</span>
+                      <span>
+                        {assignment.context.sectionName ?? assignment.context.sectionCode}
+                      </span>
+                      <span>{assignment.context.termName}</span>
+                    </div>
+                  )}
                   <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-2">
                     <Calendar className="h-3.5 w-3.5" />
                     <span>

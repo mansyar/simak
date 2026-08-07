@@ -2,7 +2,12 @@
 import { eq, and, asc, desc, sql, inArray, isNull } from 'drizzle-orm';
 import { getDb } from '../db/index';
 import { assignments, assignmentStudents, checkpoints } from '../db/schema/assignments';
-import { sectionEnrollments } from '../db/schema/academic-context';
+import {
+  academicTerms,
+  courseSections,
+  courses,
+  sectionEnrollments,
+} from '../db/schema/academic-context';
 import { assignmentTemplates } from '../db/schema/templates';
 import { reviews, submissions } from '../db/schema/submissions';
 import { revisionActionItems } from '../db/schema/revision-action-items';
@@ -49,6 +54,10 @@ export async function getStudentDashboardDataHandler() {
             finalDeadline: assignments.finalDeadline,
             templateName: assignmentTemplates.name,
             templateType: assignmentTemplates.type,
+            termName: academicTerms.name,
+            courseCode: courses.code,
+            sectionCode: courseSections.code,
+            sectionName: courseSections.name,
           })
           .from(assignmentStudents)
           .innerJoin(assignments, eq(assignmentStudents.assignmentId, assignments.id))
@@ -56,6 +65,9 @@ export async function getStudentDashboardDataHandler() {
             sectionEnrollments,
             and(eq(sectionEnrollments.sectionId, assignments.sectionId), activeStudentSection),
           )
+          .innerJoin(courseSections, eq(assignments.sectionId, courseSections.id))
+          .innerJoin(academicTerms, eq(courseSections.termId, academicTerms.id))
+          .innerJoin(courses, eq(courseSections.courseId, courses.id))
           .innerJoin(assignmentTemplates, eq(assignments.templateId, assignmentTemplates.id))
           .where(
             and(
@@ -247,6 +259,12 @@ export async function getStudentDashboardDataHandler() {
         finalDeadline: a.finalDeadline,
         templateName: a.templateName,
         templateType: a.templateType,
+        context: {
+          termName: a.termName,
+          courseCode: a.courseCode,
+          sectionCode: a.sectionCode,
+          sectionName: a.sectionName,
+        },
         progressPercent: totalCount > 0 ? Math.round((passedCount / totalCount) * 100) : 0,
         currentState,
         effectiveDeadline,
