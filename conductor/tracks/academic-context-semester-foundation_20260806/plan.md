@@ -159,7 +159,7 @@
   - [x] Run focused route/component tests
   - [x] Run i18n checks and accessibility-focused component tests
   - [x] Verify no hardcoded user-visible strings or raw server errors were introduced
-- [~] Task: Phase Verification & Checkpoint (Refer to `workflow.md`)
+- [x] Task: Phase Verification & Checkpoint (Refer to `workflow.md`) [checkpoint: 5234ed5]
 
 ## Phase 6: End-to-End Coverage, Documentation & Quality Gates
 
