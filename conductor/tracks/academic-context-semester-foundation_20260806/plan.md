@@ -174,7 +174,7 @@
   - [x] Extend isolated test database seed/reset helpers with terms, courses, sections, and memberships
   - [x] Keep test data deterministic and role-specific
   - [x] Add negative fixtures for cross-section and inactive-user authorization
-- [x] Task: Update project documentation [commit pending]
+- [x] Task: Update project documentation [commit: 9c588f6]
   - [x] Update `docs/TDD.md` with the final schema, relations, indexes, and server-function boundaries
   - [x] Update relevant `docs/PRD.md` data-model and assignment-context sections
   - [x] Document the prelaunch migration/reset assumption and future legacy-import requirement
