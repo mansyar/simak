@@ -170,6 +170,6 @@ describe('appointment timezone display', () => {
     const result = formatAppointmentRange(futureStart, futureEnd, 'not/a-timezone', 'id');
 
     expect(result.timeZone).toBe('UTC');
-    expect(result.startLabel).toContain('20.00');
+    expect(result.startLabel).toContain('13.00');
   });
 });

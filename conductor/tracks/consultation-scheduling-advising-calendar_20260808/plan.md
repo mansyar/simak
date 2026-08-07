@@ -42,12 +42,14 @@
   - **Migration verification:** `pnpm db:migrate` could not be used because the local database has the existing 23 application tables but an empty `drizzle.__drizzle_migrations` history, causing Drizzle to replay older migrations. Direct execution of migration `0024` succeeded; inspection confirmed all columns, checks, and indexes; the companion rollback removed `appointments`; re-applying `0024` restored it.
   - **Completion commits:** `048e4745` (schema, migration, rollback, and tests), `2bb4b6ea` (Drizzle migration journal and snapshot).
 
-- [~] **Task 1.3: Define pure appointment policies (RED → GREEN)**
+- [x] **Task 1.3: Define pure appointment policies (RED → GREEN)**
   - [x] Write unit tests for duration validation, future-time validation, valid/invalid lifecycle transitions, overlap detection, and timezone-safe display conversion.
   - [x] Confirm RED behavior.
   - **RED evidence:** `pnpm vitest run tests/unit/lib/appointment-policies.test.ts` failed during Vite import analysis because `@/lib/appointment-policies` does not exist; no assertions ran.
-  - [~] Implement dependency-light policy helpers and shared Zod contracts.
-  - [~] Verify boundary cases, including DST transitions and cancelled appointments excluded from conflicts.
+  - [x] Implement dependency-light policy helpers and shared Zod contracts.
+  - [x] Verify boundary cases, including DST transitions and cancelled appointments excluded from conflicts.
+  - **GREEN evidence:** `pnpm vitest run tests/unit/lib/appointment-policies.test.ts` passed 8/8 and `pnpm typecheck` passed.
+  - **Implementation notes:** Added `src/lib/appointment-policies.ts` with shared status/window Zod schemas, bounded window validation, lifecycle transition guards, half-open overlap checks that ignore cancelled appointments, and `Intl`-based timezone display using `resolveTimeZone`.
 
 - [ ] **Phase 1 Verification & Checkpoint**
   - [ ] Run focused schema/policy tests and migration verification.
