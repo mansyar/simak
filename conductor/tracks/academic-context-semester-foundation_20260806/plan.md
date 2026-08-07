@@ -131,12 +131,12 @@
 
 **Objective:** Make academic context, lifecycle, filters, and clone/rollover usable through accessible responsive surfaces.
 
-- [~] Task: Write failing UI and route tests (Red)
-  - [ ] Add admin academic-context route/component tests for terms, courses, sections, and enrollment management
-  - [ ] Add instructor assignment-form tests for context selection, authorized students, mode, lifecycle, and clone/rollover
-  - [ ] Add student/instructor list and detail tests for context visibility and lifecycle states
-  - [ ] Add tests for loading, empty, validation, authorization, server-error, and confirmation states
-  - [ ] Add i18n parity/source-contract tests for all new keys
+- [x] Task: Write failing UI and route tests (Red) [commit: pending]
+  - [x] Add admin academic-context route/component tests for terms, courses, sections, and enrollment management
+  - [x] Add instructor assignment-form tests for context selection, authorized students, mode, lifecycle, and clone/rollover
+  - [x] Add student/instructor list and detail tests for context visibility and lifecycle states
+  - [x] Add tests for loading, empty, validation, authorization, server-error, and confirmation states
+  - [x] Add i18n parity/source-contract tests for all new keys
 - [ ] Task: Add bilingual translation keys and generated types
   - [ ] Add English and Indonesian keys for academic context, lifecycle, filters, forms, clone/rollover, and errors
   - [ ] Run `pnpm generate:i18n`

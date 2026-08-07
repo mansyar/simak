@@ -46,6 +46,12 @@ describe('StudentAssignmentCard', () => {
     templateName: 'Thesis Template',
     templateType: 'Thesis',
     progressPercent: 33,
+    context: {
+      term: { name: 'Fall 2026' },
+      course: { code: 'CS101', name: 'Foundations of Computing' },
+      section: { code: 'A', name: 'Section A' },
+    },
+    status: 'active' as const,
   };
 
   it('should render the assignment title', () => {
@@ -86,5 +92,15 @@ describe('StudentAssignmentCard', () => {
     mockLocation.mockReturnValue({ pathname: '/student/assignments' });
     render(<StudentAssignmentCard assignment={mockAssignment} />);
     expect(screen.getByText('Thesis Template')).toBeDefined();
+  });
+
+  it('should render authorized academic context and lifecycle status', () => {
+    mockLocation.mockReturnValue({ pathname: '/student/assignments' });
+    render(<StudentAssignmentCard assignment={mockAssignment} />);
+
+    expect(screen.getByText('CS101')).toBeDefined();
+    expect(screen.getByText('Section A')).toBeDefined();
+    expect(screen.getByText('Fall 2026')).toBeDefined();
+    expect(screen.getByText('studentAssignments.status.active')).toBeDefined();
   });
 });
