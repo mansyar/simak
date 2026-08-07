@@ -1,0 +1,11 @@
+{
+  "track_id": "track-058",
+  "track_number": "TRACK-058",
+  "type": "feature",
+  "status": "pending",
+  "created_at": "2026-08-08T00:00:00Z",
+  "updated_at": "2026-08-08T00:00:00Z",
+  "dependencies": ["TRACK-055", "TRACK-057"],
+  "title": "Consultation Scheduling & Advising Calendar",
+  "description": "Add bounded one-off instructor appointment slots, direct student booking, conflict-safe lifecycle management, reminders, and private iCalendar output while preserving existing consultation evidence and verification semantics."
+}
