@@ -50,6 +50,7 @@
   - [x] Verify boundary cases, including DST transitions and cancelled appointments excluded from conflicts.
   - **GREEN evidence:** `pnpm vitest run tests/unit/lib/appointment-policies.test.ts` passed 8/8 and `pnpm typecheck` passed.
   - **Implementation notes:** Added `src/lib/appointment-policies.ts` with shared status/window Zod schemas, bounded window validation, lifecycle transition guards, half-open overlap checks that ignore cancelled appointments, and `Intl`-based timezone display using `resolveTimeZone`.
+  - **Completion commit:** `2eaa7957` (`feat(track-058): add appointment policy contracts`).
 
 - [ ] **Phase 1 Verification & Checkpoint**
   - [ ] Run focused schema/policy tests and migration verification.
