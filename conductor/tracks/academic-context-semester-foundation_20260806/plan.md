@@ -145,7 +145,7 @@
   - [x] Add routes/components following existing admin users/templates patterns [commit: bc2004e]
   - [x] Provide responsive list/detail/forms for terms, courses, sections, and enrollments [commit: bc2004e]
   - [x] Add accessible archive and enrollment confirmation flows [commit: bc2004e]
-   - [x] Use TanStack Query factories and mutation invalidation consistently [commit pending]
+   - [x] Use TanStack Query factories and mutation invalidation consistently [commit: c37da29]
 - [~] Task: Integrate context into instructor assignment surfaces
   - [ ] Add section selection and authorized student filtering to the assignment wizard
   - [ ] Add lifecycle controls and status feedback
