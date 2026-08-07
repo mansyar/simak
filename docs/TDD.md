@@ -153,6 +153,15 @@ simak/
 │   │   ├── users.ts          → User CRUD, invitations
 │   │   ├── assignments.ts    → Assignment CRUD (instructor + student queries)
 │   │   ├── assignments.server.ts → Server-only assignment handlers (createAssignment, listInstructor, getDetail — re-exports handlers from extras + admin files)
+│   │   ├── academic-context.ts → Client-safe term/course/section/enrollment schemas and typed stubs
+│   │   ├── academic-context.server.ts → Admin term/course/section CRUD and explicit projections
+│   │   ├── academic-context-archive.server.ts → History-safe context archival handlers
+│   │   ├── academic-context-enrollments.server.ts → Admin enrollment handlers with row locks and deactivation
+│   │   ├── instructor-assignment-context.ts → Instructor section/student context stub
+│   │   ├── instructor-assignment-context.server.ts → Authorized active-section context handler
+│   │   ├── assignments-context-handlers.server.ts → Authorized instructor assignment list/detail handlers
+│   │   ├── assignments-lifecycle.server.ts → Locked draft/active/archived assignment transitions
+│   │   └── assignments-clone-rollover.server.ts → Transactional independent clone/rollover handlers
 │   │   ├── assignments-admin.server.ts → Admin-only assignment handler (`reassignAssignmentHandler` — extracted to stay under 500-line limit, multi-handler pattern) (TRACK-040)
 │   │   ├── submissions.ts    → Upload, versioning
 │   │   ├── reviews.ts        → Review, pass/revise, optional revision-action plan validation
@@ -481,7 +490,11 @@ All 86 authenticated TanStack Start server functions are rate-limited through ex
 **User** (SuperAdmin, Admin, Instructor, Student) — core identity with role and optional settings JSONB timezone preference.
 **AssignmentTemplate** — defines a type (e.g. Thesis) with ordered checkpoint names.
 **TemplateCheckpoint** — checkpoint definition within a template (name, order).
-**Assignment** — links a template to students with a title, description, and final deadline.
+**AcademicTerm** — reusable period with a unique code, valid date range, and `draft`/`active`/`closed`/`archived` lifecycle.
+**Course** — reusable course identity with a unique code.
+**CourseSection** — term-specific course offering with unique term/course/code identity and `active`/`inactive`/`archived` lifecycle.
+**SectionEnrollment** — role-aware instructor/student membership with active history-safe state.
+**Assignment** — links a template to exactly one course section with a title, description, final deadline, explicit `individual`/`group` mode, and `draft`/`active`/`archived` lifecycle.
 **AssignmentStudent** — maps a student to an assignment (individual progress, not group work). [v1]
 **Checkpoint** — one per assignment stage; copied from template at creation time.
 **Submission** — files uploaded by a student for a checkpoint.
@@ -494,7 +507,7 @@ All 86 authenticated TanStack Start server functions are rate-limited through ex
 **ExtensionRequest** — student-initiated deadline extension with reason category, proposed duration (1–30 days), instructor approval/rejection, and configurable caps (`maxExtensionDays`, `maxTotalExtensions`). On approval, the affected student's subsequent checkpoint `dueDate` values auto-extend. The assignment-wide `finalDeadline` is immutable after creation and never mutated by extensions.
 **DeadlineReminder** — dedup tracking table for proactive deadline reminders. Records `checkpointId` (FK, cascade delete), `studentId` (FK, cascade delete), `tier` (`'7d'`/`'3d'`/`'1d'`), and `sentAt`. Unique constraint on `(checkpointId, tier)` ensures at-most-once delivery per tier per checkpoint across multiple server instances. Used by the hourly background scanner (`processDeadlineReminders()`) to deduplicate via `INSERT ... ON CONFLICT DO NOTHING RETURNING *`.
 **CalendarFeedToken** — per-student private-feed credential record introduced by migration 0020. Stores a SHA-256 token hash, ownership and created/revoked timestamps; a partial unique index enforces one active token per student. The opaque token is returned only on enable/regenerate and is never persisted or logged in plaintext. The route is `GET /api/calendar/ics` and returns UTC RFC 5545 events.
-**AuditLog** — immutable record of all meaningful system actions: user CRUD, template CRUD, assignment creation, review decisions, revision-action plan creation/status changes, deadline changes, unlocks, and consultation verifications/rejections. Stores actor, action type, entity reference, and JSON details; revision-action entries omit full feedback text. [v1] — admin viewer at `/admin/audit-log`.
+**AuditLog** — immutable record of all meaningful system actions: user CRUD, template CRUD, academic context CRUD/archive/enrollment changes, assignment creation, lifecycle transitions, clone/rollover, review decisions, revision-action plan creation/status changes, deadline changes, unlocks, and consultation verifications/rejections. Stores actor, action type, entity reference, and JSON details; revision-action entries omit full feedback text. [v1] — admin viewer at `/admin/audit-log`.
 **EmailQueue** — background delivery queue for transactional emails. [v1] — infrastructure used for invitations, password reset, 2FA emails, SLA alerts, and **11 event notification types** (submission received, review completed, revision requested, consultation verified/rejected, extension approved/rejected, extension requested, deadline reminder, student at risk, discussion reply). Event emails are dispatched as post-commit advisory work via `enqueueEventEmail()` (`src/lib/event-email.ts`) alongside existing in-app notifications — the primary operation always succeeds even if enqueue fails. `enqueueEventEmail` supports optional `subjectParams` for interpolating dynamic values into email subjects (e.g., `{assignmentTitle}` in deadline reminder subjects). A proactive deadline reminder scanner (`processDeadlineReminders()` in `src/lib/deadline-reminder-scanner.ts`) runs hourly alongside the email queue processor — it queries checkpoints with upcoming due dates, dispatches tiered (7d/3d/1d) in-app notifications + emails, and uses a `deadline_reminders` dedup table with `ON CONFLICT DO NOTHING` for at-most-once delivery per tier per checkpoint. The dedup insert and notification creation are wrapped in a single `db.transaction` (atomicity); email dispatch runs post-commit via `Promise.allSettled` (advisory). Scanner failure is isolated via `try/catch` and does not affect email processing. The scanner also calls `checkAndFireRiskAlert` for each reminder to surface at-risk students (advisory, `Promise.allSettled`). An orphaned R2 object cleanup scanner (`processOrphanedR2Objects()` in `src/lib/r2-cleanup.ts`) also runs in the tick loop — throttled to every 6 hours via in-memory `lastR2CleanupAt`, it deletes R2 objects whose upload intents expired without being consumed, using `Promise.allSettled` for parallel deletes with per-object error isolation. The R2 cleanup scanner accepts an `actorId` parameter (default `'system'`) for audit logging via `safeAuditLog`. Scanner failure is isolated via `try/catch` and does not affect email processing. Admins can manually trigger R2 cleanup via the "Trigger R2 Cleanup" button on `/admin/email-queue` (bypasses throttle, logs with admin userId). Hardened with a `processing` status, transactional claim via `FOR UPDATE SKIP LOCKED` (send occurs outside the transaction), an in-process `isRunning` guard, and stale-row reclaim (rows stuck in `processing` > 5 min reset to `pending`) to prevent concurrent-worker duplicate delivery and lockup. All user-derived interpolations in email bodies are HTML-escaped to prevent stored XSS. Admin queue inspector at `/admin/email-queue` provides observability — paginated list (20/page) with status filter, search (recipient email/subject), summary stats (pending/sent/failed), and manual retry of failed emails (idempotent: only `status='failed'` can be retried, resets to `pending` inside a `FOR UPDATE` transaction). Each row exposes a `resendMessageId` (populated from the Resend API `result.data.id` on successful send) displayed as a monospace truncated cell, enabling correlation with Resend's delivery dashboard. Processor sends emails in concurrent batches of 5 via `Promise.allSettled` (chunks run sequentially; partial failures don't abort the batch — cycle latency reduced from ~10× to ~2× single-send latency). Automatic retention cleanup prunes `sent` rows older than 90 days and `failed` rows older than 180 days on a tick-embedded 24-hour cycle (`lastPruneAt` timestamp in `email-queue-init.ts`); `pending`/`processing` rows are never deleted. Processor emits structured logs (`email_queue.cycle_start`, `email_queue.cycle_end`, `email_queue.reclaimed`, `email_queue.send_failed`, `email_queue.retention_pruned` — no PII). `EMAIL_FROM` is read from `getEnv().EMAIL_FROM` (Zod-validated in `src/config/env.ts` with default `'SIMAK <noreply@simak.app>'`).
 **TwoFactor** — TOTP configuration (secret, backup codes) managed by Better Auth's `twoFactor` plugin.
 **Session** — Better-Auth session token, FK to users, expiresAt.
@@ -608,6 +621,56 @@ All 86 authenticated TanStack Start server functions are rate-limited through ex
 | createdAt         | timestamp                           |                                       |
 | deletedAt         | timestamp                           | Soft delete (Track: Rubric-Based Grading) |
 
+#### academic_terms
+
+| Column     | Type                                      | Notes |
+| ---------- | ----------------------------------------- | ----- |
+| id         | serial (PK)                               |       |
+| code       | text, unique, not null                    | Stable term identity |
+| name       | text, not null                            | Display name |
+| startDate  | date, not null                            | Must be on or before `endDate` |
+| endDate    | date, not null                            |       |
+| status     | pgEnum (`academic_term_status`), not null | `draft` \| `active` \| `closed` \| `archived` |
+| archivedAt | timestamp                                 | Set when archived; history is retained |
+
+#### courses
+
+| Column      | Type                   | Notes |
+| ----------- | ---------------------- | ----- |
+| id          | serial (PK)            |       |
+| code        | text, unique, not null | Reusable course identity |
+| name        | text, not null         |       |
+| description | text                   |       |
+| archivedAt  | timestamp              | Soft archive; rows remain history-safe |
+
+#### course_sections
+
+| Column      | Type                                        | Notes |
+| ----------- | ------------------------------------------- | ----- |
+| id          | serial (PK)                                 |       |
+| termId      | integer (FK → academic_terms)               |       |
+| courseId    | integer (FK → courses)                      |       |
+| code        | text, not null                              | Unique within term/course |
+| name        | text                                        |       |
+| status      | pgEnum (`course_section_status`), not null  | `active` \| `inactive` \| `archived` |
+| archivedAt  | timestamp                                   | Set when archived |
+
+Unique identity is `(termId, courseId, code)`; term/course foreign keys and status indexes support authorized context filtering.
+
+#### section_enrollments
+
+| Column     | Type                                     | Notes |
+| ---------- | ---------------------------------------- | ----- |
+| id         | serial (PK)                              |       |
+| sectionId  | integer (FK → course_sections)            |       |
+| userId     | text (FK → users)                         |       |
+| role       | pgEnum (`section_enrollment_role`)       | `instructor` \| `student` |
+| isActive   | boolean, default true, not null           |       |
+| startedAt | timestamp                                |       |
+| endedAt   | timestamp                                | Deactivation preserves membership history |
+
+Unique identity is `(sectionId, userId)`; active role/user indexes support authorization and enrollment filters.
+
 #### assignments
 
 | Column             | Type                                | Notes                                                                                                   |
@@ -618,6 +681,9 @@ All 86 authenticated TanStack Start server functions are rate-limited through ex
 | description        | text                                |                                                                                                         |
 | finalDeadline      | timestamp, not null                 | Immutable after creation — course-wide soft target. Individual checkpoint `dueDate` values enforce locking; per-student effective deadline is derived at read time from the first non-passed checkpoint's `dueDate` (via `computeEffectiveDeadline` in `src/server/due-dates.server.ts`). |
 | instructorId       | text (FK → users)                   |                                                                                                         |
+| sectionId          | integer (FK → course_sections), not null | Exactly one academic section per assignment                                                          |
+| mode               | pgEnum (`assignment_mode`), not null | `individual` \| `group`; `individual` is the supported default                                       |
+| status             | pgEnum (`assignment_status`), not null | `draft` \| `active` \| `archived`; separate from `deletedAt`                                         |
 | maxExtensionDays   | integer, default 7                  | Admin cap per request, CHECK (1–30)                                                                     |
 | maxTotalExtensions | integer, default 3                  | Cap per assignment, CHECK (1–10)                                                                        |
 | createdAt          | timestamp                           |                                                                                                         |
@@ -941,7 +1007,7 @@ Composite index `checkpoints_state_due_date_idx` on `checkpoints (state, dueDate
 | activeReleaseVersion | integer, nullable              | Current student-visible snapshot version; retained when withdrawn |
 | publishedAt      | timestamp, nullable                | Timestamp of the active publication                                 |
 
-Auto-created inside `createAssignmentHandler` transaction via `createDefaultGradeConfig(tx, assignmentId)` helper. Pre-existing assignments backfilled by migration `0014_youthful_morg.sql`. Admin-only config changes audit-logged via `logAuditEvent` (action: `gradebook.config_updated`). The `logAuditEvent` call is awaited and wrapped in try/catch per SQL styleguide §6.4 (post-commit advisory pattern).
+Auto-created inside `createAssignmentHandler` transaction via `createDefaultGradeConfig(tx, assignmentId)` helper. The TRACK-057 prelaunch migration refuses unknown legacy assignments rather than backfilling fabricated context or grade history. Admin-only config changes audit-logged via `logAuditEvent` (action: `gradebook.config_updated`). The `logAuditEvent` call is awaited and wrapped in try/catch per SQL styleguide §6.4 (post-commit advisory pattern).
 
 > **Stale weights detection (Track: Gradebook — Review Fix):** `areCustomWeightsValid` in `src/lib/grade-computation.ts` checks that (1) customWeights is not null, (2) the number of keys matches the number of checkpoints (no extra entries for removed checkpoints), (3) every checkpoint has a weight entry, and (4) weights sum to exactly 100. If any check fails, computation falls back to `equal_weight` averaging and sets `staleWeights: true` on the result.
 
@@ -1026,7 +1092,7 @@ Unique constraint on `(assignmentId, releaseVersion, studentId)`. Indexes suppor
 | `checkpoint_discussions` | `assignmentId`, `createdAt` | composite b-tree | Instructor overview across all checkpoints (TRACK-026) |
 | `checkpoint_discussions` | `parentMessageId`       | b-tree           | Reply threading lookup (TRACK-026)            |
 
-All indexes use Drizzle's `index()` or `uniqueIndex()` API. Migrations generated with `drizzle-kit generate`. Migration `0008_deep_santa_claus.sql` (TRACK-005) added 7 new indexes and replaced 2 low-cardinality single-column indexes with composites. Migration `0009_familiar_hydra.sql` (TRACK-016) added the `resend_message_id` column to `email_queue`. Migrations `0010`–`0012` (TRACK-020) added rubric tables (`rubric_criteria`, `rubric_levels`, `review_scores`), `grading_type` pgEnum, `checkpoints.templateCheckpointId` FK + backfill, `template_checkpoints.deletedAt`, and the two rubric-related indexes. Migration `0014_sour_nightshade.sql` (TRACK-026) added the `checkpoint_discussions` table with 3 indexes. Migration `0016` (TRACK-039) added the `cleanedUpAt` timestamp column to `upload_intents`. Migration `0019_daffy_bulldozer.sql` (TRACK-051) added release state, immutable snapshots, indexes, and foreign keys; migration `0020_white_spacker_dave.sql` (TRACK-055) added the calendar feed token; migration `0021_round_mysterio.sql` (TRACK-054) added revision action items and its two composite indexes; migration `0022_search_trigram_indexes.sql` (TRACK-056) enables `pg_trgm` and adds ten GIN trigram indexes for contains-search fields, including the `CAST(details AS text)` audit expression. Its rollback drops only the migration's indexes and intentionally retains `pg_trgm` because `CREATE EXTENSION IF NOT EXISTS` cannot establish ownership. Companion rollbacks are kept in `drizzle/migrations/rollback/`. Each migration has a companion rollback file at `drizzle/migrations/rollback/<NNNN>_<tag>.rollback.sql`.
+All indexes use Drizzle's `index()` or `uniqueIndex()` API. Migrations generated with `drizzle-kit generate`. Migration `0008_deep_santa_claus.sql` (TRACK-005) added 7 new indexes and replaced 2 low-cardinality single-column indexes with composites. Migration `0009_familiar_hydra.sql` (TRACK-016) added the `resend_message_id` column to `email_queue`. Migrations `0010`–`0012` (TRACK-020) added rubric tables (`rubric_criteria`, `rubric_levels`, `review_scores`), `grading_type` pgEnum, `checkpoints.templateCheckpointId` FK + backfill, `template_checkpoints.deletedAt`, and the two rubric-related indexes. Migration `0014_sour_nightshade.sql` (TRACK-026) added the `checkpoint_discussions` table with 3 indexes. Migration `0016` (TRACK-039) added the `cleanedUpAt` timestamp column to `upload_intents`. Migration `0019_daffy_bulldozer.sql` (TRACK-051) added release state, immutable snapshots, indexes, and foreign keys; migration `0020_white_spacker_dave.sql` (TRACK-055) added the calendar feed token; migration `0021_round_mysterio.sql` (TRACK-054) added revision action items and its two composite indexes; migration `0022_search_trigram_indexes.sql` (TRACK-056) enables `pg_trgm` and adds ten GIN trigram indexes for contains-search fields, including the `CAST(details AS text)` audit expression; migration `0023_sloppy_anthem.sql` (TRACK-057) adds academic terms/courses/sections/enrollments and assignment context/mode/status, with a preflight that aborts when existing assignment rows would require fabricated context. The `0023` rollback removes those objects in reverse dependency order. Its prelaunch refusal is intentional; development and E2E reset/seed flows recreate deterministic context instead of inventing legacy facts. Companion rollbacks are kept in `drizzle/migrations/rollback/`. Each migration has a companion rollback file at `drizzle/migrations/rollback/<NNNN>_<tag>.rollback.sql`.
 
 ---
 
@@ -1373,7 +1439,7 @@ E2E tests run against a dedicated test database (`simak_test` on a separate `pos
 
 **DB reset** (`tests/e2e/helpers/db-reset.ts`):
 
-- `resetDatabase()` truncates 28 application tables (CASCADE), including `assignment_grade_config`, `final_grades`, and `grade_release_snapshots`, and re-seeds before each spec file.
+- `resetDatabase()` truncates 33 application tables (CASCADE), including the academic context tables (`academic_terms`, `courses`, `course_sections`, `section_enrollments`) and assignment/grade history tables, then re-seeds before each spec file.
 - `getDatabaseUrl()` is exported as a shared helper (no non-null assertions on `process.env`).
 
 **R2 mock** (`tests/e2e/helpers/r2-mock.ts`):
@@ -1498,6 +1564,7 @@ Run with `pnpm test:e2e` (headless) or `pnpm test:e2e:ui` (interactive UI mode).
 - **Concurrency guard**: `pg_advisory_lock` (ID: 789123) serializes concurrent migration runs to prevent corruption.
 - **Seed runner**: Bundled `seed.mjs` is a separate one-time/operator bootstrap command after migrations; it calls the production-safe SuperAdmin-only runner and is idempotent.
 - **Rollback convention**: Companion rollback SQL files at `drizzle/migrations/rollback/<NNNN>_<tag>.rollback.sql` for emergency manual execution.
+- **TRACK-057 prelaunch boundary**: Migration `0023_sloppy_anthem.sql` raises before creating academic objects when `assignments` is non-empty. This project has no production assignment data, so development/E2E reset and reseed fixtures; any future production import must supply an explicit term/course/section mapping and must not fabricate facts.
 
 ### Connection Pooling
 

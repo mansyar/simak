@@ -4,7 +4,7 @@
 
 - **Roadmap ID:** TRACK-057
 - **Branch:** `track-057/academic-context-semester-foundation`
-- **Status:** New
+- **Status:** Complete — reviewed and archived
 
 ## Documents
 
