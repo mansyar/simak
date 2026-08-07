@@ -29,14 +29,17 @@
   - **Deviation:** None from the approved specification.
   - **Completion commit:** `24355e70` (`chore(track-058): confirm task 1.1 boundaries`)
 
-- [~] **Task 1.2: Define appointment schema and migration (RED → GREEN)**
+- [x] **Task 1.2: Define appointment schema and migration (RED → GREEN)**
   - [x] Write schema/integration tests for assignment and optional checkpoint foreign keys, nullable student before booking, UTC timestamps, valid status values, 15–120 minute duration, indexes, and state-preserving cancellation.
   - [x] Confirm the RED tests fail against the current schema.
   - **RED evidence:** `pnpm vitest run tests/unit/db/appointments.test.ts` failed during Vite import analysis because `@/db/schema/appointments` does not exist; no assertions ran.
-  - [~] Add the Drizzle appointment schema with database constraints and participant/time indexes.
-  - [ ] Generate the forward migration and add the required companion rollback SQL.
-  - [ ] Apply, inspect, roll back, and re-apply the migration in the development database.
-  - [ ] Run the schema-focused tests.
+  - [x] Add the Drizzle appointment schema with database constraints and participant/time indexes.
+  - [x] Generate the forward migration and add the required companion rollback SQL.
+  - [x] Apply, inspect, roll back, and re-apply the migration in the development database.
+  - [x] Run the schema-focused tests.
+  - **GREEN evidence:** `pnpm vitest run tests/unit/db/appointments.test.ts` passed 5/5 and `pnpm typecheck` passed after correcting Drizzle test introspection types.
+  - **Implementation notes:** Added `src/db/schema/appointments.ts`, schema exports/relations, generated `drizzle/migrations/0024_powerful_clint_barton.sql`, and companion rollback `drizzle/migrations/rollback/0024_powerful_clint_barton.rollback.sql`. Appointment instants use PostgreSQL `timestamp with time zone`; the database enforces ordering and a 15–120 minute duration.
+  - **Migration verification:** `pnpm db:migrate` could not be used because the local database has the existing 23 application tables but an empty `drizzle.__drizzle_migrations` history, causing Drizzle to replay older migrations. Direct execution of migration `0024` succeeded; inspection confirmed all columns, checks, and indexes; the companion rollback removed `appointments`; re-applying `0024` restored it.
 
 - [ ] **Task 1.3: Define pure appointment policies (RED → GREEN)**
   - [ ] Write unit tests for duration validation, future-time validation, valid/invalid lifecycle transitions, overlap detection, and timezone-safe display conversion.

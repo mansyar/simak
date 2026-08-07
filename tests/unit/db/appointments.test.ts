@@ -13,7 +13,9 @@ function tableConfig(table: unknown) {
 function foreignTableNames(table: unknown): string[] {
   return tableConfig(table).foreignKeys.map((key) => {
     const reference = key.reference();
-    return (reference.foreignTable as { [key: symbol]: string })[Symbol.for('drizzle:Name')];
+    return (reference.foreignTable as unknown as { [key: symbol]: string })[
+      Symbol.for('drizzle:Name')
+    ];
   });
 }
 
@@ -21,7 +23,13 @@ function getIndexes(table: unknown): Array<{ name: string; columns: string[] }> 
   const config = tableConfig(table);
   return config.indexes.map((index) => ({
     name: index.config.name ?? '',
-    columns: index.config.columns.map((column) => column.name),
+    columns: index.config.columns.flatMap((column) => {
+      if (column && typeof column === 'object' && 'name' in column) {
+        return typeof column.name === 'string' ? [column.name] : [];
+      }
+
+      return [];
+    }),
   }));
 }
 
@@ -67,8 +75,8 @@ describe('appointments schema', () => {
     expect(appointments.studentId.notNull).toBe(false);
     expect(appointments.startAt.notNull).toBe(true);
     expect(appointments.endAt.notNull).toBe(true);
-    expect(appointments.startAt.withTimezone).toBe(true);
-    expect(appointments.endAt.withTimezone).toBe(true);
+    expect(appointments.startAt.getSQLType()).toBe('timestamp with time zone');
+    expect(appointments.endAt.getSQLType()).toBe('timestamp with time zone');
     expect(appointments.status.notNull).toBe(true);
     expect(appointments.status.hasDefault).toBe(true);
     expect(foreignTableNames(appointments)).toEqual(

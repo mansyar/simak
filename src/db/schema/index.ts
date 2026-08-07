@@ -9,6 +9,7 @@ export * from './academic-context';
 export * from './submissions';
 export * from './rubrics';
 export * from './consultations';
+export * from './appointments';
 export * from './notifications';
 export * from './audit-log';
 export * from './extensions';
@@ -30,6 +31,7 @@ import { academicTerms, courses, courseSections, sectionEnrollments } from './ac
 import { submissions, reviews } from './submissions';
 import { rubricCriteria, rubricLevels, reviewScores } from './rubrics';
 import { consultations } from './consultations';
+import { appointments } from './appointments';
 import { notifications } from './notifications';
 import { extensionRequests } from './extensions';
 import { emailQueue } from './email-queue';
@@ -73,6 +75,8 @@ export const usersRelations = relations(users, ({ many }) => ({
   reviews: many(reviews),
   consultationsAsStudent: many(consultations),
   consultationsAsVerifier: many(consultations),
+  appointmentsAsInstructor: many(appointments, { relationName: 'appointmentInstructor' }),
+  appointmentsAsStudent: many(appointments, { relationName: 'appointmentStudent' }),
   twoFactor: many(twoFactor),
   finalGrades: many(finalGrades),
   gradeReleaseSnapshots: many(gradeReleaseSnapshots),
@@ -162,6 +166,7 @@ export const assignmentsRelations = relations(assignments, ({ many, one }) => ({
   assignmentStudents: many(assignmentStudents),
   checkpoints: many(checkpoints),
   consultations: many(consultations),
+  appointments: many(appointments),
   assignmentGradeConfig: one(assignmentGradeConfig),
   finalGrades: many(finalGrades),
   gradeReleaseSnapshots: many(gradeReleaseSnapshots),
@@ -274,6 +279,27 @@ export const consultationsRelations = relations(consultations, ({ one }) => ({
   }),
   verifiedBy: one(users, {
     fields: [consultations.verifiedById],
+    references: [users.id],
+  }),
+}));
+
+export const appointmentsRelations = relations(appointments, ({ one }) => ({
+  assignment: one(assignments, {
+    fields: [appointments.assignmentId],
+    references: [assignments.id],
+  }),
+  checkpoint: one(checkpoints, {
+    fields: [appointments.checkpointId],
+    references: [checkpoints.id],
+  }),
+  instructor: one(users, {
+    relationName: 'appointmentInstructor',
+    fields: [appointments.instructorId],
+    references: [users.id],
+  }),
+  student: one(users, {
+    relationName: 'appointmentStudent',
+    fields: [appointments.studentId],
     references: [users.id],
   }),
 }));
