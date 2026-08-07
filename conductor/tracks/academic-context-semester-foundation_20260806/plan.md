@@ -170,10 +170,10 @@
   - [x] Cover draft/active/archive transitions and unauthorized access
   - [x] Cover clone and semester rollover with source-history preservation
   - [x] Add mobile and axe-core checks for new surfaces
-- [~] Task: Implement and stabilize E2E fixtures
-  - [ ] Extend isolated test database seed/reset helpers with terms, courses, sections, and memberships
-  - [ ] Keep test data deterministic and role-specific
-  - [ ] Add negative fixtures for cross-section and inactive-user authorization
+- [x] Task: Implement and stabilize E2E fixtures [commit: f406720]
+  - [x] Extend isolated test database seed/reset helpers with terms, courses, sections, and memberships
+  - [x] Keep test data deterministic and role-specific
+  - [x] Add negative fixtures for cross-section and inactive-user authorization
 - [ ] Task: Update project documentation
   - [ ] Update `docs/TDD.md` with the final schema, relations, indexes, and server-function boundaries
   - [ ] Update relevant `docs/PRD.md` data-model and assignment-context sections
