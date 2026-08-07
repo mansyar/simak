@@ -179,7 +179,7 @@
   - [x] Update relevant `docs/PRD.md` data-model and assignment-context sections
   - [x] Document the prelaunch migration/reset assumption and future legacy-import requirement
   - [x] Record implementation outcomes and downstream coordination in `docs/roadmap.md`
-- [ ] Task: Run complete verification
+- [~] Task: Run complete verification
   - [ ] Run `pnpm test`
   - [ ] Run `pnpm test:integration`
   - [ ] Run `pnpm test:coverage` and confirm all thresholds remain at least 80%
