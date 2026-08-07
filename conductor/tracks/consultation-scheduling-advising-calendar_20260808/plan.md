@@ -79,9 +79,13 @@
   - [x] Write handler tests for instructor role, assignment ownership/section authorization, active assignment requirement, checkpoint ownership, future time, duration, and bounded result ordering.
   - [x] Add tests proving students, unrelated instructors, admins, and inactive users cannot access the instructor slot mutation.
   - [x] Confirm RED behavior.
-  - [~] Implement create/list handlers with server-side authorization, explicit selected columns, pagination/bounds, and audit events.
-  - [~] Run focused handler tests and coverage.
+  - [x] Implement create/list handlers with server-side authorization, explicit selected columns, pagination/bounds, and audit events.
+  - [x] Run focused handler tests.
+  - [~] Establish the final >=80% appointment-handler coverage after later lifecycle placeholders are replaced; the scoped run currently reports 79.59% statements, 79.16% branches, 38.46% functions, and 78.72% lines because those later handlers are intentionally not implemented in this phase.
   - **RED evidence:** `pnpm vitest run tests/unit/server/appointments-handlers.test.ts` failed 14/14 while the server-only module still exposed its not-implemented handler placeholder.
+  - **GREEN evidence:** `pnpm vitest run tests/unit/server/appointments-handlers.test.ts tests/unit/server/appointments-schemas.test.ts` passed 22/22; `pnpm typecheck` and targeted `oxlint` passed with zero errors.
+  - **Implementation notes:** Create/list handlers enforce instructor session role, active/non-deleted instructor and assignment context, active section/term enrollment, optional checkpoint ownership, future 15–120 minute windows, explicit projections, bounded ordering/pagination, generic denial responses, and advisory creation audit events. The booking contract accepts an optional same-assignment checkpoint selection.
+  - **Coverage note:** The focused coverage command was run and its only failure is the expected threshold shortfall from later-task placeholder handlers; final coverage is deferred to the lifecycle and final quality phases rather than masking those lines.
 
 - [ ] **Task 2.3: Cancel unbooked slots (RED → GREEN)**
   - [ ] Write tests for valid cancellation, invalid past/status transitions, idempotency behavior, authorization, and audit payload redaction.
