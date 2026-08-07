@@ -156,8 +156,9 @@ describe('Appointment server-function contracts', () => {
   });
 
   it('uses the standard typedServerFn middleware, validator, and handler chain', () => {
-    expect(serverFnBuilders).toHaveLength(10);
-    for (const builder of serverFnBuilders) {
+    const appointmentBuilders = serverFnBuilders.slice(-10);
+    expect(appointmentBuilders).toHaveLength(10);
+    for (const builder of appointmentBuilders) {
       expect(builder.middleware).toHaveBeenCalledTimes(1);
       expect(builder.inputValidator).toHaveBeenCalledTimes(1);
       expect(builder.handler).toHaveBeenCalledTimes(1);

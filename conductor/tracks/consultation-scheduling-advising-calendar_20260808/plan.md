@@ -65,12 +65,14 @@
 
 ## Phase 2: Instructor slot management
 
-- [~] **Task 2.1: Add client-safe server-function contracts (RED → GREEN)**
+- [x] **Task 2.1: Add client-safe server-function contracts (RED → GREEN)**
   - [x] Write tests for input validation and the standard `typedServerFn` builder behavior.
   - [x] Confirm RED behavior.
-  - [~] Add the appointment stub module with schemas and dynamic imports; keep handlers server-only.
-  - [~] Keep related handlers split into an extras server file if the 500-line limit requires it.
+  - [x] Add the appointment stub module with schemas and dynamic imports; keep handlers server-only.
+  - [x] Keep related handlers split into an extras server file if the 500-line limit requires it.
   - **RED evidence:** `pnpm vitest run tests/unit/server/appointments-schemas.test.ts` failed before assertions because `@/server/appointments` did not exist.
+  - **GREEN evidence:** `pnpm vitest run tests/unit/server/appointments-schemas.test.ts` passed 8/8 and `pnpm typecheck` passed.
+  - **Implementation notes:** Added client-safe appointment schemas/stubs with assignment-required/checkpoint-optional slot inputs, bounded pagination, lifecycle operation contracts, standard request-ID/rate-limit middleware, and dynamic imports of the server-only handler module. No extras module is needed at the current file size.
 
 - [ ] **Task 2.2: Create and list instructor slots (RED → GREEN)**
   - [ ] Write handler tests for instructor role, assignment ownership/section authorization, active assignment requirement, checkpoint ownership, future time, duration, and bounded result ordering.
