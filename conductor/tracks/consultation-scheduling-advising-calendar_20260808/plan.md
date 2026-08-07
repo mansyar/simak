@@ -21,10 +21,12 @@
 
 ## Phase 1: Appointment contracts and persistence
 
-- [~] **Task 1.1: Confirm implementation boundaries and extension points**
-  - [~] Reconfirm current assignment ownership/enrollment helpers, consultation routes/components, calendar-feed selector/serializer, email queue scanner, and notification preference APIs.
-  - [~] Confirm the final schema/file split before coding and record any deviation in the plan.
-  - [~] Confirm no existing appointment table or status enum conflicts with the proposed domain.
+- [x] **Task 1.1: Confirm implementation boundaries and extension points**
+  - [x] Reconfirm current assignment ownership/enrollment helpers, consultation routes/components, calendar-feed selector/serializer, email queue scanner, and notification preference APIs.
+  - [x] Confirm the final schema/file split before coding and record any deviation in the plan.
+  - [x] Confirm no existing appointment table or status enum conflicts with the proposed domain.
+  - **Implementation notes:** No appointment table or status enum exists. Add `src/db/schema/appointments.ts`, re-export it from `src/db/schema/index.ts`, and add its Drizzle relations there. Use `src/server/appointments.ts` for client-safe Zod/server-function stubs and `src/server/appointments.server.ts` for handlers, with an extras handler only if the file limit requires it. Reuse `verifyAssignmentAccess` plus explicit optional-checkpoint validation. Extend `calendar-feed-selection.server.ts` and the existing ICS serializer without changing deadline events. Add appointment reminder scanning at the existing `email-queue-init.ts` boundary; keep deadline reminder behavior independent.
+  - **Deviation:** None from the approved specification.
 
 - [ ] **Task 1.2: Define appointment schema and migration (RED → GREEN)**
   - [ ] Write schema/integration tests for assignment and optional checkpoint foreign keys, nullable student before booking, UTC timestamps, valid status values, 15–120 minute duration, indexes, and state-preserving cancellation.
