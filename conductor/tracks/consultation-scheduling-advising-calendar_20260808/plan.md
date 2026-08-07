@@ -21,10 +21,10 @@
 
 ## Phase 1: Appointment contracts and persistence
 
-- [ ] **Task 1.1: Confirm implementation boundaries and extension points**
-  - [ ] Reconfirm current assignment ownership/enrollment helpers, consultation routes/components, calendar-feed selector/serializer, email queue scanner, and notification preference APIs.
-  - [ ] Confirm the final schema/file split before coding and record any deviation in the plan.
-  - [ ] Confirm no existing appointment table or status enum conflicts with the proposed domain.
+- [~] **Task 1.1: Confirm implementation boundaries and extension points**
+  - [~] Reconfirm current assignment ownership/enrollment helpers, consultation routes/components, calendar-feed selector/serializer, email queue scanner, and notification preference APIs.
+  - [~] Confirm the final schema/file split before coding and record any deviation in the plan.
+  - [~] Confirm no existing appointment table or status enum conflicts with the proposed domain.
 
 - [ ] **Task 1.2: Define appointment schema and migration (RED → GREEN)**
   - [ ] Write schema/integration tests for assignment and optional checkpoint foreign keys, nullable student before booking, UTC timestamps, valid status values, 15–120 minute duration, indexes, and state-preserving cancellation.
