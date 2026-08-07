@@ -36,7 +36,9 @@ export const ListStudentAppointmentsSchema = z.object({
   limit: z.coerce.number().int().min(1).max(100).default(20),
 });
 
-export const BookAppointmentSchema = AppointmentIdSchema;
+export const BookAppointmentSchema = AppointmentIdSchema.extend({
+  checkpointId: positiveId.optional(),
+});
 
 export const CancelAppointmentSchema = AppointmentIdSchema.extend({
   reason: z.string().trim().min(1).max(500).optional(),

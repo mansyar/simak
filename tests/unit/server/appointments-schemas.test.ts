@@ -123,7 +123,9 @@ describe('Appointment server-function contracts', () => {
   });
 
   it('validates booking, cancellation, rescheduling, and terminal transitions', () => {
-    expect(BookAppointmentSchema.safeParse({ appointmentId: '4' }).success).toBe(true);
+    expect(BookAppointmentSchema.safeParse({ appointmentId: '4', checkpointId: '9' }).success).toBe(
+      true,
+    );
     expect(
       CancelAppointmentSchema.safeParse({ appointmentId: 4, reason: 'Schedule changed' }).success,
     ).toBe(true);

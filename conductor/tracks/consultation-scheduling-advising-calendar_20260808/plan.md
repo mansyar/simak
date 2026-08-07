@@ -76,11 +76,12 @@
   - **Completion commit:** `e2644c5a` (`feat(track-058): add appointment server contracts`).
 
 - [~] **Task 2.2: Create and list instructor slots (RED → GREEN)**
-  - [~] Write handler tests for instructor role, assignment ownership/section authorization, active assignment requirement, checkpoint ownership, future time, duration, and bounded result ordering.
-  - [~] Add tests proving students, unrelated instructors, admins, and inactive users cannot access the instructor slot mutation.
-  - [~] Confirm RED behavior.
+  - [x] Write handler tests for instructor role, assignment ownership/section authorization, active assignment requirement, checkpoint ownership, future time, duration, and bounded result ordering.
+  - [x] Add tests proving students, unrelated instructors, admins, and inactive users cannot access the instructor slot mutation.
+  - [x] Confirm RED behavior.
   - [~] Implement create/list handlers with server-side authorization, explicit selected columns, pagination/bounds, and audit events.
   - [~] Run focused handler tests and coverage.
+  - **RED evidence:** `pnpm vitest run tests/unit/server/appointments-handlers.test.ts` failed 14/14 while the server-only module still exposed its not-implemented handler placeholder.
 
 - [ ] **Task 2.3: Cancel unbooked slots (RED → GREEN)**
   - [ ] Write tests for valid cancellation, invalid past/status transitions, idempotency behavior, authorization, and audit payload redaction.
