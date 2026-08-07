@@ -35,6 +35,7 @@ import { Route as AuthenticatedAdminEmailQueueRouteImport } from './routes/_auth
 import { Route as AuthenticatedAdminDashboardRouteImport } from './routes/_authenticated/admin/dashboard'
 import { Route as AuthenticatedAdminAuditLogRouteImport } from './routes/_authenticated/admin/audit-log'
 import { Route as AuthenticatedAdminAnalyticsRouteImport } from './routes/_authenticated/admin/analytics'
+import { Route as AuthenticatedAdminAcademicContextRouteImport } from './routes/_authenticated/admin/academic-context'
 import { Route as AuthenticatedStudentAssignmentsIndexRouteImport } from './routes/_authenticated/student/assignments/index'
 import { Route as AuthenticatedInstructorReviewsIndexRouteImport } from './routes/_authenticated/instructor/reviews/index'
 import { Route as AuthenticatedInstructorInterventionsIndexRouteImport } from './routes/_authenticated/instructor/interventions/index'
@@ -196,6 +197,12 @@ const AuthenticatedAdminAnalyticsRoute =
     path: '/analytics',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAdminAcademicContextRoute =
+  AuthenticatedAdminAcademicContextRouteImport.update({
+    id: '/academic-context',
+    path: '/academic-context',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedStudentAssignmentsIndexRoute =
   AuthenticatedStudentAssignmentsIndexRouteImport.update({
     id: '/assignments/',
@@ -293,6 +300,7 @@ export interface FileRoutesByFullPath {
   '/instructor': typeof AuthenticatedInstructorRouteWithChildren
   '/student': typeof AuthenticatedStudentRouteWithChildren
   '/api/health': typeof ApiHealthRoute
+  '/admin/academic-context': typeof AuthenticatedAdminAcademicContextRoute
   '/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/admin/audit-log': typeof AuthenticatedAdminAuditLogRoute
   '/admin/dashboard': typeof AuthenticatedAdminDashboardRoute
@@ -334,6 +342,7 @@ export interface FileRoutesByTo {
   '/instructor': typeof AuthenticatedInstructorRouteWithChildren
   '/student': typeof AuthenticatedStudentRouteWithChildren
   '/api/health': typeof ApiHealthRoute
+  '/admin/academic-context': typeof AuthenticatedAdminAcademicContextRoute
   '/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/admin/audit-log': typeof AuthenticatedAdminAuditLogRoute
   '/admin/dashboard': typeof AuthenticatedAdminDashboardRoute
@@ -378,6 +387,7 @@ export interface FileRoutesById {
   '/_authenticated/instructor': typeof AuthenticatedInstructorRouteWithChildren
   '/_authenticated/student': typeof AuthenticatedStudentRouteWithChildren
   '/api/health': typeof ApiHealthRoute
+  '/_authenticated/admin/academic-context': typeof AuthenticatedAdminAcademicContextRoute
   '/_authenticated/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/_authenticated/admin/audit-log': typeof AuthenticatedAdminAuditLogRoute
   '/_authenticated/admin/dashboard': typeof AuthenticatedAdminDashboardRoute
@@ -421,6 +431,7 @@ export interface FileRouteTypes {
     | '/instructor'
     | '/student'
     | '/api/health'
+    | '/admin/academic-context'
     | '/admin/analytics'
     | '/admin/audit-log'
     | '/admin/dashboard'
@@ -462,6 +473,7 @@ export interface FileRouteTypes {
     | '/instructor'
     | '/student'
     | '/api/health'
+    | '/admin/academic-context'
     | '/admin/analytics'
     | '/admin/audit-log'
     | '/admin/dashboard'
@@ -505,6 +517,7 @@ export interface FileRouteTypes {
     | '/_authenticated/instructor'
     | '/_authenticated/student'
     | '/api/health'
+    | '/_authenticated/admin/academic-context'
     | '/_authenticated/admin/analytics'
     | '/_authenticated/admin/audit-log'
     | '/_authenticated/admin/dashboard'
@@ -734,6 +747,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminAnalyticsRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/academic-context': {
+      id: '/_authenticated/admin/academic-context'
+      path: '/academic-context'
+      fullPath: '/admin/academic-context'
+      preLoaderRoute: typeof AuthenticatedAdminAcademicContextRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/student/assignments/': {
       id: '/_authenticated/student/assignments/'
       path: '/assignments'
@@ -843,6 +863,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedAdminRouteChildren {
+  AuthenticatedAdminAcademicContextRoute: typeof AuthenticatedAdminAcademicContextRoute
   AuthenticatedAdminAnalyticsRoute: typeof AuthenticatedAdminAnalyticsRoute
   AuthenticatedAdminAuditLogRoute: typeof AuthenticatedAdminAuditLogRoute
   AuthenticatedAdminDashboardRoute: typeof AuthenticatedAdminDashboardRoute
@@ -856,6 +877,8 @@ interface AuthenticatedAdminRouteChildren {
 }
 
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
+  AuthenticatedAdminAcademicContextRoute:
+    AuthenticatedAdminAcademicContextRoute,
   AuthenticatedAdminAnalyticsRoute: AuthenticatedAdminAnalyticsRoute,
   AuthenticatedAdminAuditLogRoute: AuthenticatedAdminAuditLogRoute,
   AuthenticatedAdminDashboardRoute: AuthenticatedAdminDashboardRoute,

@@ -59,14 +59,14 @@ describe('AcademicContextPage', () => {
       />,
     );
 
-    expect(screen.getByRole('heading', { name: 'adminAcademicContext.title' })).toBeInTheDocument();
-    expect(screen.getByText('2026-FALL')).toBeInTheDocument();
-    expect(screen.getByText('CS101')).toBeInTheDocument();
-    expect(screen.getByText('Section A')).toBeInTheDocument();
-    expect(screen.getByText('Ada Lovelace')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'adminAcademicContext.title' })).toBeDefined();
+    expect(screen.getByText('2026-FALL')).toBeDefined();
+    expect(screen.getByText('CS101')).toBeDefined();
+    expect(screen.getByText('Section A')).toBeDefined();
+    expect(screen.getByText('Ada Lovelace')).toBeDefined();
     expect(
-      screen.getByRole('button', { name: 'adminAcademicContext.actions.archive' }),
-    ).toBeInTheDocument();
+      screen.getAllByRole('button', { name: 'adminAcademicContext.actions.archive' })[0],
+    ).toBeDefined();
   });
 
   it('renders loading, empty, and server-error states', () => {
@@ -84,10 +84,10 @@ describe('AcademicContextPage', () => {
     };
 
     const { rerender } = render(<AcademicContextPage {...props} loading error={null} />);
-    expect(screen.getByRole('status')).toBeInTheDocument();
+    expect(screen.getByRole('status')).toBeDefined();
 
     rerender(<AcademicContextPage {...props} loading={false} error={null} />);
-    expect(screen.getByText('adminAcademicContext.empty')).toBeInTheDocument();
+    expect(screen.getByText('adminAcademicContext.empty')).toBeDefined();
 
     rerender(
       <AcademicContextPage
@@ -96,8 +96,8 @@ describe('AcademicContextPage', () => {
         error={{ code: 'INTERNAL', message: 'database failure' }}
       />,
     );
-    expect(screen.getByRole('alert')).toBeInTheDocument();
-    expect(screen.queryByText('database failure')).not.toBeInTheDocument();
+    expect(screen.getByRole('alert')).toBeDefined();
+    expect(screen.queryByText('database failure')).toBeNull();
   });
 
   it('requires confirmation before archiving context', () => {
@@ -117,7 +117,9 @@ describe('AcademicContextPage', () => {
       />,
     );
 
-    fireEvent.click(screen.getByRole('button', { name: 'adminAcademicContext.actions.archive' }));
+    fireEvent.click(
+      screen.getAllByRole('button', { name: 'adminAcademicContext.actions.archive' })[0],
+    );
     expect(onArchive).not.toHaveBeenCalled();
   });
 });

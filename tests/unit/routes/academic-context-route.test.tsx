@@ -5,6 +5,10 @@ vi.mock('@tanstack/react-router', () => ({
   createFileRoute: vi.fn().mockImplementation((_path: string) => (config: any) => config),
 }));
 
+vi.mock('@/routes/__root', () => ({
+  useI18n: () => ({ t: (key: string) => key }),
+}));
+
 vi.mock('@/server/academic-context', () => ({
   listAcademicTerms: vi.fn(),
   listCourses: vi.fn(),
@@ -15,15 +19,16 @@ vi.mock('@/server/academic-context', () => ({
 describe('Academic context admin route', () => {
   it('exports a route with a loader and component', async () => {
     const { Route } = await import('@/routes/_authenticated/admin/academic-context');
+    const route = Route as any;
 
-    expect(Route).toBeDefined();
-    expect(typeof Route.loader).toBe('function');
-    expect(typeof Route.component).toBe('function');
+    expect(route).toBeDefined();
+    expect(typeof route.loader).toBe('function');
+    expect(typeof route.component).toBe('function');
   });
 
   it('loads all context collections for the admin surface', async () => {
     const { Route } = await import('@/routes/_authenticated/admin/academic-context');
-    const result = await Route.loader?.({} as never);
+    const result = await (Route as any).loader?.({} as never);
 
     expect(result).toHaveProperty('terms');
     expect(result).toHaveProperty('courses');
