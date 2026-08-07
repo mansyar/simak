@@ -52,11 +52,16 @@
   - **Implementation notes:** Added `src/lib/appointment-policies.ts` with shared status/window Zod schemas, bounded window validation, lifecycle transition guards, half-open overlap checks that ignore cancelled appointments, and `Intl`-based timezone display using `resolveTimeZone`.
   - **Completion commit:** `2eaa7957` (`feat(track-058): add appointment policy contracts`).
 
-- [ ] **Phase 1 Verification & Checkpoint**
-  - [ ] Run focused schema/policy tests and migration verification.
-  - [ ] Run typecheck and lint for changed foundation files.
-  - [ ] Manually verify migration apply/rollback/re-apply and inspect the resulting constraints/indexes.
-  - [ ] Obtain explicit user confirmation, attach the verification note, update the checkpoint SHA, and commit the plan update.
+- [x] **Phase 1 Verification & Checkpoint**
+  - [x] Run focused schema/policy tests and migration verification.
+  - [x] Run typecheck and lint for changed foundation files.
+  - [x] Manually verify migration apply/rollback/re-apply and inspect the resulting constraints/indexes.
+  - **Automated evidence:** Focused schema/policy suites passed 13/13; `pnpm typecheck` passed; targeted `oxlint` passed with 0 warnings and 0 errors; `git diff --check` passed.
+  - **Database evidence:** Direct migration execution applied `0024`, inspection confirmed `timestamp with time zone` instants, nullable checkpoint/student fields, two checks, and four indexes; rollback removed the table; re-apply restored it. `pnpm db:migrate` remains blocked by the pre-existing empty local Drizzle migration history and is documented under Task 1.2.
+  - [x] Obtain explicit user confirmation, attach the verification note, update the checkpoint SHA, and commit the plan update.
+  - **User confirmation:** Confirmed checkpoint verification through the interactive Conductor prompt.
+  - **Verification note:** Phase 1 foundation contracts are accepted. Appointment persistence is isolated from consultation evidence/gating; migration constraints and rollback were directly verified.
+  - **Checkpoint commit:** Recorded immediately after this plan update.
 
 ## Phase 2: Instructor slot management
 
