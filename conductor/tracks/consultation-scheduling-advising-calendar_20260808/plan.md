@@ -61,7 +61,7 @@
   - [x] Obtain explicit user confirmation, attach the verification note, update the checkpoint SHA, and commit the plan update.
   - **User confirmation:** Confirmed checkpoint verification through the interactive Conductor prompt.
   - **Verification note:** Phase 1 foundation contracts are accepted. Appointment persistence is isolated from consultation evidence/gating; migration constraints and rollback were directly verified.
-  - **Checkpoint commit:** Recorded immediately after this plan update.
+  - **Checkpoint commit:** `cf376288` (`docs(track-058): checkpoint phase 1 appointment contracts`).
 
 ## Phase 2: Instructor slot management
 
