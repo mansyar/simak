@@ -86,6 +86,7 @@
   - **GREEN evidence:** `pnpm vitest run tests/unit/server/appointments-handlers.test.ts tests/unit/server/appointments-schemas.test.ts` passed 22/22; `pnpm typecheck` and targeted `oxlint` passed with zero errors.
   - **Implementation notes:** Create/list handlers enforce instructor session role, active/non-deleted instructor and assignment context, active section/term enrollment, optional checkpoint ownership, future 15–120 minute windows, explicit projections, bounded ordering/pagination, generic denial responses, and advisory creation audit events. The booking contract accepts an optional same-assignment checkpoint selection.
   - **Coverage note:** The focused coverage command was run and its only failure is the expected threshold shortfall from later-task placeholder handlers; final coverage is deferred to the lifecycle and final quality phases rather than masking those lines.
+  - **Implementation commit:** `10d0314f` (`feat(track-058): add instructor appointment slot handlers`).
 
 - [ ] **Task 2.3: Cancel unbooked slots (RED → GREEN)**
   - [ ] Write tests for valid cancellation, invalid past/status transitions, idempotency behavior, authorization, and audit payload redaction.
