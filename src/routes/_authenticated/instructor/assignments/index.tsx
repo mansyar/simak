@@ -1,5 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { listInstructorAssignments } from '@/server/assignments';
+import { listInstructorAssignmentSections } from '@/server/instructor-assignment-context';
 import { AssignmentCard } from '@/components/instructor/assignments/AssignmentCard';
 import { AssignmentFilters } from '@/components/instructor/assignments/AssignmentFilters';
 import { AssignmentEmptyState } from '@/components/instructor/assignments/AssignmentEmptyState';
@@ -19,6 +20,8 @@ const AssignmentSearchSchema = z.object({
   page: z.number().optional().default(1),
   limit: z.number().optional().default(20),
   search: z.string().optional().default(''),
+  sectionId: z.number().optional(),
+  status: z.enum(['draft', 'active', 'archived']).optional(),
 });
 
 export const Route = createFileRoute('/_authenticated/instructor/assignments/')({
@@ -27,9 +30,21 @@ export const Route = createFileRoute('/_authenticated/instructor/assignments/')(
     page: search.page,
     limit: search.limit,
     search: search.search,
+    sectionId: search.sectionId,
+    status: search.status,
   }),
   loader: async ({ deps }) => {
-    return listInstructorAssignments({ data: deps });
+    const [assignmentResult, sectionResult] = await Promise.all([
+      listInstructorAssignments({ data: deps }),
+      listInstructorAssignmentSections(),
+    ]);
+
+    if (isServerError(assignmentResult)) return assignmentResult;
+
+    return {
+      ...assignmentResult,
+      sectionOptions: isServerError(sectionResult) ? [] : sectionResult.sections,
+    };
   },
   pendingComponent: () => <AssignmentLoadingSkeleton />,
   component: AssignmentsPage,
@@ -54,6 +69,7 @@ function AssignmentsPage() {
 
   const assignments = data?.assignments ?? [];
   const total = data?.total ?? 0;
+  const sectionOptions = data?.sectionOptions ?? [];
 
   const handleSearchChange = (value: string) => {
     navigate({
@@ -70,6 +86,22 @@ function AssignmentsPage() {
     navigate({
       search: (prev: z.infer<typeof AssignmentSearchSchema>) =>
         ({ ...prev, page }) satisfies z.infer<typeof AssignmentSearchSchema>,
+    });
+  };
+
+  const handleSectionChange = (sectionId: number | undefined) => {
+    navigate({
+      search: (prev: z.infer<typeof AssignmentSearchSchema>) =>
+        ({ ...prev, sectionId, page: 1 }) satisfies z.infer<typeof AssignmentSearchSchema>,
+    });
+  };
+
+  const handleStatusChange = (
+    status: z.infer<typeof AssignmentSearchSchema>['status'] | undefined,
+  ) => {
+    navigate({
+      search: (prev: z.infer<typeof AssignmentSearchSchema>) =>
+        ({ ...prev, status, page: 1 }) satisfies z.infer<typeof AssignmentSearchSchema>,
     });
   };
 
@@ -100,7 +132,15 @@ function AssignmentsPage() {
         }
       />
 
-      <AssignmentFilters search={searchParams.search} onSearchChange={handleSearchChange} />
+      <AssignmentFilters
+        search={searchParams.search}
+        onSearchChange={handleSearchChange}
+        sectionId={searchParams.sectionId}
+        status={searchParams.status}
+        sections={sectionOptions}
+        onSectionChange={handleSectionChange}
+        onStatusChange={handleStatusChange}
+      />
 
       {assignments.length === 0 ? (
         <AssignmentEmptyState onCreateNew={handleCreateNew} />

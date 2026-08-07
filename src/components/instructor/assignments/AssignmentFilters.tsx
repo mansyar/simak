@@ -7,9 +7,22 @@ import { useDebouncedCallback } from '@/hooks/use-debounced-callback';
 interface AssignmentFiltersProps {
   search: string;
   onSearchChange: (value: string) => void;
+  sectionId?: number;
+  status?: 'draft' | 'active' | 'archived';
+  sections?: Array<{ id: number; label: string; status: 'active' | 'inactive' | 'archived' }>;
+  onSectionChange?: (sectionId: number | undefined) => void;
+  onStatusChange?: (status: 'draft' | 'active' | 'archived' | undefined) => void;
 }
 
-export function AssignmentFilters({ search, onSearchChange }: AssignmentFiltersProps) {
+export function AssignmentFilters({
+  search,
+  onSearchChange,
+  sectionId,
+  status,
+  sections = [],
+  onSectionChange,
+  onStatusChange,
+}: AssignmentFiltersProps) {
   const { t } = useI18n();
   const [localSearch, setLocalSearch] = useState(search);
   const debouncedSearchChange = useDebouncedCallback(onSearchChange, 300);
@@ -19,7 +32,7 @@ export function AssignmentFilters({ search, onSearchChange }: AssignmentFiltersP
   }, [search]);
 
   return (
-    <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+    <div className="flex flex-col gap-4 sm:flex-row sm:items-end">
       <div className="relative flex-1">
         <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
         <label htmlFor="instructor-assignment-search" className="sr-only">
@@ -50,6 +63,48 @@ export function AssignmentFilters({ search, onSearchChange }: AssignmentFiltersP
           </button>
         )}
       </div>
+
+      {onSectionChange && (
+        <label className="grid gap-1.5 text-sm font-medium">
+          {t('instructorAssignments.context.section')}
+          <select
+            aria-label={t('instructorAssignments.context.section')}
+            value={sectionId ?? ''}
+            onChange={(event) =>
+              onSectionChange(event.target.value ? Number(event.target.value) : undefined)
+            }
+            className="h-10 min-w-48 rounded-md border bg-background px-3"
+          >
+            <option value="">{t('instructorAssignments.context.selectSection')}</option>
+            {sections.map((section) => (
+              <option key={section.id} value={section.id} disabled={section.status !== 'active'}>
+                {section.label}
+              </option>
+            ))}
+          </select>
+        </label>
+      )}
+
+      {onStatusChange && (
+        <label className="grid gap-1.5 text-sm font-medium">
+          {t('instructorAssignments.context.status')}
+          <select
+            aria-label={t('instructorAssignments.context.status')}
+            value={status ?? ''}
+            onChange={(event) =>
+              onStatusChange(
+                (event.target.value || undefined) as 'draft' | 'active' | 'archived' | undefined,
+              )
+            }
+            className="h-10 min-w-36 rounded-md border bg-background px-3"
+          >
+            <option value="">{t('instructorAssignments.status.all')}</option>
+            <option value="draft">{t('instructorAssignments.status.draft')}</option>
+            <option value="active">{t('instructorAssignments.status.active')}</option>
+            <option value="archived">{t('instructorAssignments.status.archived')}</option>
+          </select>
+        </label>
+      )}
     </div>
   );
 }

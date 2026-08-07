@@ -553,7 +553,21 @@
     "newAssignment": "Tugas Baru",
     "actions": {
       "clone": "Kloning tugas",
-      "rollover": "Rollover semester"
+      "rollover": "Rollover semester",
+      "activate": "Aktifkan tugas",
+      "archive": "Arsipkan tugas"
+    },
+    "cloneDialog": {
+      "cloneTitle": "Kloning tugas",
+      "rolloverTitle": "Rollover tugas",
+      "description": "Buat konfigurasi mandiri dari {title}.",
+      "targetSection": "Kelas mata kuliah tujuan",
+      "deadline": "Tenggat akhir baru",
+      "title": "Judul tugas baru"
+    },
+    "lifecycle": {
+      "confirmActivate": "Aktifkan tugas ini? Mahasiswa akan dapat mengerjakannya.",
+      "confirmArchive": "Arsipkan tugas ini? Riwayatnya akan tetap tersedia."
     },
     "context": {
       "section": "Kelas mata kuliah",
@@ -593,6 +607,7 @@
       "effectiveDeadline": "Tenggat Efektif"
     },
     "status": {
+      "all": "Semua status",
       "draft": "Draf",
       "active": "Aktif",
       "archived": "Diarsipkan",

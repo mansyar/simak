@@ -559,6 +559,20 @@ export type Translation = {
     actions: {
       clone: string
       rollover: string
+      activate: string
+      archive: string
+    }
+    cloneDialog: {
+      cloneTitle: string
+      rolloverTitle: string
+      description: string
+      targetSection: string
+      deadline: string
+      title: string
+    }
+    lifecycle: {
+      confirmActivate: string
+      confirmArchive: string
     }
     context: {
       section: string
@@ -598,6 +612,7 @@ export type Translation = {
       effectiveDeadline: string
     }
     status: {
+      all: string
       draft: string
       active: string
       archived: string

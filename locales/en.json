@@ -553,7 +553,21 @@
     "newAssignment": "New Assignment",
     "actions": {
       "clone": "Clone assignment",
-      "rollover": "Rollover semester"
+      "rollover": "Rollover semester",
+      "activate": "Activate assignment",
+      "archive": "Archive assignment"
+    },
+    "cloneDialog": {
+      "cloneTitle": "Clone assignment",
+      "rolloverTitle": "Rollover assignment",
+      "description": "Create an independent configuration from {title}.",
+      "targetSection": "Target course section",
+      "deadline": "New final deadline",
+      "title": "New assignment title"
+    },
+    "lifecycle": {
+      "confirmActivate": "Activate this assignment? Students will be able to work on it.",
+      "confirmArchive": "Archive this assignment? Its history will remain available."
     },
     "context": {
       "section": "Course section",
@@ -593,6 +607,7 @@
       "effectiveDeadline": "Effective Deadline"
     },
     "status": {
+      "all": "All statuses",
       "draft": "Draft",
       "active": "Active",
       "archived": "Archived",
