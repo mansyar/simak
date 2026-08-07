@@ -73,6 +73,7 @@
   - **RED evidence:** `pnpm vitest run tests/unit/server/appointments-schemas.test.ts` failed before assertions because `@/server/appointments` did not exist.
   - **GREEN evidence:** `pnpm vitest run tests/unit/server/appointments-schemas.test.ts` passed 8/8 and `pnpm typecheck` passed.
   - **Implementation notes:** Added client-safe appointment schemas/stubs with assignment-required/checkpoint-optional slot inputs, bounded pagination, lifecycle operation contracts, standard request-ID/rate-limit middleware, and dynamic imports of the server-only handler module. No extras module is needed at the current file size.
+  - **Completion commit:** `e2644c5a` (`feat(track-058): add appointment server contracts`).
 
 - [ ] **Task 2.2: Create and list instructor slots (RED → GREEN)**
   - [ ] Write handler tests for instructor role, assignment ownership/section authorization, active assignment requirement, checkpoint ownership, future time, duration, and bounded result ordering.
