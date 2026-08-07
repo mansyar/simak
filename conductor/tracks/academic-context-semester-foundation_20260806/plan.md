@@ -141,7 +141,7 @@
   - [x] Add English and Indonesian keys for academic context, lifecycle, filters, forms, clone/rollover, and errors
   - [x] Run `pnpm generate:i18n`
   - [x] Run `pnpm check:i18n` and `pnpm check:i18n:unused`
-- [ ] Task: Implement admin context-management UI
+- [~] Task: Implement admin context-management UI
   - [ ] Add routes/components following existing admin users/templates patterns
   - [ ] Provide responsive list/detail/forms for terms, courses, sections, and enrollments
   - [ ] Add accessible archive and enrollment confirmation flows
