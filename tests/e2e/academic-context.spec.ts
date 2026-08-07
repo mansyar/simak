@@ -166,11 +166,15 @@ test.describe('Academic context cross-role surfaces', () => {
     page,
   }) => {
     await loginAsRole(page, 'instructor');
-    await page.goto('/instructor/assignments');
-    await page.getByRole('link', { name: 'E2E Test Assignment' }).click();
+    const sourceId = await getAssignmentIdByTitle('E2E Test Assignment');
+    if (sourceId === null) {
+      throw new Error('Could not find the seeded source assignment.');
+    }
 
+    await page.goto(`/instructor/assignments/${sourceId}`);
+
+    await expect(page).toHaveURL(/\/instructor\/assignments\/\d+/, { timeout: 30_000 });
     const sourceUrl = page.url();
-    const sourceId = Number(sourceUrl.split('/').pop());
     const sourceBefore = await getAssignmentSnapshot(sourceId);
     expect(sourceBefore?.status).toBe('active');
     expect(sourceBefore?.studentCount).toBeGreaterThan(0);
@@ -222,7 +226,12 @@ test.describe('Academic context cross-role surfaces', () => {
     await expect(page.getByText('E2E Thesis Section', { exact: true })).toBeVisible();
     await expect(page.getByText('E2E Academic Term', { exact: true })).toBeVisible();
 
-    await page.goto('/student/dashboard');
+    try {
+      await page.goto('/student/dashboard');
+    } catch (error) {
+      if (!String(error).includes('NS_BINDING_ABORTED')) throw error;
+    }
+    await page.waitForURL('**/student/dashboard');
     await expect(page.getByText('E2E-THESIS', { exact: true })).toBeVisible();
     await expect(page.getByText('E2E Thesis Section', { exact: true })).toBeVisible();
   });
