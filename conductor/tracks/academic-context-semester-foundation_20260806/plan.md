@@ -131,7 +131,7 @@
 
 **Objective:** Make academic context, lifecycle, filters, and clone/rollover usable through accessible responsive surfaces.
 
-- [ ] Task: Write failing UI and route tests (Red)
+- [~] Task: Write failing UI and route tests (Red)
   - [ ] Add admin academic-context route/component tests for terms, courses, sections, and enrollment management
   - [ ] Add instructor assignment-form tests for context selection, authorized students, mode, lifecycle, and clone/rollover
   - [ ] Add student/instructor list and detail tests for context visibility and lifecycle states
