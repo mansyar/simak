@@ -182,6 +182,7 @@ vi.mock('@/routes/__root', () => ({
 vi.mock('lucide-react', () => ({
   FileX: () => null,
   Download: () => null,
+  XIcon: () => null,
 }));
 
 vi.mock('@/components/skeletons/assignment-detail-skeleton', () => ({
