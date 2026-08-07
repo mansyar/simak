@@ -14,6 +14,14 @@ export interface AssignmentRow {
   templateName: string;
   templateType: string;
   studentCount: number;
+  sectionId?: number;
+  mode?: 'individual' | 'group';
+  status?: 'draft' | 'active' | 'archived';
+  context?: {
+    term: { name: string };
+    course: { code: string; name: string };
+    section: { code: string; name: string | null };
+  } | null;
 }
 
 interface AssignmentCardProps {
@@ -46,6 +54,32 @@ export function AssignmentCard({ assignment }: AssignmentCardProps) {
 
           {assignment.description && (
             <p className="text-sm text-muted-foreground line-clamp-2">{assignment.description}</p>
+          )}
+
+          {assignment.context && (
+            <div
+              className="flex flex-wrap gap-2 text-xs text-muted-foreground"
+              aria-label={t('instructorAssignments.context.section')}
+            >
+              <span>{assignment.context.course.code}</span>
+              <span>{assignment.context.section.name ?? assignment.context.section.code}</span>
+              <span>{assignment.context.term.name}</span>
+            </div>
+          )}
+
+          {(assignment.mode || assignment.status) && (
+            <div className="flex flex-wrap gap-2 text-xs">
+              {assignment.mode && (
+                <span className="rounded-full border px-2 py-1">
+                  {t(`instructorAssignments.mode.${assignment.mode}` as never)}
+                </span>
+              )}
+              {assignment.status && (
+                <span className="rounded-full border px-2 py-1">
+                  {t(`instructorAssignments.status.${assignment.status}` as never)}
+                </span>
+              )}
+            </div>
           )}
 
           <div className="flex items-center gap-2 text-xs text-muted-foreground border-t pt-3 mt-3">

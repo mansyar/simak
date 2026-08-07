@@ -501,12 +501,71 @@
       "restore": "Restore {title}"
     }
   },
+  "adminAcademicContext": {
+    "title": "Academic Context",
+    "terms": "Academic Terms",
+    "courses": "Courses",
+    "sections": "Course Sections",
+    "enrollments": "Section Enrollments",
+    "empty": "No academic context records found.",
+    "archiveConfirm": "Archive this academic context record? This action preserves its history.",
+    "status": {
+      "draft": "Draft",
+      "active": "Active",
+      "closed": "Closed",
+      "inactive": "Inactive",
+      "archived": "Archived"
+    },
+    "forms": {
+      "termCode": "Term code",
+      "termName": "Term name",
+      "startsOn": "Starts on",
+      "endsOn": "Ends on",
+      "courseCode": "Course code",
+      "courseName": "Course name",
+      "sectionTerm": "Term ID",
+      "sectionCourse": "Course ID",
+      "sectionCode": "Section code",
+      "sectionName": "Section name",
+      "enrollmentSection": "Section ID",
+      "enrollmentUser": "User ID",
+      "enrollmentRole": "Enrollment role",
+      "submit": "Save",
+      "cancel": "Cancel"
+    },
+    "roles": {
+      "student": "Student",
+      "instructor": "Instructor"
+    },
+    "actions": {
+      "createTerm": "Create term",
+      "createCourse": "Create course",
+      "createSection": "Create section",
+      "addEnrollment": "Add enrollment",
+      "archive": "Archive context"
+    }
+  },
   "instructorAssignments": {
     "title": "Assignments",
     "subtitle": "View and manage assignments assigned to your students.",
     "newAssignmentSubtitle": "Follow the steps to configure and launch an assignment for a student cohort.",
     "averageProgress": "Average Progress",
     "newAssignment": "New Assignment",
+    "actions": {
+      "clone": "Clone assignment",
+      "rollover": "Rollover semester"
+    },
+    "context": {
+      "section": "Course section",
+      "selectSection": "Select a course section",
+      "students": "Authorized students",
+      "mode": "Assignment mode",
+      "status": "Lifecycle status"
+    },
+    "mode": {
+      "individual": "Individual",
+      "group": "Group"
+    },
     "searchPlaceholder": "Search assignments by title...",
     "searchLabel": "Search assignments",
     "studentCount": "{count} Students",
@@ -534,6 +593,9 @@
       "effectiveDeadline": "Effective Deadline"
     },
     "status": {
+      "draft": "Draft",
+      "active": "Active",
+      "archived": "Archived",
       "passed": "Passed",
       "under_review": "Under Review",
       "submitted": "Submitted",
@@ -644,7 +706,15 @@
     "progress": "Progress",
     "empty": "No assignments yet",
     "emptyPrompt": "When your instructor assigns work to you, it will appear here.",
+    "context": {
+      "term": "Academic term",
+      "course": "Course",
+      "section": "Section"
+    },
     "status": {
+      "draft": "Draft",
+      "active": "Active",
+      "archived": "Archived",
       "passed": "Passed",
       "under_review": "Under Review",
       "submitted": "Submitted",

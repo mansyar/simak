@@ -506,12 +506,71 @@ export type Translation = {
       restore: string
     }
   }
+  adminAcademicContext: {
+    title: string
+    terms: string
+    courses: string
+    sections: string
+    enrollments: string
+    empty: string
+    archiveConfirm: string
+    status: {
+      draft: string
+      active: string
+      closed: string
+      inactive: string
+      archived: string
+    }
+    forms: {
+      termCode: string
+      termName: string
+      startsOn: string
+      endsOn: string
+      courseCode: string
+      courseName: string
+      sectionTerm: string
+      sectionCourse: string
+      sectionCode: string
+      sectionName: string
+      enrollmentSection: string
+      enrollmentUser: string
+      enrollmentRole: string
+      submit: string
+      cancel: string
+    }
+    roles: {
+      student: string
+      instructor: string
+    }
+    actions: {
+      createTerm: string
+      createCourse: string
+      createSection: string
+      addEnrollment: string
+      archive: string
+    }
+  }
   instructorAssignments: {
     title: string
     subtitle: string
     newAssignmentSubtitle: string
     averageProgress: string
     newAssignment: string
+    actions: {
+      clone: string
+      rollover: string
+    }
+    context: {
+      section: string
+      selectSection: string
+      students: string
+      mode: string
+      status: string
+    }
+    mode: {
+      individual: string
+      group: string
+    }
     searchPlaceholder: string
     searchLabel: string
     studentCount: string
@@ -539,6 +598,9 @@ export type Translation = {
       effectiveDeadline: string
     }
     status: {
+      draft: string
+      active: string
+      archived: string
       passed: string
       under_review: string
       submitted: string
@@ -649,7 +711,15 @@ export type Translation = {
     progress: string
     empty: string
     emptyPrompt: string
+    context: {
+      term: string
+      course: string
+      section: string
+    }
     status: {
+      draft: string
+      active: string
+      archived: string
       passed: string
       under_review: string
       submitted: string

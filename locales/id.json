@@ -501,12 +501,71 @@
       "restore": "Pulihkan {title}"
     }
   },
+  "adminAcademicContext": {
+    "title": "Konteks Akademik",
+    "terms": "Semester Akademik",
+    "courses": "Mata Kuliah",
+    "sections": "Kelas Mata Kuliah",
+    "enrollments": "Pendaftaran Kelas",
+    "empty": "Tidak ada data konteks akademik.",
+    "archiveConfirm": "Arsipkan data konteks akademik ini? Riwayatnya akan tetap tersimpan.",
+    "status": {
+      "draft": "Draf",
+      "active": "Aktif",
+      "closed": "Ditutup",
+      "inactive": "Tidak aktif",
+      "archived": "Diarsipkan"
+    },
+    "forms": {
+      "termCode": "Kode semester",
+      "termName": "Nama semester",
+      "startsOn": "Mulai pada",
+      "endsOn": "Berakhir pada",
+      "courseCode": "Kode mata kuliah",
+      "courseName": "Nama mata kuliah",
+      "sectionTerm": "ID semester",
+      "sectionCourse": "ID mata kuliah",
+      "sectionCode": "Kode kelas",
+      "sectionName": "Nama kelas",
+      "enrollmentSection": "ID kelas",
+      "enrollmentUser": "ID pengguna",
+      "enrollmentRole": "Peran pendaftaran",
+      "submit": "Simpan",
+      "cancel": "Batal"
+    },
+    "roles": {
+      "student": "Mahasiswa",
+      "instructor": "Dosen"
+    },
+    "actions": {
+      "createTerm": "Buat semester",
+      "createCourse": "Buat mata kuliah",
+      "createSection": "Buat kelas",
+      "addEnrollment": "Tambah pendaftaran",
+      "archive": "Arsipkan konteks"
+    }
+  },
   "instructorAssignments": {
     "title": "Tugas",
     "subtitle": "Lihat dan kelola tugas yang diberikan kepada mahasiswa Anda.",
     "newAssignmentSubtitle": "Ikuti langkah-langkah untuk mengonfigurasi dan meluncurkan tugas untuk kelompok mahasiswa.",
     "averageProgress": "Rata-rata Progres",
     "newAssignment": "Tugas Baru",
+    "actions": {
+      "clone": "Kloning tugas",
+      "rollover": "Rollover semester"
+    },
+    "context": {
+      "section": "Kelas mata kuliah",
+      "selectSection": "Pilih kelas mata kuliah",
+      "students": "Mahasiswa yang berwenang",
+      "mode": "Mode tugas",
+      "status": "Status siklus hidup"
+    },
+    "mode": {
+      "individual": "Individu",
+      "group": "Kelompok"
+    },
     "searchPlaceholder": "Cari tugas berdasarkan judul...",
     "searchLabel": "Cari tugas",
     "studentCount": "{count} Mahasiswa",
@@ -534,6 +593,9 @@
       "effectiveDeadline": "Tenggat Efektif"
     },
     "status": {
+      "draft": "Draf",
+      "active": "Aktif",
+      "archived": "Diarsipkan",
       "passed": "Lulus",
       "under_review": "Sedang Ditinjau",
       "submitted": "Dikirim",
@@ -644,7 +706,15 @@
     "progress": "Progres",
     "empty": "Belum ada tugas",
     "emptyPrompt": "Ketika dosen memberikan tugas, tugas akan muncul di sini.",
+    "context": {
+      "term": "Semester akademik",
+      "course": "Mata kuliah",
+      "section": "Kelas"
+    },
     "status": {
+      "draft": "Draf",
+      "active": "Aktif",
+      "archived": "Diarsipkan",
       "passed": "Lulus",
       "under_review": "Sedang Ditinjau",
       "submitted": "Dikirim",
