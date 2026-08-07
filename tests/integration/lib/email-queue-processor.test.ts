@@ -7,7 +7,14 @@ import { eq, like } from 'drizzle-orm';
 
 vi.mock('@/config/env', () => ({
   getEnv: vi.fn().mockReturnValue({
+    DATABASE_URL:
+      process.env.MIGRATE_DATABASE_URL ??
+      process.env.DATABASE_URL ??
+      'postgresql://simak:simak_password@localhost:5433/simak_test',
+    DB_POOL_MAX: 5,
+    DB_PREPARED_STATEMENTS_DISABLED: false,
     RESEND_API_KEY: 'test-key',
+    LOG_LEVEL: 'info',
   }),
 }));
 
