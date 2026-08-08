@@ -307,11 +307,15 @@
 
 ## Phase 8: End-to-end validation and completion
 
-- [~] **Task 8.1: Full lifecycle E2E coverage**
-   - [~] Add Playwright coverage for instructor publish → student book → notification → reschedule/cancel → completion/no-show → explicit consultation record → instructor verification.
-   - [~] Add cross-role authorization and calendar-feed scenarios.
-   - [~] Add a DST/timezone scenario and mobile viewport coverage.
-   - [ ] Confirm RED behavior for newly added scenarios, then make them pass.
+- [x] **Task 8.1: Full lifecycle E2E coverage**
+   - [x] Add Playwright coverage for instructor publish → student book → notification → reschedule/cancel → completion/no-show → explicit consultation record → instructor verification.
+   - [x] Add cross-role authorization and calendar-feed scenarios.
+   - [x] Add a DST/timezone scenario and mobile viewport coverage.
+   - [x] Confirm RED behavior for newly added scenarios, then make them pass.
+   - **RED/GREEN evidence:** The first executable runs exposed the actual SQL checkpoint-order column, unstable pre-hydration tab interaction, localized action/heading labels, Date-valued PostgreSQL timestamps, and auth/navigation waits; the fixture, selectors, bounded readiness wait, and helper timing were corrected before the passing runs.
+   - **Automated verification:** `pnpm exec playwright test tests/e2e/appointment-scheduling.spec.ts --project=chromium --retries=0` passed 3/3; the same suite passed 3/3 under `--project=mobile-chrome --retries=0`. Coverage includes DST-oriented New York inputs, 320px viewport/no-overflow checks, lifecycle notifications, private calendar UID/DTEND/rescheduling/cancellation behavior, explicit consultation prefill/verification, generic invalid-token responses, and student-to-instructor route protection. `pnpm typecheck`, formatting, and `git diff --check` passed.
+   - **Implementation notes:** E2E reset now clears appointment reminders, appointments, and private calendar tokens. The auth helper uses bounded DOM-content readiness instead of an unbounded network-idle wait; the appointment suite uses direct role login and a bounded network-idle readiness window before tab interaction. Expected existing hydration/date-timezone, route code-splitting, CSP, and PostgreSQL notices did not affect assertions.
+   - **Implementation commit:** pending.
 
 - [ ] **Task 8.2: Regression and quality gates**
   - [ ] Run focused unit suites.
