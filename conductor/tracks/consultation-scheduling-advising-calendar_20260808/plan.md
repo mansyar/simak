@@ -279,12 +279,16 @@
    - [x] Add tests for slot creation, assignment/checkpoint selection, duration/time validation, slot listing, cancellation, rescheduling, completion/no-show, and conflict errors.
    - [x] Add role/ownership and inactive-assignment UI coverage.
    - [x] Confirm RED behavior.
-   - **RED evidence:** `pnpm vitest run tests/unit/components/instructor/InstructorAppointmentPanel.test.tsx` failed before assertions because the planned `InstructorAppointmentPanel` component did not exist; `pnpm typecheck` reported the same missing module. The contract covers slot publishing, assignment/checkpoint selection, booked student/status display, confirmation-gated cancellation, replacement-slot rescheduling, completion/no-show actions, timezone labels, empty/loading/error/retry states, and generic unauthorized/inactive-context handling.
+    - **RED evidence:** `pnpm vitest run tests/unit/components/instructor/InstructorAppointmentPanel.test.tsx` failed before assertions because the planned `InstructorAppointmentPanel` component did not exist; `pnpm typecheck` reported the same missing module. The contract covers slot publishing, assignment/checkpoint selection, booked student/status display, confirmation-gated cancellation, replacement-slot rescheduling, completion/no-show actions, timezone labels, empty/loading/error/retry states, and generic unauthorized/inactive-context handling.
+    - **GREEN evidence:** The instructor panel suite passed 5/5 after implementation; `pnpm typecheck`, `pnpm check:i18n`, targeted `oxlint`, formatting, and `git diff --check` passed.
 
-- [~] **Task 7.2: Instructor slot and appointment UI (GREEN)**
-   - [~] Implement the assignment consultation scheduling surface using existing instructor consultation patterns.
-   - [~] Add mobile-friendly list/forms, status presentation, confirmation dialogs, accessible labels, and bilingual messages.
-   - [~] Ensure the instructor cannot modify appointments outside server-authorized assignments.
+- [x] **Task 7.2: Instructor slot and appointment UI (GREEN)**
+   - [x] Implement the assignment consultation scheduling surface using existing instructor consultation patterns.
+   - [x] Add mobile-friendly list/forms, status presentation, confirmation dialogs, accessible labels, and bilingual messages.
+   - [x] Ensure the instructor cannot modify appointments outside server-authorized assignments.
+   - **Implementation notes:** Added `InstructorAppointmentPanel`, integrated it above the existing consultation verification queue, and passed assignment/checkpoint options from the instructor assignment route. The panel delegates all authorization and active-context enforcement to the server functions, uses UTC-safe IANA timezone display, supports slot publishing, cancellation, replacement rescheduling, completion/no-show, and localized loading/error/empty/conflict states.
+   - **Automated verification:** Instructor panel and instructor assignment route suites passed 9/9; `pnpm typecheck`, `pnpm check:i18n`, targeted `oxlint`, formatting, and `git diff --check` passed. The implementation stayed within the 500-line modularity limit.
+   - **Implementation commit:** `80e7c83e` (with the RED contract commit `a3e79b38`).
 
 - [ ] **Task 7.3: UI quality verification**
   - [ ] Run instructor component/route tests, accessibility checks, i18n parity, lint, and typecheck.
