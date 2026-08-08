@@ -4,6 +4,7 @@ import { getDb } from '@/db/index';
 import { getNotificationKeys } from '@/lib/i18n-server';
 import { logger } from '@/lib/logger';
 import { maybeInsertNotification } from '@/lib/notification-prefs';
+import { enqueueEventEmail } from '@/lib/event-email';
 import { notifyAppointmentParticipants } from '@/lib/appointment-notifications';
 
 vi.mock('@/db/index', () => ({ getDb: vi.fn() }));
@@ -15,12 +16,14 @@ vi.mock('@/lib/i18n-server', () => ({
 }));
 vi.mock('@/lib/logger', () => ({ logger: { error: vi.fn() } }));
 vi.mock('@/lib/notification-prefs', () => ({ maybeInsertNotification: vi.fn() }));
+vi.mock('@/lib/event-email', () => ({ enqueueEventEmail: vi.fn() }));
 
 describe('appointment participant notifications', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.mocked(getDb).mockReturnValue({} as never);
     vi.mocked(maybeInsertNotification).mockResolvedValue(undefined);
+    vi.mocked(enqueueEventEmail).mockResolvedValue(undefined);
   });
 
   it('creates preference-aware in-app notifications once per participant', async () => {
@@ -118,6 +121,68 @@ describe('appointment participant notifications', () => {
       expect.objectContaining({
         event: 'advisory_failed',
         error: 'database unavailable',
+      }),
+    );
+  });
+
+  it('enqueues localized participant emails without private consultation notes', async () => {
+    await notifyAppointmentParticipants({
+      event: 'appointment_rescheduled',
+      appointmentId: 401,
+      assignmentId: 10,
+      participantIds: ['student-1', 'instructor-1'],
+      startAt: new Date('2026-08-08T12:00:00.000Z'),
+      endAt: new Date('2026-08-08T13:00:00.000Z'),
+    });
+
+    expect(enqueueEventEmail).toHaveBeenCalledTimes(2);
+    expect(enqueueEventEmail).toHaveBeenCalledWith(
+      expect.objectContaining({
+        recipientId: 'student-1',
+        subjectKey: 'emails.subjects.appointmentRescheduled',
+        templateType: 'appointment_rescheduled',
+        notificationType: 'appointment_rescheduled',
+      }),
+    );
+    expect(JSON.stringify(vi.mocked(enqueueEventEmail).mock.calls)).not.toContain(
+      'consultation notes',
+    );
+  });
+
+  it('continues email delivery when in-app notification insertion fails', async () => {
+    vi.mocked(maybeInsertNotification).mockRejectedValue(new Error('in-app unavailable'));
+
+    await notifyAppointmentParticipants({
+      event: 'appointment_booked',
+      appointmentId: 401,
+      assignmentId: 10,
+      participantIds: ['student-1'],
+      startAt: new Date('2026-08-08T12:00:00.000Z'),
+      endAt: new Date('2026-08-08T13:00:00.000Z'),
+    });
+
+    expect(enqueueEventEmail).toHaveBeenCalledTimes(1);
+  });
+
+  it('isolates an email enqueue failure after the appointment mutation', async () => {
+    vi.mocked(enqueueEventEmail).mockRejectedValue(new Error('email queue unavailable'));
+
+    await expect(
+      notifyAppointmentParticipants({
+        event: 'appointment_completed',
+        appointmentId: 401,
+        assignmentId: 10,
+        participantIds: ['student-1'],
+        startAt: new Date('2026-08-08T12:00:00.000Z'),
+        endAt: new Date('2026-08-08T13:00:00.000Z'),
+      }),
+    ).resolves.toBeUndefined();
+
+    expect(logger.error).toHaveBeenCalledWith(
+      expect.objectContaining({
+        event: 'advisory_failed',
+        channel: 'email',
+        error: 'email queue unavailable',
       }),
     );
   });

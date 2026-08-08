@@ -265,4 +265,53 @@ describe('enqueueEventEmail — email preference gate (TRACK-022)', () => {
 
     expect(enqueueEmail).toHaveBeenCalledTimes(1);
   });
+
+  it('should suppress appointment emails when the appointment preference is disabled', async () => {
+    vi.mocked(resolveEmailRecipient).mockResolvedValue({
+      email: 'student@test.com',
+      locale: 'en',
+      settings: {
+        reducedMotion: false,
+        notificationPrefs: { appointment_booked: { email: false } },
+      },
+    });
+
+    await enqueueEventEmail({
+      recipientId: 'student-1',
+      subjectKey: 'emails.subjects.appointmentBooked',
+      templateType: 'appointment_booked',
+      notificationType: 'appointment_booked',
+      subjectParams: { assignmentId: '10' },
+      buildBody: () => '<html>appointment</html>',
+    });
+
+    expect(enqueueEmail).not.toHaveBeenCalled();
+  });
+
+  it('enqueues appointment emails when the appointment preference is enabled', async () => {
+    vi.mocked(resolveEmailRecipient).mockResolvedValue({
+      email: 'student@test.com',
+      locale: 'id',
+      settings: {
+        reducedMotion: false,
+        notificationPrefs: { appointment_booked: { email: true } },
+      },
+    });
+
+    await enqueueEventEmail({
+      recipientId: 'student-1',
+      subjectKey: 'emails.subjects.appointmentBooked',
+      templateType: 'appointment_booked',
+      notificationType: 'appointment_booked',
+      subjectParams: { assignmentId: '10' },
+      buildBody: () => '<html>appointment</html>',
+    });
+
+    expect(enqueueEmail).toHaveBeenCalledWith(
+      expect.objectContaining({
+        subject: '[SIMAK] Janji Temu Dipesan — Tugas 10',
+        templateType: 'appointment_booked',
+      }),
+    );
+  });
 });

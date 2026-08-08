@@ -1,7 +1,9 @@
 import { getDb } from '@/db/index';
+import { enqueueEventEmail } from '@/lib/event-email';
 import { getNotificationKeys } from '@/lib/i18n-server';
 import { logger } from '@/lib/logger';
 import { maybeInsertNotification } from '@/lib/notification-prefs';
+import { buildAppointmentEmailBody, getAppointmentEmailConfig } from '@/lib/appointment-email';
 
 export type AppointmentNotificationEvent =
   | 'appointment_booked'
@@ -39,6 +41,7 @@ export async function notifyAppointmentParticipants({
   if (recipientIds.length === 0) return;
 
   const { titleKey, messageKey } = getNotificationKeys(event);
+  const email = getAppointmentEmailConfig(event);
   const params = {
     appointmentId: String(appointmentId),
     assignmentId: String(assignmentId),
@@ -51,10 +54,20 @@ export async function notifyAppointmentParticipants({
     assignmentId,
     ...(checkpointId == null ? {} : { checkpointId }),
   };
+  let db: ReturnType<typeof getDb> | undefined;
   try {
-    const db = getDb();
-    await Promise.all(
-      recipientIds.map(async (recipientId) => {
+    db = getDb();
+  } catch (error) {
+    logger.error({
+      event: 'advisory_failed',
+      handler: 'notifyAppointmentParticipants',
+      error: error instanceof Error ? error.message : String(error),
+    });
+  }
+
+  await Promise.all(
+    recipientIds.map(async (recipientId) => {
+      if (db) {
         try {
           await maybeInsertNotification(db, recipientId, event, {
             userId: recipientId,
@@ -73,13 +86,26 @@ export async function notifyAppointmentParticipants({
             error: error instanceof Error ? error.message : String(error),
           });
         }
-      }),
-    );
-  } catch (error) {
-    logger.error({
-      event: 'advisory_failed',
-      handler: 'notifyAppointmentParticipants',
-      error: error instanceof Error ? error.message : String(error),
-    });
-  }
+      }
+
+      try {
+        await enqueueEventEmail({
+          recipientId,
+          subjectKey: email.subjectKey,
+          subjectParams: params,
+          templateType: email.templateType,
+          notificationType: event,
+          buildBody: (locale) => buildAppointmentEmailBody(event, params, locale),
+        });
+      } catch (error) {
+        logger.error({
+          event: 'advisory_failed',
+          handler: 'notifyAppointmentParticipants',
+          recipientId,
+          channel: 'email',
+          error: error instanceof Error ? error.message : String(error),
+        });
+      }
+    }),
+  );
 }

@@ -1233,11 +1233,11 @@
       },
       "appointment_completed": {
         "title": "Appointment Completed",
-        "message": "Appointment #{appointmentId} for assignment #{assignmentId} was completed."
+        "message": "Appointment #{appointmentId} for assignment #{assignmentId} at {startAt} was completed."
       },
       "appointment_no_show": {
         "title": "Appointment Marked No-Show",
-        "message": "Appointment #{appointmentId} for assignment #{assignmentId} was marked as no-show."
+        "message": "Appointment #{appointmentId} for assignment #{assignmentId} at {startAt} was marked as no-show."
       },
       "appointment_reminder_24h": {
         "title": "Appointment Reminder",
