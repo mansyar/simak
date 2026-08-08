@@ -119,11 +119,11 @@
   - **Implementation notes:** Student booking locks the authorized appointment, instructor user, student user, and assignment enrollment in one transaction; it rechecks active context/status, validates the optional student-owned checkpoint, excludes cancelled records by querying only `booked` conflicts, guards the final update, and audits only safe appointment state.
   - **Implementation commit:** `bb75b022` (`feat(track-058): add race-safe student booking`).
 
-- [ ] **Task 3.2: Cancellation and rescheduling (RED → GREEN)**
-  - [ ] Write tests for student/instructor cancellation, future-only rules, selecting another available slot, instructor time changes, target-slot locking, conflict rejection, and preservation of the original appointment on failure.
-  - [ ] Confirm RED behavior.
-  - [ ] Implement transactional cancellation/rescheduling with stable appointment identity and audit before/after times.
-  - [ ] Add preference-aware participant notifications after successful commit.
+- [~] **Task 3.2: Cancellation and rescheduling (RED → GREEN)**
+  - [~] Write tests for student/instructor cancellation, future-only rules, selecting another available slot, instructor time changes, target-slot locking, conflict rejection, and preservation of the original appointment on failure.
+  - [~] Confirm RED behavior.
+  - [~] Implement transactional cancellation/rescheduling with stable appointment identity and audit before/after times.
+  - [~] Add preference-aware participant notifications after successful commit.
 
 - [ ] **Task 3.3: Completion, no-show, and explicit evidence action (RED → GREEN)**
   - [ ] Write tests for instructor-only completion/no-show, post-end timing, invalid transitions, and appointment-to-consultation form linkage.
