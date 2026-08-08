@@ -47,12 +47,12 @@
 
 ## Phase 2: Grade Release and Enrollment Integration
 
-- [~] Task: Write failing integration tests for official record creation
-  - [ ] Test publishing a designated assignment creates records only for eligible enrolled students.
-  - [ ] Test draft and unpublished grades remain unavailable.
-  - [ ] Test later release versions preserve history and switch the active official result.
-  - [ ] Test authorized withdrawal creates a visible, GPA-excluded record without fabricating a grade.
-- [ ] Task: Integrate academic records with grade release
+- [x] Task: Write failing integration tests for official record creation [e0ac5f3]
+  - [x] Test publishing a designated assignment creates records only for eligible enrolled students.
+  - [x] Test draft and unpublished grades remain unavailable.
+  - [x] Test later release versions preserve history and switch the active official result.
+  - [x] Test authorized withdrawal creates a visible, GPA-excluded record without fabricating a grade.
+- [~] Task: Integrate academic records with grade release
   - [ ] Extend the existing release transaction at the server boundary without changing grade formulas.
   - [ ] Add release preflight validation for missing, ambiguous, and incomplete source data.
   - [ ] Add explicit withdrawal/status provenance and preserve enrollment history.
