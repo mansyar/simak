@@ -111,7 +111,7 @@ export const completeAppointment = typedServerFn({ method: 'POST' })
   .middleware(serverFnMiddlewares(RATE_LIMITS.destructive))
   .inputValidator(CompleteAppointmentSchema)
   .handler(async ({ data }) => {
-    const { completeAppointmentHandler } = await import('./appointments-lifecycle.server');
+    const { completeAppointmentHandler } = await import('./appointments-outcomes.server');
     return completeAppointmentHandler({ data });
   });
 
@@ -119,7 +119,7 @@ export const markAppointmentNoShow = typedServerFn({ method: 'POST' })
   .middleware(serverFnMiddlewares(RATE_LIMITS.destructive))
   .inputValidator(MarkAppointmentNoShowSchema)
   .handler(async ({ data }) => {
-    const { markAppointmentNoShowHandler } = await import('./appointments-lifecycle.server');
+    const { markAppointmentNoShowHandler } = await import('./appointments-outcomes.server');
     return markAppointmentNoShowHandler({ data });
   });
 

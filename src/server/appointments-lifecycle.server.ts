@@ -352,6 +352,4 @@ async function appointmentLifecycleHandlerNotImplemented(_context: unknown): Pro
 export const listAvailableAppointmentsHandler = appointmentLifecycleHandlerNotImplemented;
 export const listStudentAppointmentsHandler = appointmentLifecycleHandlerNotImplemented;
 export const rescheduleAppointmentHandler = appointmentLifecycleHandlerNotImplemented;
-export const completeAppointmentHandler = appointmentLifecycleHandlerNotImplemented;
-export const markAppointmentNoShowHandler = appointmentLifecycleHandlerNotImplemented;
 export const getAppointmentDetailHandler = appointmentLifecycleHandlerNotImplemented;

@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -32,12 +33,14 @@ interface CheckpointOption {
 interface ConsultationFormProps {
   assignmentId: number;
   checkpoints: CheckpointOption[];
+  initialCheckpointId?: number | null;
   onSuccess: () => void;
 }
 
 export function ConsultationForm({
   assignmentId: _assignmentId,
   checkpoints,
+  initialCheckpointId,
   onSuccess,
 }: ConsultationFormProps) {
   const { t } = useI18n();
@@ -64,13 +67,22 @@ export function ConsultationForm({
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      checkpointId: '',
+      checkpointId:
+        initialCheckpointId === null || initialCheckpointId === undefined
+          ? ''
+          : String(initialCheckpointId),
       sessionType: 'internal',
       externalConsultantName: '',
       notes: '',
     },
     mode: 'onBlur',
   });
+
+  useEffect(() => {
+    if (initialCheckpointId !== null && initialCheckpointId !== undefined) {
+      form.setValue('checkpointId', String(initialCheckpointId));
+    }
+  }, [form, initialCheckpointId]);
 
   const sessionType = form.watch('sessionType');
 

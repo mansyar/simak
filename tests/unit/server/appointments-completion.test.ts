@@ -4,10 +4,11 @@ import { getDb } from '@/db/index';
 import { notifyAppointmentParticipants } from '@/lib/appointment-notifications';
 import { safeAuditLog } from '@/lib/audit';
 import { getSessionFromHeaders } from '@/server/auth';
+import { listVerifiedCounts } from '@/server/consultations';
 import {
   completeAppointmentHandler,
   markAppointmentNoShowHandler,
-} from '@/server/appointments-lifecycle.server';
+} from '@/server/appointments-outcomes.server';
 
 vi.mock('@/server/auth', () => ({
   getSessionFromHeaders: vi.fn(),
@@ -23,6 +24,10 @@ vi.mock('@/lib/audit', () => ({
 
 vi.mock('@/lib/appointment-notifications', () => ({
   notifyAppointmentParticipants: vi.fn().mockResolvedValue(undefined),
+}));
+
+vi.mock('@/server/consultations', () => ({
+  listVerifiedCounts: vi.fn(),
 }));
 
 const instructorSession = {
@@ -128,6 +133,7 @@ describe('appointment completion and no-show transitions', () => {
         }),
       );
       expect(mockDb.insert).not.toHaveBeenCalled();
+      expect(listVerifiedCounts).not.toHaveBeenCalled();
     },
   );
 
