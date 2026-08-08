@@ -96,12 +96,16 @@
   - **RED evidence:** The cancellation additions to `tests/unit/server/appointments-handlers.test.ts` failed 8/8 because the server-only cancellation handler still threw its not-implemented placeholder; the existing create/list tests remained green at 14/14.
   - **GREEN evidence:** `pnpm vitest run tests/unit/server/appointments-handlers.test.ts tests/unit/server/appointments-schemas.test.ts` passed 30/30; `pnpm typecheck` and targeted `oxlint` passed with zero errors; focused coverage for `src/server/appointments.server.ts` passed at 94.02% statements, 80% branches, 100% functions, and 93.84% lines.
   - **Implementation notes:** Instructor cancellation locks the authorized appointment row inside a transaction, accepts only future `available` slots, treats repeated cancellation as an audit-free idempotent success, rejects booked/past/stale transitions, updates status with a guarded predicate, and performs redacted advisory audit after commit. Lifecycle placeholders are isolated in `appointments-lifecycle.server.ts` for later phases.
+  - **Implementation commit:** `1ada58e2` (`feat(track-058): cancel unbooked appointment slots`); test typing follow-up: `f650bbb5` (`test(track-058): type cancellation audit assertion`).
 
-- [ ] **Phase 2 Verification & Checkpoint**
-  - [ ] Run focused server tests, typecheck, and lint.
-  - [ ] Manually create an instructor slot, inspect its status, list it, and cancel it through the UI/API.
-  - [ ] Verify an unauthorized user receives a generic response and cannot enumerate assignment/slot existence.
-  - [ ] Obtain confirmation, attach the verification note, record the checkpoint SHA, and commit the plan update.
+- [x] **Phase 2 Verification & Checkpoint**
+  - [x] Run focused server tests, typecheck, and lint: 30/30 appointment handler/contract tests passed; `pnpm typecheck` and targeted `oxlint` passed with zero errors; scoped handler coverage is 94.02% statements, 80% branches, 100% functions, and 93.84% lines.
+  - [x] Manually create an instructor slot, inspect its status, list it, and cancel it through the UI/API.
+  - [x] Verify unauthorized access receives generic responses and cannot enumerate assignment/slot existence through the instructor-handler authorization tests.
+  - [x] Obtain explicit user confirmation, attach the verification note, record the checkpoint SHA, and commit the plan update.
+  - **Manual verification:** User explicitly confirmed the authorized create → inspect → list → cancel flow, idempotent repeat cancellation, and generic unauthorized access behavior.
+  - **Verification note:** Phase 2 checkpoint accepted on 2026-08-08 after automated and manual verification; appointments remain separate from consultation evidence and gating.
+  - **Checkpoint commit:** pending plan commit.
 
 ## Phase 3: Student booking and appointment lifecycle
 
