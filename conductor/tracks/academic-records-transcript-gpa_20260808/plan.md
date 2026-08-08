@@ -12,11 +12,11 @@
 
 ## Phase 0: Policy and Data Contract
 
-- [ ] Task: Confirm the academic-record policy contract
-  - [ ] Document the configured default grade-to-point mapping and rounding behavior.
-  - [ ] Define course-credit ownership, policy activation, and effective-version rules.
-  - [ ] Define complete, incomplete, withdrawn, unavailable, and GPA-excluded states.
-  - [ ] Define deterministic ordering for repeated attempts and active-record selection.
+- [x] Task: Confirm the academic-record policy contract [deccce5]
+  - [x] Document the configured default grade-to-point mapping and rounding behavior.
+  - [x] Define course-credit ownership, policy activation, and effective-version rules.
+  - [x] Define complete, incomplete, withdrawn, unavailable, and GPA-excluded states.
+  - [x] Define deterministic ordering for repeated attempts and active-record selection.
 - [ ] Task: Write policy-contract tests before implementation
   - [ ] Test valid and invalid grade mappings, credits, and rounding configurations.
   - [ ] Test term GPA and cumulative GPA calculations, including no-eligible-record states.
