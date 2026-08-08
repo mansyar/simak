@@ -331,6 +331,7 @@
     - **Verification evidence:** Focused appointment, consultation-regression, student/instructor UI, and calendar suites were green during implementation; the full unit run passed 462 files and 4,551 tests. The full coverage run passed at 87.39% statements, 80.64% branches, 82.51% functions, and 88.23% lines; appointment modules also passed their scoped thresholds. `pnpm typecheck`, `pnpm check:i18n`, `pnpm format`, `pnpm build`, and `git diff --check` passed. `pnpm lint` passed with four pre-existing warnings and no errors.
     - **Integration evidence:** The configured default database remains a legacy pre-TRACK-057 instance, so the first default integration attempt could not resolve academic-context tables. After synchronizing disposable `simak_test` with `pnpm db:push` and running the full integration suite serially to avoid shared-database worker interference, all 16 files and 42 tests passed, including the appointment lifecycle concurrency suite. The parallel run's sole email-queue duplicate-delivery failure reproduced as green when isolated and did not affect appointment behavior.
     - **E2E/accessibility evidence:** The appointment Playwright suite passed 3/3 under Chromium and 3/3 under mobile Chromium, including 320px no-overflow, light/dark, keyboard/44px controls, lifecycle, timezone/DST, private calendar, notification, explicit consultation, and cross-role authorization checks. Accessibility assertions and existing axe/E2E coverage passed; expected hydration/date-timezone and route warnings did not fail assertions.
+    - **Implementation/documentation commit:** `9508aa21`.
 
  - [x] **Task 8.3: Documentation and self-review**
    - [x] Update roadmap/product documentation only where completed behavior requires it.
@@ -340,7 +341,8 @@
    - [x] Prepare the track for `conductor-review`.
    - **Documentation:** Updated `docs/roadmap.md`, `docs/PRD.md`, `docs/TDD.md`, and `conductor/product.md` with the completed appointment domain, reminder scheduler, private calendar extension, separate consultation evidence boundary, migrations/rollbacks, and operational database limitation.
    - **Self-review:** FR-1–FR-10 and NFR-1–NFR-8 are covered by the implementation and recorded verification; all acceptance criteria are represented by focused, integration, UI, calendar, consultation-regression, and Playwright coverage. Explicitly out-of-scope OAuth/two-way sync, recurring/resource calendars, group/external advising, attendance management, transcript/reporting/risk-history work, and consultation-gating changes were not introduced.
-   - **Architecture/dependency review:** No new runtime dependency or tech-stack deviation was introduced. The implementation uses the existing Drizzle/PostgreSQL migrations, typed server-function split, email queue, notification preferences, timezone utilities, private feed token boundary, Base UI/Tailwind surfaces, and Playwright/Vitest quality stack.
+    - **Architecture/dependency review:** No new runtime dependency or tech-stack deviation was introduced. The implementation uses the existing Drizzle/PostgreSQL migrations, typed server-function split, email queue, notification preferences, timezone utilities, private feed token boundary, Base UI/Tailwind surfaces, and Playwright/Vitest quality stack.
+    - **Implementation/documentation commit:** `9508aa21`.
 
 - [ ] **Final Verification & Completion Checkpoint**
   - [ ] Present final automated verification results and manual verification summary.
