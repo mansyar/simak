@@ -130,12 +130,12 @@
   - **Implementation commits:** `1ada58e2` (`feat(track-058): cancel unbooked appointment slots`), `f650bbb5` (`test(track-058): type cancellation audit assertion`), and `ab2a7e32` (`feat(track-058): add appointment lifecycle changes`).
   - **Notification RED evidence:** `pnpm vitest run tests/unit/lib/appointment-notifications.test.ts` could not import the missing `@/lib/appointment-notifications` module; no tests ran.
 
-- [ ] **Task 3.3: Completion, no-show, and explicit evidence action (RED → GREEN)**
-  - [ ] Write tests for instructor-only completion/no-show, post-end timing, invalid transitions, and appointment-to-consultation form linkage.
-  - [ ] Add a regression test proving completion does not insert a consultation or alter verified counts.
-  - [ ] Confirm RED behavior.
-  - [ ] Implement lifecycle transitions and an explicit action that opens/prefills the existing consultation evidence flow without auto-verification.
-  - [ ] Verify existing consultation verification and gating tests remain green.
+- [~] **Task 3.3: Completion, no-show, and explicit evidence action (RED → GREEN)**
+  - [~] Write tests for instructor-only completion/no-show, post-end timing, invalid transitions, and appointment-to-consultation form linkage.
+  - [~] Add a regression test proving completion does not insert a consultation or alter verified counts.
+  - [~] Confirm RED behavior.
+  - [~] Implement lifecycle transitions and an explicit action that opens/prefills the existing consultation evidence flow without auto-verification.
+  - [~] Verify existing consultation verification and gating tests remain green.
 
 - [ ] **Task 3.4: Transaction and authorization integration coverage**
   - [ ] Add database-backed tests for concurrent booking/rescheduling and stale transition handling.
