@@ -317,7 +317,7 @@ describe('Appointment instructor handlers', () => {
         entityId: '201',
         details: { beforeStatus: 'available', afterStatus: 'cancelled', assignmentId: 10 },
       });
-      expect(JSON.stringify(safeAuditLog.mock.calls[0])).not.toContain(
+      expect(JSON.stringify(vi.mocked(safeAuditLog).mock.calls[0])).not.toContain(
         'Private consultation notes',
       );
     });
