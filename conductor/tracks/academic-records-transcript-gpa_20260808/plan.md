@@ -79,11 +79,11 @@
   - [x] Add server-only handlers with session, role, and academic-context authorization.
   - [x] Add paginated/filterable transcript queries without N+1 database access.
   - [x] Add rate-limit tiers appropriate to reads and administrative mutations.
-- [~] Task: Phase Verification & Checkpoint (Refer to `conductor/workflow.md`)
+- [x] Task: Phase Verification & Checkpoint [5782d5b] (Refer to `conductor/workflow.md`)
 
 ## Phase 4: Role-Based Academic Record UI
 
-- [ ] Task: Write failing component and route tests
+- [~] Task: Write failing component and route tests
   - [ ] Test student transcript, term filter, GPA summary, and empty/unavailable states.
   - [ ] Test admin policy/source metadata and record-detail states.
   - [ ] Test instructor section-scoped record view and unauthorized states.
