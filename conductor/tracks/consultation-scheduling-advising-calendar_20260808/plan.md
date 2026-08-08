@@ -202,9 +202,9 @@
 
 ## Phase 5: Private iCalendar extension
 
-- [ ] **Task 5.1: Appointment event selection (RED → GREEN)**
-  - [ ] Write selector tests for student ownership, booked-only status, future events, active assignment authorization, cancelled omission, optional checkpoint labels, and unrelated-student isolation.
-  - [ ] Confirm RED behavior.
+- [~] **Task 5.1: Appointment event selection (RED → GREEN)**
+  - [~] Write selector tests for student ownership, booked-only status, future events, active assignment authorization, cancelled omission, optional checkpoint labels, and unrelated-student isolation.
+  - [~] Confirm RED behavior.
   - [ ] Extend the existing calendar-feed selection helper without changing deadline event semantics.
   - [ ] Verify token-owner checks remain in the route boundary.
 
