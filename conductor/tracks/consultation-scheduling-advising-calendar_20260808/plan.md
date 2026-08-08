@@ -140,7 +140,7 @@
   - **Linkage RED evidence:** The consultation form regression test fails because `ConsultationForm` has no appointment-supplied checkpoint prefill prop; the existing selector defaults to its first option.
   - **GREEN evidence:** Completion/no-show tests passed 9/9; the consultation form suite passed 15/15; appointment booking/handler/rescheduling/contract suites passed 63/63; consultation handler/database/audit/transaction and form regression suites passed 55/55; `pnpm typecheck`, targeted `oxlint`, and `git diff --check` passed. Combined scoped coverage passed at 91.53% statements, 82.38% branches, 96.87% functions, and 92.09% lines.
   - **Implementation notes:** Instructor-only outcome transitions lock the owned appointment and active academic context, require a booked appointment whose end time has passed, guard the `booked → completed|no_show` update, audit only status/assignment data, and send advisory preference-aware participant notifications after commit. The outcomes handler is isolated in `appointments-outcomes.server.ts` to preserve the 500-line module limit. Completion never inserts consultation evidence or calls verified-count handlers. `ConsultationForm` now accepts an optional `initialCheckpointId` so a later explicit appointment action can open the existing pending-evidence flow without changing consultation verification/gating semantics.
-  - **Implementation commit:** pending.
+  - **Implementation commit:** `897895db` (`feat(track-058): add appointment outcomes`).
 
 - [ ] **Task 3.4: Transaction and authorization integration coverage**
   - [ ] Add database-backed tests for concurrent booking/rescheduling and stale transition handling.
