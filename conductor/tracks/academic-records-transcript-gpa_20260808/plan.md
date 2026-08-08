@@ -57,11 +57,11 @@
   - [x] Add release preflight validation for missing, ambiguous, and incomplete source data.
   - [x] Add explicit withdrawal/status provenance and preserve enrollment history.
   - [x] Add relevant audit events and structured error handling.
-- [~] Task: Write compatibility tests
-  - [ ] Verify gradebook recomputation does not mutate official records.
-  - [ ] Verify existing student grade visibility still uses published snapshots.
-  - [ ] Verify existing analytics and grade-release flows remain compatible.
-- [ ] Task: Phase Verification & Checkpoint (Refer to `conductor/workflow.md`)
+- [x] Task: Write compatibility tests [8628eff]
+  - [x] Verify gradebook recomputation does not mutate official records.
+  - [x] Verify existing student grade visibility still uses published snapshots.
+  - [x] Verify existing analytics and grade-release flows remain compatible.
+- [~] Task: Phase Verification & Checkpoint (Refer to `conductor/workflow.md`)
 
 ## Phase 3: Policy Engine and Role-Scoped Server Functions
 
