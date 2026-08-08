@@ -271,7 +271,7 @@
    - **Automated verification:** Student panel/list suites passed 20/20; assignment route regression and ConsultationForm suites passed 15/15 each. Scoped V8 coverage for the new panel/list modules passed at 96.77% statements, 84.41% branches, 96.55% functions, and 98.31% lines. `pnpm check:i18n`, `pnpm typecheck`, targeted `oxlint`, and `git diff --check` passed.
    - **Manual verification:** User confirmed the Phase 6 student flow on 2026-08-08: responsive 320px/desktop light-dark presentation, keyboard-reachable 44px controls, booking with optional checkpoint, confirmation-gated cancellation, rescheduling, timezone/UTC fallback display, loading/error/empty and terminal states, and explicit consultation prefill without automatic evidence creation.
    - **Implementation commit:** `84378837`.
-   - **Checkpoint commit:** pending.
+   - **Checkpoint commit:** `8dbdffea`.
 
 ## Phase 7: Instructor scheduling experience
 
