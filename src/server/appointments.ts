@@ -59,12 +59,16 @@ export type AppointmentListItem = {
   id: number;
   assignmentId: number;
   checkpointId: number | null;
-  checkpointName: string | null;
+  checkpointName?: string | null;
   instructorId: string;
   studentId: string | null;
+  studentName?: string | null;
+  studentEmail?: string | null;
   startAt: Date;
   endAt: Date;
   status: AppointmentStatus;
+  createdAt?: Date;
+  updatedAt?: Date;
 };
 
 export type AppointmentListResponse = {

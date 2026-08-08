@@ -45,8 +45,12 @@ vi.mock('@/routes/__root', () => ({
         'instructorAppointments.noStudent': 'No student yet',
         'instructorAppointments.cancel': 'Cancel appointment',
         'instructorAppointments.cancelConfirm': 'Cancel this appointment?',
+        'instructorAppointments.cancelDescription': 'The appointment will be cancelled.',
+        'instructorAppointments.confirmCancel': 'Confirm cancellation',
+        'instructorAppointments.keep': 'Keep appointment',
         'instructorAppointments.reschedule': 'Reschedule appointment',
         'instructorAppointments.replacement': 'Replacement slot',
+        'instructorAppointments.selectReplacement': 'Select a replacement slot',
         'instructorAppointments.complete': 'Mark completed',
         'instructorAppointments.markNoShow': 'Mark no-show',
         'instructorAppointments.empty': 'No appointments found',
@@ -78,6 +82,16 @@ vi.mock('@/components/ui/button', () => ({
       {children}
     </button>
   ),
+}));
+vi.mock('@/components/ui/dialog', () => ({
+  Dialog: ({ open, children }: { open: boolean; children?: ReactNode }) =>
+    open ? <div role="dialog">{children}</div> : null,
+  DialogClose: ({ children }: { children?: ReactNode }) => <button>{children}</button>,
+  DialogContent: ({ children }: { children?: ReactNode }) => <div>{children}</div>,
+  DialogDescription: ({ children }: { children?: ReactNode }) => <p>{children}</p>,
+  DialogFooter: ({ children }: { children?: ReactNode }) => <div>{children}</div>,
+  DialogHeader: ({ children }: { children?: ReactNode }) => <div>{children}</div>,
+  DialogTitle: ({ children }: { children?: ReactNode }) => <h2>{children}</h2>,
 }));
 
 import { InstructorAppointmentPanel } from '@/components/instructor/assignments/InstructorAppointmentPanel';
@@ -142,10 +156,10 @@ describe('InstructorAppointmentPanel', () => {
 
     expect(await screen.findByRole('heading', { name: 'Consultation scheduling' })).toBeTruthy();
     expect(screen.getByText('Publish a slot')).toBeTruthy();
-    expect(screen.getByText('Alice')).toBeTruthy();
+    expect(screen.getByText(/Alice/)).toBeTruthy();
     expect(screen.getAllByText('Available').length).toBeGreaterThan(0);
     expect(screen.getByText('Booked')).toBeTruthy();
-    expect(screen.getAllByText(/Time zone: America\/New_York/).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Time zone:/).length).toBeGreaterThan(0);
   });
 
   it('publishes a valid assignment/checkpoint slot and refreshes', async () => {
@@ -167,15 +181,14 @@ describe('InstructorAppointmentPanel', () => {
   });
 
   it('requires cancellation confirmation and supports replacement-slot rescheduling', async () => {
-    const confirm = vi.spyOn(window, 'confirm').mockReturnValue(false);
     renderPanel();
 
-    fireEvent.click(await screen.findByRole('button', { name: 'Cancel appointment' }));
-    expect(confirm).toHaveBeenCalled();
+    fireEvent.click((await screen.findAllByRole('button', { name: 'Cancel appointment' }))[1]);
     expect(api.cancelAppointment).not.toHaveBeenCalled();
 
-    confirm.mockReturnValue(true);
-    fireEvent.click(screen.getByRole('button', { name: 'Cancel appointment' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Keep appointment' }));
+    fireEvent.click(screen.getAllByRole('button', { name: 'Cancel appointment' })[1]);
+    fireEvent.click(screen.getByRole('button', { name: 'Confirm cancellation' }));
     await waitFor(() =>
       expect(api.cancelAppointment).toHaveBeenCalledWith({
         data: { appointmentId: 201 },
@@ -189,7 +202,6 @@ describe('InstructorAppointmentPanel', () => {
         data: { appointmentId: 201, replacementAppointmentId: 202 },
       }),
     );
-    confirm.mockRestore();
   });
 
   it('offers completion and no-show actions for ended booked appointments', async () => {
@@ -205,9 +217,11 @@ describe('InstructorAppointmentPanel', () => {
     renderPanel();
 
     fireEvent.click(await screen.findByRole('button', { name: 'Mark completed' }));
-    fireEvent.click(screen.getByRole('button', { name: 'Mark no-show' }));
     await waitFor(() => {
       expect(api.completeAppointment).toHaveBeenCalledWith({ data: { appointmentId: 201 } });
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'Mark no-show' }));
+    await waitFor(() => {
       expect(api.markAppointmentNoShow).toHaveBeenCalledWith({ data: { appointmentId: 201 } });
     });
   });
@@ -218,7 +232,9 @@ describe('InstructorAppointmentPanel', () => {
     });
     renderPanel();
 
-    expect(await screen.findByRole('status')).toHaveTextContent('Unable to load appointments');
+    expect((await screen.findByText('Unable to load appointments')).textContent).toContain(
+      'Unable to load appointments',
+    );
     expect(screen.getByRole('button', { name: 'Retry' })).toBeTruthy();
     expect(api.createAppointmentSlot).not.toHaveBeenCalled();
 

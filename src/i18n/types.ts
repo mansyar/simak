@@ -1309,6 +1309,39 @@ export type Translation = {
       recordConsultation: string
     }
   }
+  instructorAppointments: {
+    title: string
+    publishTitle: string
+    startAt: string
+    endAt: string
+    checkpoint: string
+    allCheckpoints: string
+    publish: string
+    available: string
+    booked: string
+    cancelled: string
+    completed: string
+    noShow: string
+    student: string
+    noStudent: string
+    cancel: string
+    cancelConfirm: string
+    cancelDescription: string
+    confirmCancel: string
+    keep: string
+    reschedule: string
+    replacement: string
+    selectReplacement: string
+    complete: string
+    markNoShow: string
+    empty: string
+    loading: string
+    error: string
+    retry: string
+    conflict: string
+    invalidWindow: string
+    timeZone: string
+  }
   errors: {
     fetchFailed: string
   }
