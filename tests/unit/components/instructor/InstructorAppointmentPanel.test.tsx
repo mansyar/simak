@@ -178,6 +178,8 @@ describe('InstructorAppointmentPanel', () => {
     expect(api.createAppointmentSlot).toHaveBeenCalledWith({
       data: expect.objectContaining({ assignmentId: 10, checkpointId: 7 }),
     });
+    expect(api.listInstructorAppointments).toHaveBeenCalledTimes(2);
+    expect(screen.getByLabelText('Checkpoint').className).toContain('min-h-11');
   });
 
   it('requires cancellation confirmation and supports replacement-slot rescheduling', async () => {
@@ -194,6 +196,7 @@ describe('InstructorAppointmentPanel', () => {
         data: { appointmentId: 201 },
       }),
     );
+    expect(api.listInstructorAppointments).toHaveBeenCalledTimes(2);
 
     fireEvent.change(screen.getByLabelText('Replacement slot'), { target: { value: '202' } });
     fireEvent.click(screen.getByRole('button', { name: 'Reschedule appointment' }));
@@ -202,6 +205,7 @@ describe('InstructorAppointmentPanel', () => {
         data: { appointmentId: 201, replacementAppointmentId: 202 },
       }),
     );
+    expect(api.listInstructorAppointments).toHaveBeenCalledTimes(3);
   });
 
   it('offers completion and no-show actions for ended booked appointments', async () => {
