@@ -247,6 +247,7 @@
   - [x] Confirm RED behavior.
    - **RED evidence:** `pnpm vitest run tests/unit/components/student/StudentAppointmentPanel.test.tsx` failed before assertions because the planned `StudentAppointmentPanel` component did not exist; `pnpm typecheck` reported the same missing module. The RED contract covers available/booked rendering, timezone labeling, booking/conflict handling, confirmation-gated cancellation, stable-ID rescheduling, terminal outcome display, loading/error/empty states, and explicit consultation recording.
    - **GREEN evidence:** The student appointment panel implementation and route integration now pass the focused component suite together with the existing ConsultationForm suite. The panel covers server-backed list loading and mutations, optional checkpoint selection, timezone labels, lifecycle controls, terminal outcomes, retry/error/empty states, and explicit consultation prefill without automatic evidence creation.
+   - **Implementation commit:** `84378837` (with the RED contract commit `1d04a26e`).
 
 - [x] **Task 6.2: Student booking and management UI (GREEN)**
    - [x] Implement responsive assignment-level slot and appointment views using existing UI primitives.
@@ -255,17 +256,20 @@
    - [x] Verify no hardcoded UI strings and no hydration-unsafe timezone rendering.
    - **Implementation notes:** Added `StudentAppointmentPanel`, assignment-route integration, student list handlers with active-context authorization/pagination, and bilingual `appointments.student` keys. The component uses the existing `useStudentTimezone` hydration boundary, starts from UTC, labels the resolved IANA timezone, and wires the explicit record-consultation action to `ConsultationForm`'s checkpoint prefill.
    - **Automated verification:** Student panel/list suites passed 20/20; the assignment route regression suite passed 15/15 and the ConsultationForm suite passed 15/15. Scoped V8 coverage for the new panel/list modules passed at 96.77% statements, 84.41% branches, 96.55% functions, and 98.31% lines; `pnpm check:i18n`, `pnpm typecheck`, targeted `oxlint`, and `git diff --check` passed.
+   - **Implementation commit:** `84378837`.
 
-- [~] **Task 6.3: Student timezone and accessibility verification**
+- [x] **Task 6.3: Student timezone and accessibility verification**
    - [x] Add/adjust tests for browser timezone preference, explicit timezone labels, UTC fallback, and DST fixtures.
    - [x] Run component tests, accessibility-oriented assertions, i18n parity, and relevant route tests.
    - **Verification notes:** The panel consumes `useStudentTimezone`, uses UTC until hydration completes, and the shared appointment policy tests cover IANA/DST formatting and invalid-zone UTC fallback. Focused tests assert semantic roles, confirmation behavior, keyboard-reachable controls, and 44px select/button classes; the i18n parity check, typecheck, lint, and diff checks pass. Manual responsive/light-dark/keyboard verification remains for the phase checkpoint.
 
-- [ ] **Phase 6 Verification & Checkpoint**
-  - [ ] Run the exact focused student UI test command and announce it before execution.
-  - [ ] Manually test at 320px/mobile and desktop widths in light and dark mode.
-  - [ ] Verify booking, cancel/reschedule, timezone display, empty states, keyboard navigation, and explicit evidence action.
-  - [ ] Obtain confirmation, attach the verification note, record the checkpoint SHA, and commit the plan update.
+- [~] **Phase 6 Verification & Checkpoint**
+   - [x] Run the exact focused student UI test command and announce it before execution.
+   - [ ] Manually test at 320px/mobile and desktop widths in light and dark mode.
+   - [ ] Verify booking, cancel/reschedule, timezone display, empty states, keyboard navigation, and explicit evidence action.
+   - [ ] Obtain confirmation, attach the verification note, record the checkpoint SHA, and commit the plan update.
+   - **Automated verification:** Student panel/list suites passed 20/20; assignment route regression and ConsultationForm suites passed 15/15 each. Scoped V8 coverage for the new panel/list modules passed at 96.77% statements, 84.41% branches, 96.55% functions, and 98.31% lines. `pnpm check:i18n`, `pnpm typecheck`, targeted `oxlint`, and `git diff --check` passed.
+   - **Implementation commit:** `84378837`.
 
 ## Phase 7: Instructor scheduling experience
 
