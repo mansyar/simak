@@ -21,7 +21,7 @@
   - [x] Test valid and invalid grade mappings, credits, and rounding configurations.
   - [x] Test term GPA and cumulative GPA calculations, including no-eligible-record states.
   - [x] Test repeat selection, incomplete exclusion, and withdrawn exclusion.
-- [ ] Task: Phase Verification & Checkpoint (Refer to `conductor/workflow.md`)
+- [x] Task: Phase Verification & Checkpoint (Refer to `conductor/workflow.md`) [48e166f]
 
 ## Phase 1: Schema and Immutable Academic Records
 
