@@ -68,4 +68,28 @@ describe('serializeCalendarFeed', () => {
     expect(eventFeed).toContain('UID:checkpoint-locked@simak\r\n');
     expect(eventFeed).not.toContain('token');
   });
+
+  it('serializes appointment end times while keeping the UID stable after rescheduling', () => {
+    const originalEvent = {
+      uid: 'appointment-401@simak',
+      summary: 'Research Project — Proposal',
+      startsAt: new Date('2026-11-01T08:30:00.000Z'),
+      endsAt: new Date('2026-11-01T09:30:00.000Z'),
+    } as CalendarIcsEvent & { endsAt: Date };
+    const rescheduledEvent = {
+      ...originalEvent,
+      startsAt: new Date('2026-11-02T10:00:00.000Z'),
+      endsAt: new Date('2026-11-02T11:00:00.000Z'),
+    };
+
+    const originalFeed = serializeCalendarFeed([originalEvent], generatedAt);
+    const rescheduledFeed = serializeCalendarFeed([rescheduledEvent], generatedAt);
+
+    expect(originalFeed).toContain('UID:appointment-401@simak\r\n');
+    expect(originalFeed).toContain('DTSTART:20261101T083000Z\r\n');
+    expect(originalFeed).toContain('DTEND:20261101T093000Z\r\n');
+    expect(rescheduledFeed).toContain('UID:appointment-401@simak\r\n');
+    expect(rescheduledFeed).toContain('DTSTART:20261102T100000Z\r\n');
+    expect(rescheduledFeed).toContain('DTEND:20261102T110000Z\r\n');
+  });
 });

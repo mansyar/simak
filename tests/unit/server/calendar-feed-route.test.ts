@@ -12,6 +12,7 @@ type TestCalendarEvent = {
   kind: string;
   summary: string;
   startsAt: Date;
+  endsAt?: Date;
 };
 const getCalendarFeedEvents = vi.hoisted(() =>
   vi.fn<() => Promise<TestCalendarEvent[]>>().mockResolvedValue([]),
@@ -137,5 +138,31 @@ describe('handleCalendarFeedRequest', () => {
 
     expect(serializeCalendarFeed).toHaveBeenNthCalledWith(1, firstEvents, expect.any(Date));
     expect(serializeCalendarFeed).toHaveBeenNthCalledWith(2, changedEvents, expect.any(Date));
+  });
+
+  it('passes mixed deadline and booked appointment events through the private feed boundary', async () => {
+    state.tokenRows = [{ tokenId: 'token-row-1', studentId: 'student-1' }];
+    const events = [
+      {
+        uid: 'checkpoint-11@simak',
+        kind: 'checkpoint',
+        summary: 'Research Project — Proposal',
+        startsAt: new Date('2026-08-10T12:00:00.000Z'),
+      },
+      {
+        uid: 'appointment-401@simak',
+        kind: 'appointment',
+        summary: 'Research Project — Proposal',
+        startsAt: new Date('2026-08-11T12:00:00.000Z'),
+        endsAt: new Date('2026-08-11T13:00:00.000Z'),
+      },
+    ];
+    getCalendarFeedEvents.mockResolvedValueOnce(events);
+
+    const response = await handleCalendarFeedRequest(request({ token: validToken }));
+
+    expect(response.status).toBe(200);
+    expect(await response.text()).not.toContain(validToken);
+    expect(serializeCalendarFeed).toHaveBeenCalledWith(events, expect.any(Date));
   });
 });

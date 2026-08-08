@@ -1218,6 +1218,34 @@
       "discussion_reply": {
         "title": "New Discussion Reply",
         "message": "{authorName} replied in checkpoint \"{checkpointName}\" ({assignmentTitle}): \"{messagePreview}\""
+      },
+      "appointment_booked": {
+        "title": "Appointment Booked",
+        "message": "Appointment #{appointmentId} for assignment #{assignmentId} is booked for {startAt}–{endAt}."
+      },
+      "appointment_cancelled": {
+        "title": "Appointment Cancelled",
+        "message": "Appointment #{appointmentId} for assignment #{assignmentId} has been cancelled."
+      },
+      "appointment_rescheduled": {
+        "title": "Appointment Rescheduled",
+        "message": "Appointment #{appointmentId} for assignment #{assignmentId} is now scheduled for {startAt}–{endAt}."
+      },
+      "appointment_completed": {
+        "title": "Appointment Completed",
+        "message": "Appointment #{appointmentId} for assignment #{assignmentId} at {startAt} was completed."
+      },
+      "appointment_no_show": {
+        "title": "Appointment Marked No-Show",
+        "message": "Appointment #{appointmentId} for assignment #{assignmentId} at {startAt} was marked as no-show."
+      },
+      "appointment_reminder_24h": {
+        "title": "Appointment Reminder",
+        "message": "Reminder: appointment #{appointmentId} for assignment #{assignmentId} starts at {startAt}."
+      },
+      "appointment_reminder_1h": {
+        "title": "Appointment Reminder",
+        "message": "Reminder: appointment #{appointmentId} for assignment #{assignmentId} starts at {startAt}."
       }
     }
   },
@@ -1238,8 +1266,76 @@
       "studentAtRisk": "Student At Risk — {assignmentTitle}",
       "discussionReply": "New Discussion Reply — {assignmentTitle}",
       "twoFactorEnabled": "Two-Factor Authentication Enabled",
-      "twoFactorDisabled": "Two-Factor Authentication Disabled"
+      "twoFactorDisabled": "Two-Factor Authentication Disabled",
+      "appointmentBooked": "Appointment Booked — Assignment {assignmentId}",
+      "appointmentCancelled": "Appointment Cancelled — Assignment {assignmentId}",
+      "appointmentRescheduled": "Appointment Rescheduled — Assignment {assignmentId}",
+      "appointmentCompleted": "Appointment Completed — Assignment {assignmentId}",
+      "appointmentNoShow": "Appointment No-Show — Assignment {assignmentId}",
+      "appointmentReminder": "Appointment Reminder — Assignment {assignmentId}"
     }
+  },
+  "appointments": {
+    "student": {
+      "title": "Appointments",
+      "availableSlots": "Available slots",
+      "yourAppointments": "Your appointments",
+      "book": "Book",
+      "reschedule": "Reschedule",
+      "cancel": "Cancel",
+      "cancelTitle": "Cancel appointment?",
+      "cancelDescription": "This appointment will be cancelled.",
+      "confirm": "Confirm",
+      "keep": "Keep appointment",
+      "timeZone": "Time zone: {timeZone}",
+      "empty": "No appointment slots available",
+      "noBooked": "No booked appointments yet",
+      "loading": "Loading appointments",
+      "error": "Unable to load appointments",
+      "retry": "Retry",
+      "conflict": "This appointment conflicts with another booking.",
+      "booked": "Booked",
+      "available": "Available",
+      "cancelled": "Cancelled",
+      "completed": "Completed",
+      "noShow": "No-show",
+      "checkpoint": "Checkpoint (optional)",
+      "noCheckpoint": "No specific checkpoint",
+      "recordConsultation": "Record consultation"
+    }
+  },
+  "instructorAppointments": {
+    "title": "Consultation scheduling",
+    "publishTitle": "Publish a slot",
+    "startAt": "Start time",
+    "endAt": "End time",
+    "checkpoint": "Checkpoint",
+    "allCheckpoints": "Assignment-wide",
+    "publish": "Publish slot",
+    "available": "Available",
+    "booked": "Booked",
+    "cancelled": "Cancelled",
+    "completed": "Completed",
+    "noShow": "No-show",
+    "student": "Student",
+    "noStudent": "No student yet",
+    "cancel": "Cancel appointment",
+    "cancelConfirm": "Cancel this appointment?",
+    "cancelDescription": "The appointment will be cancelled and the student will be notified.",
+    "confirmCancel": "Confirm cancellation",
+    "keep": "Keep appointment",
+    "reschedule": "Reschedule appointment",
+    "replacement": "Replacement slot",
+    "selectReplacement": "Select a replacement slot",
+    "complete": "Mark completed",
+    "markNoShow": "Mark no-show",
+    "empty": "No appointments found",
+    "loading": "Loading appointments",
+    "error": "Unable to load appointments",
+    "retry": "Retry",
+    "conflict": "This appointment conflicts with another booking.",
+    "invalidWindow": "Choose a valid future slot.",
+    "timeZone": "Time zone: {timeZone}"
   },
   "errors": {
     "fetchFailed": "Failed to load data. Please try again."

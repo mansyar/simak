@@ -1,6 +1,7 @@
 import { processEmailQueue, reclaimAllProcessingRows } from './email-queue-processor';
 import { pruneOldEmails } from './email-queue-retention';
 import { processDeadlineReminders } from './deadline-reminder-scanner';
+import { processAppointmentReminders } from './appointment-reminder-scanner';
 import { processOrphanedR2Objects } from './r2-cleanup';
 import { logger } from '@/lib/logger';
 
@@ -12,6 +13,7 @@ let intervalId: ReturnType<typeof setInterval> | null = null;
 let isRunning = false;
 let lastPruneAt: Date | null = null;
 let lastReminderScanAt: Date | null = null;
+let lastAppointmentReminderScanAt: Date | null = null;
 let lastR2CleanupAt: Date | null = null;
 let currentTickPromise: Promise<void> | null = null;
 
@@ -36,6 +38,22 @@ async function tick(): Promise<void> {
       } catch (error) {
         tickLogger.error({
           event: 'deadline_reminder.scan_error',
+          error: error instanceof Error ? error.message : String(error),
+        });
+      }
+    }
+
+    // Appointment reminder scanner — hourly throttle, advisory (failure must not break email processing)
+    if (
+      lastAppointmentReminderScanAt === null ||
+      now - lastAppointmentReminderScanAt.getTime() > REMINDER_SCAN_INTERVAL_MS
+    ) {
+      try {
+        await processAppointmentReminders();
+        lastAppointmentReminderScanAt = new Date();
+      } catch (error) {
+        tickLogger.error({
+          event: 'appointment_reminder.scan_error',
           error: error instanceof Error ? error.message : String(error),
         });
       }

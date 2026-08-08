@@ -1,0 +1,1 @@
+ALTER TABLE "appointments" ADD CONSTRAINT "appointments_status_student_check" CHECK (("appointments"."status" = 'available' AND "appointments"."student_id" IS NULL) OR ("appointments"."status" IN ('booked', 'completed', 'no_show') AND "appointments"."student_id" IS NOT NULL) OR "appointments"."status" = 'cancelled');

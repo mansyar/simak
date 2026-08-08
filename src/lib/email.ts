@@ -21,7 +21,14 @@ export type TemplateType =
   | 'extension_requested'
   | 'deadline_reminder'
   | 'student_at_risk'
-  | 'discussion_reply';
+  | 'discussion_reply'
+  | 'appointment_booked'
+  | 'appointment_cancelled'
+  | 'appointment_rescheduled'
+  | 'appointment_completed'
+  | 'appointment_no_show'
+  | 'appointment_reminder_24h'
+  | 'appointment_reminder_1h';
 
 async function getUserLocaleByEmail(email: string): Promise<Locales> {
   try {

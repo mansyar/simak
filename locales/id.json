@@ -1218,6 +1218,34 @@
       "discussion_reply": {
         "title": "Balasan Diskusi Baru",
         "message": "{authorName} membalas di checkpoint \"{checkpointName}\" ({assignmentTitle}): \"{messagePreview}\""
+      },
+      "appointment_booked": {
+        "title": "Janji Temu Dipesan",
+        "message": "Janji temu #{appointmentId} untuk tugas #{assignmentId} telah dipesan pada {startAt}–{endAt}."
+      },
+      "appointment_cancelled": {
+        "title": "Janji Temu Dibatalkan",
+        "message": "Janji temu #{appointmentId} untuk tugas #{assignmentId} telah dibatalkan."
+      },
+      "appointment_rescheduled": {
+        "title": "Jadwal Janji Temu Diubah",
+        "message": "Janji temu #{appointmentId} untuk tugas #{assignmentId} dijadwalkan pada {startAt}–{endAt}."
+      },
+      "appointment_completed": {
+        "title": "Janji Temu Selesai",
+        "message": "Janji temu #{appointmentId} untuk tugas #{assignmentId} pada {startAt} telah diselesaikan."
+      },
+      "appointment_no_show": {
+        "title": "Janji Temu Ditandai Tidak Hadir",
+        "message": "Janji temu #{appointmentId} untuk tugas #{assignmentId} pada {startAt} ditandai tidak hadir."
+      },
+      "appointment_reminder_24h": {
+        "title": "Pengingat Janji Temu",
+        "message": "Pengingat: janji temu #{appointmentId} untuk tugas #{assignmentId} dimulai pada {startAt}."
+      },
+      "appointment_reminder_1h": {
+        "title": "Pengingat Janji Temu",
+        "message": "Pengingat: janji temu #{appointmentId} untuk tugas #{assignmentId} dimulai pada {startAt}."
       }
     }
   },
@@ -1238,8 +1266,76 @@
       "studentAtRisk": "Mahasiswa Berisiko — {assignmentTitle}",
       "discussionReply": "Balasan Diskusi Baru — {assignmentTitle}",
       "twoFactorEnabled": "Autentikasi Dua Faktor Diaktifkan",
-      "twoFactorDisabled": "Autentikasi Dua Faktor Dinonaktifkan"
+      "twoFactorDisabled": "Autentikasi Dua Faktor Dinonaktifkan",
+      "appointmentBooked": "Janji Temu Dipesan — Tugas {assignmentId}",
+      "appointmentCancelled": "Janji Temu Dibatalkan — Tugas {assignmentId}",
+      "appointmentRescheduled": "Jadwal Janji Temu Diubah — Tugas {assignmentId}",
+      "appointmentCompleted": "Janji Temu Selesai — Tugas {assignmentId}",
+      "appointmentNoShow": "Janji Temu Tidak Hadir — Tugas {assignmentId}",
+      "appointmentReminder": "Pengingat Janji Temu — Tugas {assignmentId}"
     }
+  },
+  "appointments": {
+    "student": {
+      "title": "Janji Temu",
+      "availableSlots": "Slot tersedia",
+      "yourAppointments": "Janji temu Anda",
+      "book": "Pesan",
+      "reschedule": "Jadwalkan ulang",
+      "cancel": "Batalkan",
+      "cancelTitle": "Batalkan janji temu?",
+      "cancelDescription": "Janji temu ini akan dibatalkan.",
+      "confirm": "Konfirmasi",
+      "keep": "Pertahankan janji temu",
+      "timeZone": "Zona waktu: {timeZone}",
+      "empty": "Belum ada slot janji temu",
+      "noBooked": "Belum ada janji temu yang dipesan",
+      "loading": "Memuat janji temu",
+      "error": "Janji temu tidak dapat dimuat",
+      "retry": "Coba lagi",
+      "conflict": "Janji temu ini bertabrakan dengan pemesanan lain.",
+      "booked": "Dipesan",
+      "available": "Tersedia",
+      "cancelled": "Dibatalkan",
+      "completed": "Selesai",
+      "noShow": "Tidak hadir",
+      "checkpoint": "Checkpoint (opsional)",
+      "noCheckpoint": "Tidak ada checkpoint tertentu",
+      "recordConsultation": "Catat konsultasi"
+    }
+  },
+  "instructorAppointments": {
+    "title": "Penjadwalan konsultasi",
+    "publishTitle": "Terbitkan slot",
+    "startAt": "Waktu mulai",
+    "endAt": "Waktu selesai",
+    "checkpoint": "Checkpoint",
+    "allCheckpoints": "Seluruh tugas",
+    "publish": "Terbitkan slot",
+    "available": "Tersedia",
+    "booked": "Dipesan",
+    "cancelled": "Dibatalkan",
+    "completed": "Selesai",
+    "noShow": "Tidak hadir",
+    "student": "Mahasiswa",
+    "noStudent": "Belum ada mahasiswa",
+    "cancel": "Batalkan janji",
+    "cancelConfirm": "Batalkan janji ini?",
+    "cancelDescription": "Janji akan dibatalkan dan mahasiswa akan diberi tahu.",
+    "confirmCancel": "Konfirmasi pembatalan",
+    "keep": "Pertahankan janji",
+    "reschedule": "Jadwalkan ulang",
+    "replacement": "Slot pengganti",
+    "selectReplacement": "Pilih slot pengganti",
+    "complete": "Tandai selesai",
+    "markNoShow": "Tandai tidak hadir",
+    "empty": "Tidak ada janji temu",
+    "loading": "Memuat janji temu",
+    "error": "Janji temu tidak dapat dimuat",
+    "retry": "Coba lagi",
+    "conflict": "Janji temu ini bertabrakan dengan pemesanan lain.",
+    "invalidWindow": "Pilih slot mendatang yang valid.",
+    "timeZone": "Zona waktu: {timeZone}"
   },
   "errors": {
     "fetchFailed": "Gagal memuat data. Silakan coba lagi."

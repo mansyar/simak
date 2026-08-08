@@ -169,6 +169,34 @@
       "when": 1786007826900,
       "tag": "0023_sloppy_anthem",
       "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1786144804243,
+      "tag": "0024_powerful_clint_barton",
+      "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "7",
+      "when": 1786160904397,
+      "tag": "0025_breezy_carlie_cooper",
+      "breakpoints": true
+    },
+    {
+      "idx": 26,
+      "version": "7",
+      "when": 1786180650938,
+      "tag": "0026_purple_payback",
+      "breakpoints": true
+    },
+    {
+      "idx": 27,
+      "version": "7",
+      "when": 1786181283318,
+      "tag": "0027_daily_synch",
+      "breakpoints": true
     }
   ]
 }

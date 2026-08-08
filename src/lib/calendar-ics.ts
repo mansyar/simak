@@ -4,6 +4,7 @@ export type CalendarIcsEvent = {
   uid: string;
   summary: string;
   startsAt: Date;
+  endsAt?: Date;
 };
 
 function formatUtcDate(value: Date) {
@@ -62,10 +63,12 @@ export function serializeCalendarFeed(events: CalendarIcsEvent[], generatedAt: D
       'BEGIN:VEVENT',
       `UID:${escapeText(event.uid)}`,
       `DTSTAMP:${formatUtcDate(generatedAt)}`,
-      `DTSTART:${formatUtcDate(event.startsAt)}`,
-      `SUMMARY:${escapeText(event.summary)}`,
-      'END:VEVENT',
     );
+    logicalLines.push(`DTSTART:${formatUtcDate(event.startsAt)}`);
+    if (event.endsAt) {
+      logicalLines.push(`DTEND:${formatUtcDate(event.endsAt)}`);
+    }
+    logicalLines.push(`SUMMARY:${escapeText(event.summary)}`, 'END:VEVENT');
   }
 
   logicalLines.push('END:VCALENDAR');

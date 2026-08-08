@@ -1224,6 +1224,34 @@ export type Translation = {
         title: string
         message: string
       }
+      appointment_booked: {
+        title: string
+        message: string
+      }
+      appointment_cancelled: {
+        title: string
+        message: string
+      }
+      appointment_rescheduled: {
+        title: string
+        message: string
+      }
+      appointment_completed: {
+        title: string
+        message: string
+      }
+      appointment_no_show: {
+        title: string
+        message: string
+      }
+      appointment_reminder_24h: {
+        title: string
+        message: string
+      }
+      appointment_reminder_1h: {
+        title: string
+        message: string
+      }
     }
   }
   emails: {
@@ -1244,7 +1272,75 @@ export type Translation = {
       discussionReply: string
       twoFactorEnabled: string
       twoFactorDisabled: string
+      appointmentBooked: string
+      appointmentCancelled: string
+      appointmentRescheduled: string
+      appointmentCompleted: string
+      appointmentNoShow: string
+      appointmentReminder: string
     }
+  }
+  appointments: {
+    student: {
+      title: string
+      availableSlots: string
+      yourAppointments: string
+      book: string
+      reschedule: string
+      cancel: string
+      cancelTitle: string
+      cancelDescription: string
+      confirm: string
+      keep: string
+      timeZone: string
+      empty: string
+      noBooked: string
+      loading: string
+      error: string
+      retry: string
+      conflict: string
+      booked: string
+      available: string
+      cancelled: string
+      completed: string
+      noShow: string
+      checkpoint: string
+      noCheckpoint: string
+      recordConsultation: string
+    }
+  }
+  instructorAppointments: {
+    title: string
+    publishTitle: string
+    startAt: string
+    endAt: string
+    checkpoint: string
+    allCheckpoints: string
+    publish: string
+    available: string
+    booked: string
+    cancelled: string
+    completed: string
+    noShow: string
+    student: string
+    noStudent: string
+    cancel: string
+    cancelConfirm: string
+    cancelDescription: string
+    confirmCancel: string
+    keep: string
+    reschedule: string
+    replacement: string
+    selectReplacement: string
+    complete: string
+    markNoShow: string
+    empty: string
+    loading: string
+    error: string
+    retry: string
+    conflict: string
+    invalidWindow: string
+    timeZone: string
   }
   errors: {
     fetchFailed: string

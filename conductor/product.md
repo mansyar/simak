@@ -41,8 +41,8 @@ Students and instructors lack a centralized system to:
 - **File submissions** — Upload .docx/.pdf files (max 25MB) to Cloudflare R2 via presigned URLs
 - **Review workflow** — Instructors review submissions with Pass/Revise decisions, comments, and optional feedback files
 - **Instructor feedback snippets** — Instructors maintain a private, searchable plain-text snippet library with soft archive/restore and explicitly append snippets to editable review comments without changing review decisions or historical comments
-- **Consultation tracking** — Students log sessions; instructors verify; minimum consultation thresholds gate checkpoint unlocks
-- **Notifications** — Real-time in-app alerts and email notifications for submissions, reviews, revisions, consultations, extensions, deadline reminders, and discussion replies
+- **Consultation tracking** — Students log sessions; instructors verify; minimum consultation thresholds gate checkpoint unlocks. Separate one-off appointment scheduling supports assignment-scoped booking, cancellation, rescheduling, completion/no-show, timezone-aware display, and explicit evidence recording without bypassing verification.
+- **Notifications** — Real-time in-app alerts and email notifications for submissions, reviews, revisions, consultations, extensions, deadline reminders, discussion replies, and preference-aware appointment lifecycle/reminder events
 - **Deadline management** — Auto-locking overdue checkpoints, instructor override, SLA breach escalation (3-day review SLA), proactive deadline reminders (7-day/3-day/1-day lead times via hourly background scanner)
 - **Bilingual i18n** — Full English and Indonesian language support
 - **Dark mode & responsive UI** — Light/dark themes, mobile-friendly, accessible (WCAG 2.1 AA)

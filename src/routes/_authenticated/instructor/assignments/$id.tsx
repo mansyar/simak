@@ -134,6 +134,14 @@ function AssignmentDetailPage() {
     availableSections?: AssignmentSectionOption[];
   };
   const availableSections = assignmentData.availableSections ?? [];
+  const appointmentCheckpoints = Array.from(
+    assignmentData.students
+      .flatMap((student) => student.checkpoints)
+      .reduce((checkpoints, checkpoint) => {
+        checkpoints.set(checkpoint.id, { id: checkpoint.id, name: checkpoint.name });
+        return checkpoints;
+      }, new Map<number, { id: number; name: string }>()),
+  ).map(([, checkpoint]) => checkpoint);
   const nextStatus = assignmentStatus === 'draft' ? 'active' : 'archived';
 
   const handleStatusTransition = async () => {
@@ -321,6 +329,8 @@ function AssignmentDetailPage() {
         {activeTab === 'overview' && <AssignmentOverviewTab assignment={assignmentData} />}
         {activeTab === 'consultations' && (
           <AssignmentConsultationsTab
+            assignmentId={assignmentData.id}
+            checkpoints={appointmentCheckpoints}
             pendingConsultations={tabs.pendingConsultations}
             selectedConsultationId={selectedConsultationId}
             setSelectedConsultationId={setSelectedConsultationId}

@@ -15,6 +15,9 @@ import { execSync } from 'node:child_process';
  * Order doesn't matter — we use CASCADE.
  */
 export const TABLES_TO_TRUNCATE = [
+  'appointment_reminders',
+  'appointments',
+  'calendar_feed_tokens',
   'email_queue',
   'feedback_snippets',
   'audit_log',
