@@ -83,24 +83,24 @@
 
 ## Phase 4: Role-Based Academic Record UI
 
-- [~] Task: Write failing component and route tests
-  - [ ] Test student transcript, term filter, GPA summary, and empty/unavailable states.
-  - [ ] Test admin policy/source metadata and record-detail states.
-  - [ ] Test instructor section-scoped record view and unauthorized states.
-  - [ ] Test incomplete, withdrawn, repeated, and GPA-excluded visual states.
-- [ ] Task: Implement student academic-record experience
-  - [ ] Add the student route and responsive transcript layout.
-  - [ ] Add term filtering, term GPA, cumulative GPA, record details, and calculation summary.
-  - [ ] Add loading, error, empty, unavailable, and retry states.
-- [ ] Task: Implement admin and instructor academic-record experiences
-  - [ ] Add authorized administrative record/policy-source views.
-  - [ ] Add instructor section-scoped record access.
-  - [ ] Surface ambiguous source assignments and policy validation errors through existing patterns.
-- [ ] Task: Add localization and accessibility coverage
-  - [ ] Add English and Indonesian locale keys and regenerate i18n types.
-  - [ ] Use approved accessible primitives, semantic status colors, focus states, and keyboard behavior.
-  - [ ] Verify responsive layouts from 320px through desktop and both color schemes.
-- [ ] Task: Phase Verification & Checkpoint (Refer to `conductor/workflow.md`)
+- [x] Task: Write failing component and route tests [b4aab55]
+  - [x] Test student transcript, term filter, GPA summary, and empty/unavailable states.
+  - [x] Test admin policy/source metadata and record-detail states.
+  - [x] Test instructor section-scoped record view and unauthorized states.
+  - [x] Test incomplete, withdrawn, repeated, and GPA-excluded visual states.
+- [x] Task: Implement student academic-record experience [08f672e]
+  - [x] Add the student route and responsive transcript layout.
+  - [x] Add term filtering, term GPA, cumulative GPA, record details, and calculation summary.
+  - [x] Add loading, error, empty, unavailable, and retry states.
+- [x] Task: Implement admin and instructor academic-record experiences [08f672e]
+  - [x] Add authorized administrative record/policy-source views.
+  - [x] Add instructor section-scoped record access.
+  - [x] Surface ambiguous source assignments and policy validation errors through existing patterns.
+- [x] Task: Add localization and accessibility coverage [08f672e]
+  - [x] Add English and Indonesian locale keys and regenerate i18n types.
+  - [x] Use approved accessible primitives, semantic status colors, focus states, and keyboard behavior.
+  - [x] Verify responsive layouts from 320px through desktop and both color schemes.
+- [~] Task: Phase Verification & Checkpoint (Refer to `conductor/workflow.md`)
 
 ## Phase 5: End-to-End Verification and Handoff
 
