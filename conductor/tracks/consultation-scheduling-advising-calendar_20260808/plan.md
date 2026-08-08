@@ -120,10 +120,11 @@
   - **Implementation commit:** `bb75b022` (`feat(track-058): add race-safe student booking`).
 
 - [~] **Task 3.2: Cancellation and rescheduling (RED → GREEN)**
-  - [~] Write tests for student/instructor cancellation, future-only rules, selecting another available slot, instructor time changes, target-slot locking, conflict rejection, and preservation of the original appointment on failure.
-  - [~] Confirm RED behavior.
+  - [x] Write tests for student/instructor cancellation, future-only rules, selecting another available slot, instructor time changes, target-slot locking, conflict rejection, and preservation of the original appointment on failure.
+  - [x] Confirm RED behavior.
   - [~] Implement transactional cancellation/rescheduling with stable appointment identity and audit before/after times.
   - [~] Add preference-aware participant notifications after successful commit.
+  - **RED evidence:** `pnpm vitest run tests/unit/server/appointments-rescheduling.test.ts` could not import the missing `@/server/appointments-rescheduling.server` module; no tests ran. The new cancellation assertions also target the current instructor-only/available-slot behavior and remain RED until lifecycle support is implemented.
 
 - [ ] **Task 3.3: Completion, no-show, and explicit evidence action (RED → GREEN)**
   - [ ] Write tests for instructor-only completion/no-show, post-end timing, invalid transitions, and appointment-to-consultation form linkage.
