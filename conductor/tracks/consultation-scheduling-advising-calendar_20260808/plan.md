@@ -203,10 +203,11 @@
 ## Phase 5: Private iCalendar extension
 
 - [~] **Task 5.1: Appointment event selection (RED → GREEN)**
-  - [~] Write selector tests for student ownership, booked-only status, future events, active assignment authorization, cancelled omission, optional checkpoint labels, and unrelated-student isolation.
-  - [~] Confirm RED behavior.
+  - [x] Write selector tests for student ownership, booked-only status, future events, active assignment authorization, cancelled omission, optional checkpoint labels, and unrelated-student isolation.
+  - [x] Confirm RED behavior.
   - [ ] Extend the existing calendar-feed selection helper without changing deadline event semantics.
   - [ ] Verify token-owner checks remain in the route boundary.
+  - **RED evidence:** `pnpm vitest run tests/unit/server/calendar-feed-selection.test.ts` retained the seven existing deadline tests but failed the two new appointment tests because `buildAppointmentFeedEvents` and `CalendarAppointmentRow` were not yet exported. `pnpm typecheck` reported the same missing exports; no production changes were made.
 
 - [ ] **Task 5.2: Stable appointment serialization (RED → GREEN)**
   - [ ] Write serializer tests for stable appointment UID, UTC `DTSTART`/`DTEND`, rescheduling with unchanged UID, RFC 5545 escaping/folding, and safe titles.
