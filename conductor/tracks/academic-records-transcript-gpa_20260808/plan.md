@@ -100,11 +100,11 @@
   - [x] Add English and Indonesian locale keys and regenerate i18n types.
   - [x] Use approved accessible primitives, semantic status colors, focus states, and keyboard behavior.
   - [x] Verify responsive layouts from 320px through desktop and both color schemes.
-- [~] Task: Phase Verification & Checkpoint (Refer to `conductor/workflow.md`)
+- [x] Task: Phase Verification & Checkpoint [bb6e1a8] (Refer to `conductor/workflow.md`)
 
 ## Phase 5: End-to-End Verification and Handoff
 
-- [ ] Task: Write and run end-to-end academic-record scenarios
+- [~] Task: Write and run end-to-end academic-record scenarios
   - [ ] Verify publish-to-transcript flow for a complete eligible student.
   - [ ] Verify draft, unpublished, incomplete, withdrawn, and repeat-course behavior.
   - [ ] Verify student, instructor, and admin authorization boundaries.
