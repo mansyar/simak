@@ -178,7 +178,7 @@ async function lockParticipants(
 
 export async function rescheduleAppointmentHandler(args: {
   data: RescheduleAppointmentInput;
-}): Promise<unknown | ServerError> {
+}): Promise<{ appointment: RescheduleRow } | ServerError> {
   const session = await getSessionFromHeaders();
   const role = session?.user.role;
   if (!session || (role !== 'instructor' && role !== 'student')) {
