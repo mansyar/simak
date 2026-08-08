@@ -17,10 +17,10 @@
   - [x] Define course-credit ownership, policy activation, and effective-version rules.
   - [x] Define complete, incomplete, withdrawn, unavailable, and GPA-excluded states.
   - [x] Define deterministic ordering for repeated attempts and active-record selection.
-- [ ] Task: Write policy-contract tests before implementation
-  - [ ] Test valid and invalid grade mappings, credits, and rounding configurations.
-  - [ ] Test term GPA and cumulative GPA calculations, including no-eligible-record states.
-  - [ ] Test repeat selection, incomplete exclusion, and withdrawn exclusion.
+- [x] Task: Write policy-contract tests before implementation [a44f96e]
+  - [x] Test valid and invalid grade mappings, credits, and rounding configurations.
+  - [x] Test term GPA and cumulative GPA calculations, including no-eligible-record states.
+  - [x] Test repeat selection, incomplete exclusion, and withdrawn exclusion.
 - [ ] Task: Phase Verification & Checkpoint (Refer to `conductor/workflow.md`)
 
 ## Phase 1: Schema and Immutable Academic Records
