@@ -142,10 +142,10 @@
   - **Implementation notes:** Instructor-only outcome transitions lock the owned appointment and active academic context, require a booked appointment whose end time has passed, guard the `booked → completed|no_show` update, audit only status/assignment data, and send advisory preference-aware participant notifications after commit. The outcomes handler is isolated in `appointments-outcomes.server.ts` to preserve the 500-line module limit. Completion never inserts consultation evidence or calls verified-count handlers. `ConsultationForm` now accepts an optional `initialCheckpointId` so a later explicit appointment action can open the existing pending-evidence flow without changing consultation verification/gating semantics.
   - **Implementation commit:** `897895db` (`feat(track-058): add appointment outcomes`).
 
-- [ ] **Task 3.4: Transaction and authorization integration coverage**
-  - [ ] Add database-backed tests for concurrent booking/rescheduling and stale transition handling.
-  - [ ] Add privacy tests for soft-cancelled appointments, deleted/inactive users, and cross-assignment access.
-  - [ ] Run integration coverage for all appointment mutations.
+- [~] **Task 3.4: Transaction and authorization integration coverage**
+  - [~] Add database-backed tests for concurrent booking/rescheduling and stale transition handling.
+  - [~] Add privacy tests for soft-cancelled appointments, deleted/inactive users, and cross-assignment access.
+  - [~] Run integration coverage for all appointment mutations.
 
 - [ ] **Phase 3 Verification & Checkpoint**
   - [ ] Run focused unit/integration appointment suites and typecheck.
