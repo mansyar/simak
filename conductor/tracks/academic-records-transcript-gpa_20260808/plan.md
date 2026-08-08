@@ -70,16 +70,16 @@
   - [x] Test instructor access limited to authorized sections.
   - [x] Test admin/superadmin access and policy/source metadata visibility.
   - [x] Test term and cumulative GPA responses and transparent calculation inputs.
-- [~] Task: Implement academic-record policy services
-  - [ ] Implement grade-point mapping, configured rounding, credits, and status eligibility.
-  - [ ] Implement term GPA and cumulative GPA using immutable records.
-  - [ ] Implement latest-eligible-repeat selection with deterministic ordering.
-- [ ] Task: Implement client-safe server-function stubs and handlers
-  - [ ] Add Zod input/output schemas and `typedServerFn` stubs.
-  - [ ] Add server-only handlers with session, role, and academic-context authorization.
-  - [ ] Add paginated/filterable transcript queries without N+1 database access.
-  - [ ] Add rate-limit tiers appropriate to reads and administrative mutations.
-- [ ] Task: Phase Verification & Checkpoint (Refer to `conductor/workflow.md`)
+- [x] Task: Implement academic-record policy services [385f59b]
+  - [x] Implement grade-point mapping, configured rounding, credits, and status eligibility.
+  - [x] Implement term GPA and cumulative GPA using immutable records.
+  - [x] Implement latest-eligible-repeat selection with deterministic ordering.
+- [x] Task: Implement client-safe server-function stubs and handlers [5782d5b]
+  - [x] Add Zod input/output schemas and `typedServerFn` stubs.
+  - [x] Add server-only handlers with session, role, and academic-context authorization.
+  - [x] Add paginated/filterable transcript queries without N+1 database access.
+  - [x] Add rate-limit tiers appropriate to reads and administrative mutations.
+- [~] Task: Phase Verification & Checkpoint (Refer to `conductor/workflow.md`)
 
 ## Phase 4: Role-Based Academic Record UI
 
