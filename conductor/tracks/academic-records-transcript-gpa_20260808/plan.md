@@ -30,12 +30,12 @@
   - [x] Test immutable historical rows and active-version uniqueness.
   - [x] Test the single transcript-source assignment rule for a section.
   - [x] Test indexes and foreign-key behavior for student, section, term, assignment, and policy lookups.
-- [~] Task: Implement the academic-record data model
-  - [ ] Add course-credit and versioned grading-policy persistence using approved Drizzle patterns.
-  - [ ] Add the explicit section transcript-source association with safe validation.
-  - [ ] Add immutable academic-record tables, enums, constraints, indexes, and migration.
-  - [ ] Add migration preflight/rollback handling consistent with TRACK-057.
-- [ ] Task: Write failing persistence-service tests
+- [x] Task: Implement the academic-record data model [a97a9ce]
+  - [x] Add course-credit and versioned grading-policy persistence using approved Drizzle patterns.
+  - [x] Add the explicit section transcript-source association with safe validation.
+  - [x] Add immutable academic-record tables, enums, constraints, indexes, and migration.
+  - [x] Add migration preflight/rollback handling consistent with TRACK-057.
+- [~] Task: Write failing persistence-service tests
   - [ ] Test creation from an eligible published snapshot.
   - [ ] Test creation of a new immutable version when a later release supersedes a prior one.
   - [ ] Test rejection of missing, ambiguous, draft, unpublished, and ineligible sources.
