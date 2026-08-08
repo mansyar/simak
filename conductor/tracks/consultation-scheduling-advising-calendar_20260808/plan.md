@@ -290,9 +290,9 @@
    - **Automated verification:** Instructor panel and instructor assignment route suites passed 9/9; `pnpm typecheck`, `pnpm check:i18n`, targeted `oxlint`, formatting, and `git diff --check` passed. The implementation stayed within the 500-line modularity limit.
    - **Implementation commit:** `80e7c83e` (with the RED contract commit `a3e79b38`).
 
-- [ ] **Task 7.3: UI quality verification**
-  - [ ] Run instructor component/route tests, accessibility checks, i18n parity, lint, and typecheck.
-  - [ ] Verify appointment state changes are reflected without stale client cache data.
+- [~] **Task 7.3: UI quality verification**
+   - [~] Run instructor component/route tests, accessibility checks, i18n parity, lint, and typecheck.
+   - [~] Verify appointment state changes are reflected without stale client cache data.
 
 - [ ] **Phase 7 Verification & Checkpoint**
   - [ ] Run the exact focused instructor UI test command and announce it before execution.
