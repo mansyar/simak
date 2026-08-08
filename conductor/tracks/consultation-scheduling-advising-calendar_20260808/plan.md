@@ -220,7 +220,7 @@
   - **RED evidence:** `pnpm vitest run tests/unit/lib/calendar-ics.test.ts` passed the three existing serializer tests and failed the new appointment contract because `DTEND` was not emitted. The test also establishes stable appointment UID and rescheduled UTC start/end expectations.
   - **GREEN evidence:** Serializer tests passed 4/4; the selector, route-security, and serializer regression suites passed 16/16; `pnpm typecheck`, targeted `oxlint`, and `git diff --check` passed. Scoped V8 coverage for `calendar-ics.ts` passed at 100% statements, 90% branches, 100% functions, and 100% lines.
   - **Implementation notes:** Extended the existing optional event end-time contract and emits UTC `DTEND` only for appointment events, preserving CRLF formatting, RFC 5545 escaping/folding, stable UIDs, and all existing route cache/content-type/rate-limit/credential behavior.
-  - **Implementation commit:** Pending.
+  - **Implementation commit:** `d7280db1`.
 
 - [ ] **Task 5.3: Calendar route regression/security coverage**
   - [ ] Extend route tests for valid/invalid/revoked credentials, generic unauthorized responses, no enumeration, and mixed deadline/appointment feeds.
