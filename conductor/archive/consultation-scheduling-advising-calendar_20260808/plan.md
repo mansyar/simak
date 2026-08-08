@@ -2,7 +2,7 @@
 
 ## Source of Truth
 
-- Specification: `conductor/tracks/consultation-scheduling-advising-calendar_20260808/spec.md`
+- Specification: `conductor/archive/consultation-scheduling-advising-calendar_20260808/spec.md`
 - Roadmap: `docs/roadmap.md` (Milestone 20, TRACK-058)
 - Workflow: `conductor/workflow.md`
 
