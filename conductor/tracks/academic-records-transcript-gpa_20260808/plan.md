@@ -35,11 +35,11 @@
   - [x] Add the explicit section transcript-source association with safe validation.
   - [x] Add immutable academic-record tables, enums, constraints, indexes, and migration.
   - [x] Add migration preflight/rollback handling consistent with TRACK-057.
-- [~] Task: Write failing persistence-service tests
-  - [ ] Test creation from an eligible published snapshot.
-  - [ ] Test creation of a new immutable version when a later release supersedes a prior one.
-  - [ ] Test rejection of missing, ambiguous, draft, unpublished, and ineligible sources.
-- [ ] Task: Implement record persistence services
+- [x] Task: Write failing persistence-service tests [b451154]
+  - [x] Test creation from an eligible published snapshot.
+  - [x] Test creation of a new immutable version when a later release supersedes a prior one.
+  - [x] Test rejection of missing, ambiguous, draft, unpublished, and ineligible sources.
+- [~] Task: Implement record persistence services
   - [ ] Implement transactional academic-record creation and active-version selection.
   - [ ] Persist source assignment, release version, policy version, status, credits, and calculated values.
   - [ ] Ensure existing grade snapshots remain unchanged.
