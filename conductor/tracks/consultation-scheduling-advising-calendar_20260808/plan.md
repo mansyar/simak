@@ -186,7 +186,7 @@
   - [x] Confirm RED behavior.
   - [~] Implement the scanner using the existing background processor boundary and a durable deduplication mechanism.
   - [~] Verify failures are logged and isolated from email queue processing.
-  - **RED evidence:** `pnpm vitest run tests/unit/db/appointment-reminders.test.ts` failed during import analysis because `@/db/schema/appointment-reminders` did not exist; no assertions ran.
+  - **RED evidence:** The persistence contract initially failed during import analysis because `@/db/schema/appointment-reminders` did not exist; after the schema contract was added, the scanner contract `pnpm vitest run tests/unit/lib/appointment-reminder-scanner.test.ts` failed during import analysis because `@/lib/appointment-reminder-scanner` did not exist; no scanner assertions ran.
 
 - [ ] **Phase 4 Verification & Checkpoint**
   - [ ] Run focused notification/reminder tests, i18n parity, and typecheck.
