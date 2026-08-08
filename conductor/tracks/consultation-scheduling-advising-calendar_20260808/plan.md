@@ -182,10 +182,11 @@
   - **Implementation commit:** `9c7c996f`.
 
 - [~] **Task 4.3: 24-hour and 1-hour reminder scanner (RED → GREEN)**
-  - [~] Write tests for both reminder windows, UTC comparisons, timezone-independent trigger behavior, repeated scans, boundary times, cancelled appointments, and completed/no-show appointments.
-  - [~] Confirm RED behavior.
+  - [x] Write tests for both reminder windows, UTC comparisons, timezone-independent trigger behavior, repeated scans, boundary times, cancelled appointments, and completed/no-show appointments.
+  - [x] Confirm RED behavior.
   - [~] Implement the scanner using the existing background processor boundary and a durable deduplication mechanism.
   - [~] Verify failures are logged and isolated from email queue processing.
+  - **RED evidence:** `pnpm vitest run tests/unit/db/appointment-reminders.test.ts` failed during import analysis because `@/db/schema/appointment-reminders` did not exist; no assertions ran.
 
 - [ ] **Phase 4 Verification & Checkpoint**
   - [ ] Run focused notification/reminder tests, i18n parity, and typecheck.
