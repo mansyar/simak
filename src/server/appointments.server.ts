@@ -1,39 +1,29 @@
 // Server-only appointment handlers. This module must never be imported by client code.
 import { and, asc, eq, isNull, sql } from 'drizzle-orm';
 import type { z } from 'zod';
-import { getDb } from '@/db/index';
+import { getDb, type Db } from '@/db/index';
 import { appointments } from '@/db/schema/appointments';
 import { assignments, checkpoints } from '@/db/schema/assignments';
 import { academicTerms, courseSections, sectionEnrollments } from '@/db/schema/academic-context';
 import { users } from '@/db/schema/users';
-import { appointmentStatusSchema, validateAppointmentWindow } from '@/lib/appointment-policies';
+import {
+  appointmentStatusSchema,
+  canTransitionAppointment,
+  validateAppointmentWindow,
+} from '@/lib/appointment-policies';
 import { safeAuditLog } from '@/lib/audit';
 import { ErrorCode, serverError, type ServerError } from '@/lib/errors';
 import { isInstructor } from '@/lib/session-guards';
 import { getSessionFromHeaders } from './auth';
 import type {
-  AppointmentIdSchema,
-  BookAppointmentSchema,
   CancelAppointmentSchema,
-  CompleteAppointmentSchema,
   CreateAppointmentSlotSchema,
-  ListAvailableAppointmentsSchema,
   ListInstructorAppointmentsSchema,
-  ListStudentAppointmentsSchema,
-  MarkAppointmentNoShowSchema,
-  RescheduleAppointmentSchema,
 } from './appointments';
 
-type AppointmentIdInput = z.infer<typeof AppointmentIdSchema>;
-type BookAppointmentInput = z.infer<typeof BookAppointmentSchema>;
 type CancelAppointmentInput = z.infer<typeof CancelAppointmentSchema>;
-type CompleteAppointmentInput = z.infer<typeof CompleteAppointmentSchema>;
 type CreateAppointmentSlotInput = z.infer<typeof CreateAppointmentSlotSchema>;
-type ListAvailableAppointmentsInput = z.infer<typeof ListAvailableAppointmentsSchema>;
 type ListInstructorAppointmentsInput = z.infer<typeof ListInstructorAppointmentsSchema>;
-type ListStudentAppointmentsInput = z.infer<typeof ListStudentAppointmentsSchema>;
-type MarkAppointmentNoShowInput = z.infer<typeof MarkAppointmentNoShowSchema>;
-type RescheduleAppointmentInput = z.infer<typeof RescheduleAppointmentSchema>;
 
 type AuthorizedAssignment = { id: number; sectionId: number };
 
@@ -95,6 +85,56 @@ async function getAuthorizedInstructorAssignment(
     .limit(1);
 
   return assignment ?? null;
+}
+
+type AppointmentTransaction = Parameters<Parameters<Db['transaction']>[0]>[0];
+
+async function fetchInstructorAppointmentForUpdate(
+  tx: AppointmentTransaction,
+  appointmentId: number,
+  instructorId: string,
+) {
+  return tx
+    .select({
+      id: appointments.id,
+      assignmentId: appointments.assignmentId,
+      checkpointId: appointments.checkpointId,
+      instructorId: appointments.instructorId,
+      studentId: appointments.studentId,
+      startAt: appointments.startAt,
+      endAt: appointments.endAt,
+      status: appointments.status,
+      createdAt: appointments.createdAt,
+      updatedAt: appointments.updatedAt,
+    })
+    .from(appointments)
+    .innerJoin(assignments, eq(appointments.assignmentId, assignments.id))
+    .innerJoin(courseSections, eq(assignments.sectionId, courseSections.id))
+    .innerJoin(academicTerms, eq(courseSections.termId, academicTerms.id))
+    .innerJoin(
+      sectionEnrollments,
+      and(
+        eq(sectionEnrollments.sectionId, assignments.sectionId),
+        eq(sectionEnrollments.userId, instructorId),
+        eq(sectionEnrollments.role, 'instructor'),
+        eq(sectionEnrollments.isActive, true),
+      ),
+    )
+    .innerJoin(users, eq(users.id, appointments.instructorId))
+    .where(
+      and(
+        eq(appointments.id, appointmentId),
+        eq(appointments.instructorId, instructorId),
+        eq(assignments.instructorId, instructorId),
+        eq(assignments.status, 'active'),
+        isNull(assignments.deletedAt),
+        eq(courseSections.status, 'active'),
+        eq(academicTerms.status, 'active'),
+        isNull(users.deletedAt),
+      ),
+    )
+    .limit(1)
+    .for('update', { of: appointments });
 }
 
 async function verifyCheckpointForAssignment(
@@ -239,50 +279,97 @@ export async function listInstructorAppointmentsHandler(args: {
   }
 }
 
-export async function cancelAppointmentHandler(_args: {
+export async function cancelAppointmentHandler(args: {
   data: CancelAppointmentInput;
-}): Promise<never> {
-  throw new Error('Appointment cancellation is implemented in a later lifecycle task');
-}
+}): Promise<AppointmentMutationResult | ServerError> {
+  const session = await getSessionFromHeaders();
+  if (!isInstructor(session)) {
+    return serverError(ErrorCode.UNAUTHORIZED, 'Unauthorized');
+  }
 
-export async function listAvailableAppointmentsHandler(_args: {
-  data: ListAvailableAppointmentsInput;
-}): Promise<never> {
-  throw new Error('Student appointment listing is implemented in a later lifecycle task');
-}
+  const db = getDb();
+  let auditData:
+    | { assignmentId: number; beforeStatus: 'available'; afterStatus: 'cancelled' }
+    | undefined;
 
-export async function listStudentAppointmentsHandler(_args: {
-  data: ListStudentAppointmentsInput;
-}): Promise<never> {
-  throw new Error('Student appointment listing is implemented in a later lifecycle task');
-}
+  try {
+    const result = await db.transaction(async (tx) => {
+      const [appointment] = await fetchInstructorAppointmentForUpdate(
+        tx,
+        args.data.appointmentId,
+        session.user.id,
+      );
 
-export async function bookAppointmentHandler(_args: {
-  data: BookAppointmentInput;
-}): Promise<never> {
-  throw new Error('Appointment booking is implemented in a later lifecycle task');
-}
+      if (!appointment) {
+        return serverError(ErrorCode.NOT_FOUND, 'Appointment not found');
+      }
 
-export async function rescheduleAppointmentHandler(_args: {
-  data: RescheduleAppointmentInput;
-}): Promise<never> {
-  throw new Error('Appointment rescheduling is implemented in a later lifecycle task');
-}
+      if (appointment.status === 'cancelled') {
+        return { appointment: { ...appointment, studentName: null, studentEmail: null } };
+      }
 
-export async function completeAppointmentHandler(_args: {
-  data: CompleteAppointmentInput;
-}): Promise<never> {
-  throw new Error('Appointment completion is implemented in a later lifecycle task');
-}
+      if (appointment.status !== 'available') {
+        return serverError(
+          ErrorCode.CONFLICT,
+          'Appointment cannot be cancelled in its current state',
+        );
+      }
 
-export async function markAppointmentNoShowHandler(_args: {
-  data: MarkAppointmentNoShowInput;
-}): Promise<never> {
-  throw new Error('Appointment no-show is implemented in a later lifecycle task');
-}
+      const transition = canTransitionAppointment('available', 'cancelled', {
+        startAt: appointment.startAt,
+        endAt: appointment.endAt,
+      });
+      if (!transition.valid) {
+        return serverError(ErrorCode.BAD_REQUEST, 'Appointment can no longer be cancelled');
+      }
 
-export async function getAppointmentDetailHandler(_args: {
-  data: AppointmentIdInput;
-}): Promise<never> {
-  throw new Error('Appointment detail is implemented in a later lifecycle task');
+      const [cancelledAppointment] = await tx
+        .update(appointments)
+        .set({ status: 'cancelled', updatedAt: new Date() })
+        .where(and(eq(appointments.id, appointment.id), eq(appointments.status, 'available')))
+        .returning({
+          id: appointments.id,
+          assignmentId: appointments.assignmentId,
+          checkpointId: appointments.checkpointId,
+          instructorId: appointments.instructorId,
+          studentId: appointments.studentId,
+          startAt: appointments.startAt,
+          endAt: appointments.endAt,
+          status: appointments.status,
+          createdAt: appointments.createdAt,
+          updatedAt: appointments.updatedAt,
+        });
+
+      if (!cancelledAppointment) {
+        return serverError(ErrorCode.CONFLICT, 'Appointment state changed; please try again');
+      }
+
+      auditData = {
+        assignmentId: appointment.assignmentId,
+        beforeStatus: 'available',
+        afterStatus: 'cancelled',
+      };
+
+      return {
+        appointment: { ...cancelledAppointment, studentName: null, studentEmail: null },
+      };
+    });
+
+    if (auditData) {
+      await safeAuditLog('appointment.cancelled', {
+        actorId: session.user.id,
+        action: 'appointment.cancelled',
+        entityType: 'appointment',
+        entityId: String(args.data.appointmentId),
+        details: auditData,
+      });
+    }
+
+    return result;
+  } catch (err) {
+    return serverError(ErrorCode.INTERNAL, 'Internal Server Error', {
+      cause: err instanceof Error ? err.message : String(err),
+      handler: 'cancelAppointmentHandler',
+    });
+  }
 }

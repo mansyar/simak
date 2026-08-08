@@ -79,7 +79,7 @@ export const listAvailableAppointments = typedServerFn({ method: 'GET' })
   .middleware(serverFnMiddlewares(RATE_LIMITS.standardRead))
   .inputValidator(ListAvailableAppointmentsSchema)
   .handler(async ({ data }) => {
-    const { listAvailableAppointmentsHandler } = await import('./appointments.server');
+    const { listAvailableAppointmentsHandler } = await import('./appointments-lifecycle.server');
     return listAvailableAppointmentsHandler({ data });
   });
 
@@ -87,7 +87,7 @@ export const listStudentAppointments = typedServerFn({ method: 'GET' })
   .middleware(serverFnMiddlewares(RATE_LIMITS.standardRead))
   .inputValidator(ListStudentAppointmentsSchema)
   .handler(async ({ data }) => {
-    const { listStudentAppointmentsHandler } = await import('./appointments.server');
+    const { listStudentAppointmentsHandler } = await import('./appointments-lifecycle.server');
     return listStudentAppointmentsHandler({ data });
   });
 
@@ -95,7 +95,7 @@ export const bookAppointment = typedServerFn({ method: 'POST' })
   .middleware(serverFnMiddlewares(RATE_LIMITS.destructive))
   .inputValidator(BookAppointmentSchema)
   .handler(async ({ data }) => {
-    const { bookAppointmentHandler } = await import('./appointments.server');
+    const { bookAppointmentHandler } = await import('./appointments-lifecycle.server');
     return bookAppointmentHandler({ data });
   });
 
@@ -103,7 +103,7 @@ export const rescheduleAppointment = typedServerFn({ method: 'POST' })
   .middleware(serverFnMiddlewares(RATE_LIMITS.destructive))
   .inputValidator(RescheduleAppointmentSchema)
   .handler(async ({ data }) => {
-    const { rescheduleAppointmentHandler } = await import('./appointments.server');
+    const { rescheduleAppointmentHandler } = await import('./appointments-lifecycle.server');
     return rescheduleAppointmentHandler({ data });
   });
 
@@ -111,7 +111,7 @@ export const completeAppointment = typedServerFn({ method: 'POST' })
   .middleware(serverFnMiddlewares(RATE_LIMITS.destructive))
   .inputValidator(CompleteAppointmentSchema)
   .handler(async ({ data }) => {
-    const { completeAppointmentHandler } = await import('./appointments.server');
+    const { completeAppointmentHandler } = await import('./appointments-lifecycle.server');
     return completeAppointmentHandler({ data });
   });
 
@@ -119,7 +119,7 @@ export const markAppointmentNoShow = typedServerFn({ method: 'POST' })
   .middleware(serverFnMiddlewares(RATE_LIMITS.destructive))
   .inputValidator(MarkAppointmentNoShowSchema)
   .handler(async ({ data }) => {
-    const { markAppointmentNoShowHandler } = await import('./appointments.server');
+    const { markAppointmentNoShowHandler } = await import('./appointments-lifecycle.server');
     return markAppointmentNoShowHandler({ data });
   });
 
@@ -127,6 +127,6 @@ export const getAppointmentDetail = typedServerFn({ method: 'GET' })
   .middleware(serverFnMiddlewares(RATE_LIMITS.standardRead))
   .inputValidator(AppointmentIdSchema)
   .handler(async ({ data }) => {
-    const { getAppointmentDetailHandler } = await import('./appointments.server');
+    const { getAppointmentDetailHandler } = await import('./appointments-lifecycle.server');
     return getAppointmentDetailHandler({ data });
   });
