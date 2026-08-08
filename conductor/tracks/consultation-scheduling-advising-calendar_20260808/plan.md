@@ -181,12 +181,15 @@
   - **Implementation notes:** Added localized appointment email configuration/body rendering, extended the existing participant helper to enqueue preference-aware email after in-app work, isolated each channel and database acquisition as advisory work, and retained `void` post-commit calls from mutation handlers so committed appointment state is never rolled back by notification failures. Email subjects/body parameters contain appointment/assignment/time identifiers only; consultation notes and tokens are excluded.
   - **Implementation commit:** `9c7c996f`.
 
-- [~] **Task 4.3: 24-hour and 1-hour reminder scanner (RED → GREEN)**
+- [x] **Task 4.3: 24-hour and 1-hour reminder scanner (RED → GREEN)**
   - [x] Write tests for both reminder windows, UTC comparisons, timezone-independent trigger behavior, repeated scans, boundary times, cancelled appointments, and completed/no-show appointments.
   - [x] Confirm RED behavior.
-  - [~] Implement the scanner using the existing background processor boundary and a durable deduplication mechanism.
-  - [~] Verify failures are logged and isolated from email queue processing.
+  - [x] Implement the scanner using the existing background processor boundary and a durable deduplication mechanism.
+  - [x] Verify failures are logged and isolated from email queue processing.
   - **RED evidence:** The persistence contract initially failed during import analysis because `@/db/schema/appointment-reminders` did not exist; after the schema contract was added, the scanner contract `pnpm vitest run tests/unit/lib/appointment-reminder-scanner.test.ts` failed during import analysis because `@/lib/appointment-reminder-scanner` did not exist; no scanner assertions ran.
+  - **GREEN evidence:** Schema tests passed 4/4; scanner and email-queue-init suites passed 28/28; `pnpm typecheck`, targeted `oxlint`, and `git diff --check` passed. Scoped V8 coverage for `appointment-reminder-scanner.ts` and `email-queue-init.ts` passed at 97% statements, 83.01% branches, 100% functions, and 100% lines.
+  - **Implementation notes:** Added `appointment_reminders` durable rows with a PostgreSQL `appointment_reminder_tier` enum, participant/tier uniqueness, foreign keys, indexes, and forward/rollback migrations. The scanner evaluates booked active appointments in UTC half-open 24-hour and 1-hour windows, atomically claims student/instructor reminder rows with `ON CONFLICT DO NOTHING`, groups claimed participants, and dispatches through the existing preference-aware notification/email helper. `email-queue-init` invokes it on its existing 30-second tick with an independent hourly throttle; scanner, deduplication, and delivery failures are advisory and cannot stop queue processing. Direct `simak_test` apply/inspect/rollback/re-apply verification confirmed migration behavior.
+  - **Implementation commits:** `0e32cfb6` (persistence), pending (scanner/queue integration).
 
 - [ ] **Phase 4 Verification & Checkpoint**
   - [ ] Run focused notification/reminder tests, i18n parity, and typecheck.

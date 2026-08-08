@@ -99,6 +99,7 @@ describe('appointment reminder scanner', () => {
       [
         { appointmentId: 401, participantId: 'student-1', tier: '24h' },
         { appointmentId: 401, participantId: 'instructor-1', tier: '24h' },
+        { appointmentId: 401, participantId: 'student-1', tier: '24h' },
       ],
       [appointment1h],
       [
@@ -138,6 +139,32 @@ describe('appointment reminder scanner', () => {
     expect(notifyAppointmentParticipants).not.toHaveBeenCalled();
   });
 
+  it('skips candidates without a participant after the database eligibility filter', async () => {
+    queueResults(db, [{ ...appointment24h, studentId: null }], [], []);
+
+    await processAppointmentReminders(now);
+
+    expect(notifyAppointmentParticipants).not.toHaveBeenCalled();
+  });
+
+  it('isolates a failure in one reminder window and continues the next window', async () => {
+    const error = new Error('reminder query unavailable');
+    db.then.mockImplementationOnce(
+      (_onfulfilled: (value: unknown) => unknown, onrejected?: (reason: unknown) => unknown) => {
+        onrejected?.(error);
+      },
+    );
+
+    await expect(processAppointmentReminders(now)).resolves.toBeUndefined();
+
+    const childLogger = vi.mocked(logger.child).mock.results[0]?.value as {
+      error: ReturnType<typeof vi.fn>;
+    };
+    expect(childLogger.error).toHaveBeenCalledWith(
+      expect.objectContaining({ event: 'appointment_reminder.scan_error', tier: '24h' }),
+    );
+  });
+
   it('uses half-open UTC windows and excludes cancelled or completed appointments', () => {
     expect(
       isAppointmentReminderEligible(
@@ -157,6 +184,9 @@ describe('appointment reminder scanner', () => {
       isAppointmentReminderEligible({ ...appointment24h, status: 'cancelled' }, now, '24h'),
     ).toBe(false);
     expect(
+      isAppointmentReminderEligible({ ...appointment24h, status: 'available' }, now, '24h'),
+    ).toBe(false);
+    expect(
       isAppointmentReminderEligible({ ...appointment24h, status: 'completed' }, now, '24h'),
     ).toBe(false);
     expect(
@@ -166,7 +196,9 @@ describe('appointment reminder scanner', () => {
 
   it('logs scan failures and does not reject the queue tick', async () => {
     const error = new Error('database unavailable');
-    db.then.mockImplementationOnce(() => Promise.reject(error));
+    vi.mocked(getDb).mockImplementationOnce(() => {
+      throw error;
+    });
 
     await expect(processAppointmentReminders(now)).resolves.toBeUndefined();
 

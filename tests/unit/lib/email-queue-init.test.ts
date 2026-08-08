@@ -5,10 +5,18 @@ vi.mock('@/config/env', () => ({
   getEnv: vi.fn().mockReturnValue({ RESEND_API_KEY: 'test-key' }),
 }));
 
-const { mockChildLogger, pruneMock, scannerMock, r2CleanupMock, reclaimMock } = vi.hoisted(() => ({
+const {
+  mockChildLogger,
+  pruneMock,
+  scannerMock,
+  appointmentScannerMock,
+  r2CleanupMock,
+  reclaimMock,
+} = vi.hoisted(() => ({
   mockChildLogger: { error: vi.fn(), info: vi.fn(), warn: vi.fn() },
   pruneMock: vi.fn(),
   scannerMock: vi.fn(),
+  appointmentScannerMock: vi.fn(),
   r2CleanupMock: vi.fn(),
   reclaimMock: vi.fn(),
 }));
@@ -30,6 +38,10 @@ vi.mock('@/lib/deadline-reminder-scanner', () => ({
   processDeadlineReminders: scannerMock,
 }));
 
+vi.mock('@/lib/appointment-reminder-scanner', () => ({
+  processAppointmentReminders: appointmentScannerMock,
+}));
+
 vi.mock('@/lib/r2-cleanup', () => ({
   processOrphanedR2Objects: r2CleanupMock,
 }));
@@ -43,6 +55,8 @@ describe('email-queue-init', () => {
     pruneMock.mockResolvedValue({ deleted: 0 });
     scannerMock.mockReset();
     scannerMock.mockResolvedValue(undefined);
+    appointmentScannerMock.mockReset();
+    appointmentScannerMock.mockResolvedValue(undefined);
     r2CleanupMock.mockReset();
     r2CleanupMock.mockResolvedValue({ deleted: 0, failed: 0, batchSize: 0 });
     reclaimMock.mockReset();
@@ -232,6 +246,35 @@ describe('email-queue-init', () => {
     vi.advanceTimersByTime(60 * 60 * 1000 + 1_000);
     await vi.advanceTimersByTimeAsync(0);
     expect(scannerMock).toHaveBeenCalledTimes(2);
+
+    await stopGracefully();
+  });
+
+  it('runs appointment reminders through the existing email queue tick', async () => {
+    mockProcessor(() => Promise.resolve());
+    const { startEmailQueue, stopGracefully } = await import('@/lib/email-queue-init');
+
+    startEmailQueue();
+    await vi.advanceTimersByTimeAsync(0);
+
+    expect(appointmentScannerMock).toHaveBeenCalledTimes(1);
+
+    await stopGracefully();
+  });
+
+  it('isolates appointment reminder scanner failure from email processing', async () => {
+    const processMock = mockProcessor(() => Promise.resolve());
+    appointmentScannerMock.mockRejectedValueOnce(new Error('appointment scan failed'));
+    const { startEmailQueue, stopGracefully } = await import('@/lib/email-queue-init');
+
+    startEmailQueue();
+    await vi.advanceTimersByTimeAsync(0);
+    expect(processMock).toHaveBeenCalledTimes(1);
+    expect(appointmentScannerMock).toHaveBeenCalledTimes(1);
+
+    vi.advanceTimersByTime(30_000);
+    await vi.advanceTimersByTimeAsync(0);
+    expect(processMock).toHaveBeenCalledTimes(2);
 
     await stopGracefully();
   });
