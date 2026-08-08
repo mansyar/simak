@@ -307,11 +307,11 @@
 
 ## Phase 8: End-to-end validation and completion
 
-- [ ] **Task 8.1: Full lifecycle E2E coverage**
-  - [ ] Add Playwright coverage for instructor publish → student book → notification → reschedule/cancel → completion/no-show → explicit consultation record → instructor verification.
-  - [ ] Add cross-role authorization and calendar-feed scenarios.
-  - [ ] Add a DST/timezone scenario and mobile viewport coverage.
-  - [ ] Confirm RED behavior for newly added scenarios, then make them pass.
+- [~] **Task 8.1: Full lifecycle E2E coverage**
+   - [~] Add Playwright coverage for instructor publish → student book → notification → reschedule/cancel → completion/no-show → explicit consultation record → instructor verification.
+   - [~] Add cross-role authorization and calendar-feed scenarios.
+   - [~] Add a DST/timezone scenario and mobile viewport coverage.
+   - [ ] Confirm RED behavior for newly added scenarios, then make them pass.
 
 - [ ] **Task 8.2: Regression and quality gates**
   - [ ] Run focused unit suites.
