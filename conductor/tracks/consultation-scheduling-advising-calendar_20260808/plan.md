@@ -212,11 +212,12 @@
   - **Implementation notes:** Added a separate appointment projection/query joined to active assignments and the authorized student's assignment membership. Selection is limited server-side to future `booked` appointments for the requested student, excludes cancelled/available/terminal/inactive/deleted contexts, retains optional checkpoint labels, and emits stable `appointment-{id}@simak` UIDs with UTC instants and end times. Existing deadline selection remains unchanged. The existing route still performs token hashing, active student ownership, rate limiting, generic unauthorized responses, and secure private headers.
   - **Implementation commit:** `4ea12742`.
 
-- [ ] **Task 5.2: Stable appointment serialization (RED → GREEN)**
-  - [ ] Write serializer tests for stable appointment UID, UTC `DTSTART`/`DTEND`, rescheduling with unchanged UID, RFC 5545 escaping/folding, and safe titles.
-  - [ ] Confirm RED behavior.
+- [~] **Task 5.2: Stable appointment serialization (RED → GREEN)**
+  - [x] Write serializer tests for stable appointment UID, UTC `DTSTART`/`DTEND`, rescheduling with unchanged UID, RFC 5545 escaping/folding, and safe titles.
+  - [x] Confirm RED behavior.
   - [ ] Implement appointment event serialization using the existing feed conventions.
   - [ ] Preserve existing cache, content-type, rate-limit, and credential secrecy behavior.
+  - **RED evidence:** `pnpm vitest run tests/unit/lib/calendar-ics.test.ts` passed the three existing serializer tests and failed the new appointment contract because `DTEND` was not emitted. The test also establishes stable appointment UID and rescheduled UTC start/end expectations.
 
 - [ ] **Task 5.3: Calendar route regression/security coverage**
   - [ ] Extend route tests for valid/invalid/revoked credentials, generic unauthorized responses, no enumeration, and mixed deadline/appointment feeds.
