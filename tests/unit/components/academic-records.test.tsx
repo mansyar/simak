@@ -20,6 +20,7 @@ const completeRecord = {
   termName: 'Spring 2026',
   termStartDate: '2026-01-01',
   sourceAssignmentId: 42,
+  sourceSnapshotId: 100,
   sourceReleaseVersion: 1,
   policyVersion: 2,
   recordVersion: 1,
@@ -28,13 +29,16 @@ const completeRecord = {
   status: 'complete' as const,
   credits: 3,
   gradePoints: 4,
+  roundingScale: 2,
   publishedAt: '2026-02-01T10:00:00.000Z',
+  createdAt: '2026-02-01T10:00:00.000Z',
 };
 
 const data = {
   page: 1,
   limit: 20,
   total: 3,
+  terms: [{ id: 3, code: '2026-1', name: 'Spring 2026' }],
   records: [
     completeRecord,
     {
@@ -70,7 +74,7 @@ describe('AcademicRecordsView', () => {
 
     expect(screen.getByText('academicRecords.termGpa')).toBeDefined();
     expect(screen.getByText('academicRecords.cumulativeGpa')).toBeDefined();
-    expect(screen.getAllByText('4.00')).toHaveLength(2);
+    expect(screen.getAllByText('4.00')).toHaveLength(3);
     expect(screen.getByText('CS101')).toBeDefined();
     expect(screen.getByText('CS102')).toBeDefined();
     expect(screen.getByText('CS103')).toBeDefined();
@@ -85,9 +89,9 @@ describe('AcademicRecordsView', () => {
     expect(screen.queryByText('academicRecords.policyVersion')).toBeNull();
 
     rerender(<AcademicRecordsView data={data} role="admin" />);
-    expect(screen.getByText('academicRecords.policyVersion')).toBeDefined();
-    expect(screen.getByText('academicRecords.sourceRelease')).toBeDefined();
-    expect(screen.getByText('academicRecords.sourceAssignment')).toBeDefined();
+    expect(screen.getAllByText('academicRecords.policyVersion')).toHaveLength(3);
+    expect(screen.getAllByText('academicRecords.sourceRelease')).toHaveLength(3);
+    expect(screen.getAllByText('academicRecords.sourceAssignment')).toHaveLength(3);
   });
 
   it('emits a term change from the accessible filter', () => {
@@ -119,6 +123,7 @@ describe('AcademicRecordsView', () => {
           page: 1,
           limit: 20,
           total: 0,
+          terms: [],
           records: [],
           termGpa: null,
           cumulativeGpa: null,
@@ -127,7 +132,7 @@ describe('AcademicRecordsView', () => {
       />,
     );
     expect(screen.getByText('academicRecords.empty')).toBeDefined();
-    expect(screen.getByText('academicRecords.gpaUnavailable')).toBeDefined();
+    expect(screen.getAllByText('academicRecords.gpaUnavailable')).toHaveLength(3);
 
     rerender(
       <AcademicRecordsView
@@ -135,6 +140,6 @@ describe('AcademicRecordsView', () => {
         role="instructor"
       />,
     );
-    expect(screen.getByText('errors.forbidden')).toBeDefined();
+    expect(screen.getByText('error.forbidden')).toBeDefined();
   });
 });

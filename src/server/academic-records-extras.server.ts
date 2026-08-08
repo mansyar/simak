@@ -88,6 +88,7 @@ type QueryOptions = {
 
 type AcademicRecordsResponse = {
   records: AcademicRecordRow[];
+  terms: Array<{ id: number; code: string; name: string }>;
   page: number;
   limit: number;
   total: number;
@@ -195,12 +196,21 @@ async function queryRecords(options: QueryOptions): Promise<AcademicRecordsRespo
     roundingScale: roundingScale(normalizedAllRows),
   };
   const policyRecords = normalizedAllRows.map(toPolicyRecord);
+  const terms = Array.from(
+    new Map(
+      normalizedAllRows.map((row) => [
+        row.termId,
+        { id: row.termId, code: row.termCode, name: row.termName },
+      ]),
+    ).values(),
+  );
   const termRecords = options.termId
     ? calculateTermGpa(policyRecords, options.termId, policy)
     : null;
 
   return {
     records: normalizedRows,
+    terms,
     page: options.page,
     limit: options.limit,
     total: Number(count),

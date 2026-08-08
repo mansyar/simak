@@ -2,7 +2,49 @@
 // Handler implementations live in academic-records-extras.server.ts.
 import { RATE_LIMITS } from '@/lib/rate-limiter';
 import { serverFnMiddlewares, typedServerFn } from '@/lib/server-fn';
+import type { ServerError } from '@/lib/errors';
 import { z } from 'zod';
+import type { GpaCalculation } from '@/lib/academic-record-policy';
+
+export type AcademicRecordView = {
+  recordId: number;
+  studentId: string;
+  studentName?: string;
+  courseId: number;
+  courseCode: string;
+  courseName: string;
+  courseSectionId: number;
+  sectionCode: string;
+  termId: number;
+  termCode: string;
+  termName: string;
+  termStartDate: string;
+  sourceAssignmentId: number;
+  sourceSnapshotId: number | null;
+  sourceReleaseVersion: number | null;
+  policyVersion: number;
+  recordVersion: number;
+  numericScore: number | null;
+  letterGrade: string | null;
+  status: 'complete' | 'incomplete' | 'withdrawn';
+  credits: number;
+  gradePoints: number | null;
+  roundingScale: number | null;
+  publishedAt: Date | string | null;
+  createdAt: Date | string;
+};
+
+export type AcademicRecordsResponse = {
+  records: AcademicRecordView[];
+  terms: Array<{ id: number; code: string; name: string }>;
+  page: number;
+  limit: number;
+  total: number;
+  termGpa: GpaCalculation | null;
+  cumulativeGpa: GpaCalculation | null;
+};
+
+export type AcademicRecordsResult = AcademicRecordsResponse | ServerError;
 
 const PageSchema = z.coerce.number().int().min(1).default(1);
 const LimitSchema = z.coerce.number().int().min(1).max(100).default(20);

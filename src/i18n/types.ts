@@ -710,6 +710,42 @@ export type Translation = {
     sectionMain: string
     sectionPreferences: string
   }
+  academicRecords: {
+    eyebrow: string
+    title: string
+    subtitle: {
+      student: string
+      instructor: string
+      admin: string
+    }
+    termGpa: string
+    cumulativeGpa: string
+    gpaUnavailable: string
+    credits: string
+    qualityPoints: string
+    termFilter: string
+    allTerms: string
+    section: string
+    score: string
+    letterGrade: string
+    gradePoints: string
+    recordList: string
+    pagination: string
+    previous: string
+    next: string
+    empty: string
+    loadError: string
+    gpaExcluded: string
+    sourceAssignment: string
+    sourceRelease: string
+    policyVersion: string
+    recordVersion: string
+    status: {
+      complete: string
+      incomplete: string
+      withdrawn: string
+    }
+  }
   studentRubrics: {
     title: string
     weightedTotal: string
