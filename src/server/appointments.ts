@@ -103,7 +103,7 @@ export const rescheduleAppointment = typedServerFn({ method: 'POST' })
   .middleware(serverFnMiddlewares(RATE_LIMITS.destructive))
   .inputValidator(RescheduleAppointmentSchema)
   .handler(async ({ data }) => {
-    const { rescheduleAppointmentHandler } = await import('./appointments-lifecycle.server');
+    const { rescheduleAppointmentHandler } = await import('./appointments-rescheduling.server');
     return rescheduleAppointmentHandler({ data });
   });
 

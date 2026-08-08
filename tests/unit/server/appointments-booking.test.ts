@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { getSessionFromHeaders } from '@/server/auth';
 import { getDb } from '@/db/index';
 import { safeAuditLog } from '@/lib/audit';
+import { notifyAppointmentParticipants } from '@/lib/appointment-notifications';
 import { bookAppointmentHandler } from '@/server/appointments-lifecycle.server';
 
 vi.mock('@/server/auth', () => ({
@@ -15,6 +16,10 @@ vi.mock('@/db/index', () => ({
 
 vi.mock('@/lib/audit', () => ({
   safeAuditLog: vi.fn(),
+}));
+
+vi.mock('@/lib/appointment-notifications', () => ({
+  notifyAppointmentParticipants: vi.fn().mockResolvedValue(undefined),
 }));
 
 const studentSession = {
@@ -150,6 +155,13 @@ describe('Student appointment booking handler', () => {
         checkpointId: 7,
       },
     });
+    expect(notifyAppointmentParticipants).toHaveBeenCalledWith(
+      expect.objectContaining({
+        event: 'appointment_booked',
+        appointmentId: 301,
+        participantIds: ['student-1', 'instructor-1'],
+      }),
+    );
   });
 
   it('books without a checkpoint when the student leaves the optional link empty', async () => {

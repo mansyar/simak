@@ -119,12 +119,15 @@
   - **Implementation notes:** Student booking locks the authorized appointment, instructor user, student user, and assignment enrollment in one transaction; it rechecks active context/status, validates the optional student-owned checkpoint, excludes cancelled records by querying only `booked` conflicts, guards the final update, and audits only safe appointment state.
   - **Implementation commit:** `bb75b022` (`feat(track-058): add race-safe student booking`).
 
-- [~] **Task 3.2: Cancellation and rescheduling (RED → GREEN)**
+- [x] **Task 3.2: Cancellation and rescheduling (RED → GREEN)**
   - [x] Write tests for student/instructor cancellation, future-only rules, selecting another available slot, instructor time changes, target-slot locking, conflict rejection, and preservation of the original appointment on failure.
   - [x] Confirm RED behavior.
-  - [~] Implement transactional cancellation/rescheduling with stable appointment identity and audit before/after times.
-  - [~] Add preference-aware participant notifications after successful commit.
+  - [x] Implement transactional cancellation/rescheduling with stable appointment identity and audit before/after times.
+  - [x] Add preference-aware participant notifications after successful commit.
   - **RED evidence:** `pnpm vitest run tests/unit/server/appointments-rescheduling.test.ts` could not import the missing `@/server/appointments-rescheduling.server` module; no tests ran. The new cancellation assertions also target the current instructor-only/available-slot behavior and remain RED until lifecycle support is implemented.
+  - **GREEN evidence:** 50 focused appointment notification/booking/handler/rescheduling tests passed; `pnpm typecheck`, targeted `oxlint`, and `git diff --check` passed. Scoped coverage is 91.34% statements, 82.24% branches, 96.29% functions, and 91.96% lines.
+  - **Implementation notes:** Students and instructors can cancel only authorized future booked appointments; cancellation is idempotent for already-cancelled records and preserves private reasons. Rescheduling locks both identities and participant rows, requires an available same-assignment/instructor replacement, preserves the original appointment ID, cancels the replacement, rejects booked overlaps, and leaves the transaction unchanged on stale/conflicting updates. Post-commit in-app notifications deduplicate participants, honor existing preferences, include UTC-safe appointment identifiers/times, and isolate advisory failures without consultation notes.
+  - **Implementation commits:** `1ada58e2` (`feat(track-058): cancel unbooked appointment slots`), `f650bbb5` (`test(track-058): type cancellation audit assertion`), and follow-up lifecycle changes pending commit.
   - **Notification RED evidence:** `pnpm vitest run tests/unit/lib/appointment-notifications.test.ts` could not import the missing `@/lib/appointment-notifications` module; no tests ran.
 
 - [ ] **Task 3.3: Completion, no-show, and explicit evidence action (RED → GREEN)**

@@ -3,7 +3,9 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { getSessionFromHeaders } from '@/server/auth';
 import { getDb } from '@/db/index';
 import { safeAuditLog } from '@/lib/audit';
+import { notifyAppointmentParticipants } from '@/lib/appointment-notifications';
 import { cancelAppointmentHandler } from '@/server/appointments.server';
+import { cancelStudentAppointmentHandler } from '@/server/appointments-cancellation.server';
 import { rescheduleAppointmentHandler } from '@/server/appointments-rescheduling.server';
 
 vi.mock('@/server/auth', () => ({
@@ -16,6 +18,10 @@ vi.mock('@/db/index', () => ({
 
 vi.mock('@/lib/audit', () => ({
   safeAuditLog: vi.fn(),
+}));
+
+vi.mock('@/lib/appointment-notifications', () => ({
+  notifyAppointmentParticipants: vi.fn().mockResolvedValue(undefined),
 }));
 
 const instructorSession = {
@@ -130,6 +136,12 @@ describe('Booked appointment cancellation', () => {
     expect(JSON.stringify(vi.mocked(safeAuditLog).mock.calls[0])).not.toContain(
       'Private consultation note',
     );
+    expect(notifyAppointmentParticipants).toHaveBeenCalledWith(
+      expect.objectContaining({
+        event: 'appointment_cancelled',
+        participantIds: ['student-1', 'instructor-1'],
+      }),
+    );
   });
 
   it('lets the owning instructor cancel a booked appointment', async () => {
@@ -175,6 +187,48 @@ describe('Booked appointment cancellation', () => {
     expect(result).toHaveProperty('appointment.status', 'cancelled');
     expect(transactionDb.update).not.toHaveBeenCalled();
     expect(safeAuditLog).not.toHaveBeenCalled();
+  });
+
+  it('rejects a stale cancellation update without auditing a state change', async () => {
+    const transactionDb = queueTransaction(mockDb, [[bookedAppointment], []]);
+
+    const result = await cancelAppointmentHandler({ data: { appointmentId: 401 } });
+
+    expect(result).toEqual({
+      error: { code: 'CONFLICT', message: 'Appointment state changed; please try again' },
+    });
+    expect(safeAuditLog).not.toHaveBeenCalled();
+    expect(transactionDb.update).toHaveBeenCalledTimes(1);
+  });
+
+  it('returns a generic internal error when student cancellation cannot commit', async () => {
+    mockDb.transaction.mockRejectedValue(new Error('database unavailable'));
+
+    const result = await cancelAppointmentHandler({ data: { appointmentId: 401 } });
+
+    expect(result).toEqual({ error: { code: 'INTERNAL', message: 'Internal Server Error' } });
+  });
+
+  it('rejects direct student-cancellation calls from non-students', async () => {
+    vi.mocked(getSessionFromHeaders).mockResolvedValue(null as never);
+
+    const result = await cancelStudentAppointmentHandler({ data: { appointmentId: 401 } });
+
+    expect(result).toEqual({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } });
+    expect(getDb).not.toHaveBeenCalled();
+  });
+
+  it('rejects a student cancellation when the locked appointment is not booked', async () => {
+    const transactionDb = queueTransaction(mockDb, [
+      [{ ...bookedAppointment, status: 'available' }],
+    ]);
+
+    const result = await cancelStudentAppointmentHandler({ data: { appointmentId: 401 } });
+
+    expect(result).toEqual({
+      error: { code: 'CONFLICT', message: 'Appointment cannot be cancelled in its current state' },
+    });
+    expect(transactionDb.update).not.toHaveBeenCalled();
   });
 });
 
@@ -234,6 +288,15 @@ describe('Appointment rescheduling', () => {
         afterEndAt: replacementEnd,
       },
     });
+    expect(notifyAppointmentParticipants).toHaveBeenCalledWith(
+      expect.objectContaining({
+        event: 'appointment_rescheduled',
+        appointmentId: 401,
+        participantIds: ['student-1', 'instructor-1'],
+        startAt: replacementStart,
+        endAt: replacementEnd,
+      }),
+    );
   });
 
   it('allows the owning instructor to change a booked appointment time', async () => {

@@ -11,6 +11,7 @@ import {
   canTransitionAppointment,
   validateAppointmentWindow,
 } from '@/lib/appointment-policies';
+import { notifyAppointmentParticipants } from '@/lib/appointment-notifications';
 import { safeAuditLog } from '@/lib/audit';
 import { ErrorCode, serverError, type ServerError } from '@/lib/errors';
 import { isInstructor } from '@/lib/session-guards';
@@ -283,13 +284,29 @@ export async function cancelAppointmentHandler(args: {
   data: CancelAppointmentInput;
 }): Promise<AppointmentMutationResult | ServerError> {
   const session = await getSessionFromHeaders();
+  if (session?.user.role === 'student') {
+    const { cancelStudentAppointmentHandler } = await import('./appointments-cancellation.server');
+    return cancelStudentAppointmentHandler(args);
+  }
+
   if (!isInstructor(session)) {
     return serverError(ErrorCode.UNAUTHORIZED, 'Unauthorized');
   }
 
   const db = getDb();
   let auditData:
-    | { assignmentId: number; beforeStatus: 'available'; afterStatus: 'cancelled' }
+    | { assignmentId: number; beforeStatus: 'available' | 'booked'; afterStatus: 'cancelled' }
+    | undefined;
+  let notificationData:
+    | {
+        appointmentId: number;
+        assignmentId: number;
+        checkpointId: number | null;
+        instructorId: string;
+        studentId: string;
+        startAt: Date;
+        endAt: Date;
+      }
     | undefined;
 
   try {
@@ -308,14 +325,17 @@ export async function cancelAppointmentHandler(args: {
         return { appointment: { ...appointment, studentName: null, studentEmail: null } };
       }
 
-      if (appointment.status !== 'available') {
+      if (
+        appointment.status !== 'available' &&
+        (appointment.status !== 'booked' || appointment.studentId === null)
+      ) {
         return serverError(
           ErrorCode.CONFLICT,
           'Appointment cannot be cancelled in its current state',
         );
       }
 
-      const transition = canTransitionAppointment('available', 'cancelled', {
+      const transition = canTransitionAppointment(appointment.status, 'cancelled', {
         startAt: appointment.startAt,
         endAt: appointment.endAt,
       });
@@ -326,7 +346,15 @@ export async function cancelAppointmentHandler(args: {
       const [cancelledAppointment] = await tx
         .update(appointments)
         .set({ status: 'cancelled', updatedAt: new Date() })
-        .where(and(eq(appointments.id, appointment.id), eq(appointments.status, 'available')))
+        .where(
+          and(
+            eq(appointments.id, appointment.id),
+            eq(appointments.status, appointment.status),
+            appointment.studentId
+              ? eq(appointments.studentId, appointment.studentId)
+              : isNull(appointments.studentId),
+          ),
+        )
         .returning({
           id: appointments.id,
           assignmentId: appointments.assignmentId,
@@ -346,9 +374,20 @@ export async function cancelAppointmentHandler(args: {
 
       auditData = {
         assignmentId: appointment.assignmentId,
-        beforeStatus: 'available',
+        beforeStatus: appointment.status,
         afterStatus: 'cancelled',
       };
+      notificationData = cancelledAppointment.studentId
+        ? {
+            appointmentId: cancelledAppointment.id,
+            assignmentId: cancelledAppointment.assignmentId,
+            checkpointId: cancelledAppointment.checkpointId,
+            instructorId: cancelledAppointment.instructorId,
+            studentId: cancelledAppointment.studentId,
+            startAt: cancelledAppointment.startAt,
+            endAt: cancelledAppointment.endAt,
+          }
+        : undefined;
 
       return {
         appointment: { ...cancelledAppointment, studentName: null, studentEmail: null },
@@ -362,6 +401,17 @@ export async function cancelAppointmentHandler(args: {
         entityType: 'appointment',
         entityId: String(args.data.appointmentId),
         details: auditData,
+      });
+    }
+    if (notificationData) {
+      void notifyAppointmentParticipants({
+        event: 'appointment_cancelled',
+        appointmentId: notificationData.appointmentId,
+        assignmentId: notificationData.assignmentId,
+        checkpointId: notificationData.checkpointId,
+        participantIds: [notificationData.studentId, notificationData.instructorId],
+        startAt: notificationData.startAt,
+        endAt: notificationData.endAt,
       });
     }
 

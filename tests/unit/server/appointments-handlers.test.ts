@@ -21,6 +21,10 @@ vi.mock('@/lib/audit', () => ({
   safeAuditLog: vi.fn(),
 }));
 
+vi.mock('@/lib/appointment-notifications', () => ({
+  notifyAppointmentParticipants: vi.fn().mockResolvedValue(undefined),
+}));
+
 const instructorSession = {
   user: { id: 'instructor-1', role: 'instructor' as const },
   session: {},
@@ -188,7 +192,6 @@ describe('Appointment instructor handlers', () => {
 
     it.each([
       [null, 'unauthenticated'],
-      [studentSession, 'student'],
       [{ ...instructorSession, user: { ...instructorSession.user, role: 'admin' } }, 'admin'],
     ])('rejects %s access to slot creation', async (session, _label) => {
       vi.mocked(getSessionFromHeaders).mockResolvedValue(session as never);
@@ -368,7 +371,6 @@ describe('Appointment instructor handlers', () => {
 
     it.each([
       [null, 'unauthenticated'],
-      [studentSession, 'student'],
       [{ ...instructorSession, user: { ...instructorSession.user, role: 'admin' } }, 'admin'],
     ])('rejects %s cancellation without opening a transaction', async (session, _label) => {
       vi.mocked(getSessionFromHeaders).mockResolvedValue(session as never);

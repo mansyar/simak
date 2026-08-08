@@ -6,6 +6,7 @@ import { appointments } from '@/db/schema/appointments';
 import { assignments, assignmentStudents, checkpoints } from '@/db/schema/assignments';
 import { academicTerms, courseSections, sectionEnrollments } from '@/db/schema/academic-context';
 import { users } from '@/db/schema/users';
+import { notifyAppointmentParticipants } from '@/lib/appointment-notifications';
 import { validateAppointmentWindow } from '@/lib/appointment-policies';
 import { safeAuditLog } from '@/lib/audit';
 import { ErrorCode, serverError, type ServerError } from '@/lib/errors';
@@ -195,6 +196,17 @@ export async function bookAppointmentHandler(args: {
         checkpointId: number | null;
       }
     | undefined;
+  let notificationData:
+    | {
+        appointmentId: number;
+        assignmentId: number;
+        checkpointId: number | null;
+        instructorId: string;
+        studentId: string;
+        startAt: Date;
+        endAt: Date;
+      }
+    | undefined;
 
   try {
     const result = await db.transaction(async (tx) => {
@@ -290,6 +302,15 @@ export async function bookAppointmentHandler(args: {
         afterStatus: 'booked',
         checkpointId: checkpointId ?? null,
       };
+      notificationData = {
+        appointmentId: bookedAppointment.id,
+        assignmentId: bookedAppointment.assignmentId,
+        checkpointId: bookedAppointment.checkpointId,
+        instructorId: bookedAppointment.instructorId,
+        studentId: bookedAppointment.studentId ?? session.user.id,
+        startAt: bookedAppointment.startAt,
+        endAt: bookedAppointment.endAt,
+      };
 
       return { appointment: bookedAppointment };
     });
@@ -301,6 +322,17 @@ export async function bookAppointmentHandler(args: {
         entityType: 'appointment',
         entityId: String(args.data.appointmentId),
         details: auditData,
+      });
+    }
+    if (notificationData) {
+      void notifyAppointmentParticipants({
+        event: 'appointment_booked',
+        appointmentId: notificationData.appointmentId,
+        assignmentId: notificationData.assignmentId,
+        checkpointId: notificationData.checkpointId,
+        participantIds: [notificationData.studentId, notificationData.instructorId],
+        startAt: notificationData.startAt,
+        endAt: notificationData.endAt,
       });
     }
 

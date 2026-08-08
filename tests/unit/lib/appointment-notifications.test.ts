@@ -85,4 +85,40 @@ describe('appointment participant notifications', () => {
       'consultation',
     );
   });
+
+  it('does not open the database when no participant remains after deduplication', async () => {
+    await notifyAppointmentParticipants({
+      event: 'appointment_booked',
+      appointmentId: 401,
+      assignmentId: 10,
+      participantIds: ['', ''],
+      startAt: new Date('2026-08-08T12:00:00.000Z'),
+      endAt: new Date('2026-08-08T13:00:00.000Z'),
+    });
+
+    expect(getDb).not.toHaveBeenCalled();
+    expect(maybeInsertNotification).not.toHaveBeenCalled();
+  });
+
+  it('isolates a database acquisition failure as advisory work', async () => {
+    vi.mocked(getDb).mockImplementation(() => {
+      throw new Error('database unavailable');
+    });
+
+    await notifyAppointmentParticipants({
+      event: 'appointment_reminder_1h',
+      appointmentId: 401,
+      assignmentId: 10,
+      participantIds: ['student-1'],
+      startAt: new Date('2026-08-08T12:00:00.000Z'),
+      endAt: new Date('2026-08-08T13:00:00.000Z'),
+    });
+
+    expect(logger.error).toHaveBeenCalledWith(
+      expect.objectContaining({
+        event: 'advisory_failed',
+        error: 'database unavailable',
+      }),
+    );
+  });
 });
