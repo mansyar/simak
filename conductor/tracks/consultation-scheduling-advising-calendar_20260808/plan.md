@@ -275,10 +275,11 @@
 
 ## Phase 7: Instructor scheduling experience
 
-- [~] **Task 7.1: Instructor UI tests (RED)**
-   - [~] Add tests for slot creation, assignment/checkpoint selection, duration/time validation, slot listing, cancellation, rescheduling, completion/no-show, and conflict errors.
-   - [~] Add role/ownership and inactive-assignment UI coverage.
-   - [ ] Confirm RED behavior.
+- [x] **Task 7.1: Instructor UI tests (RED)**
+   - [x] Add tests for slot creation, assignment/checkpoint selection, duration/time validation, slot listing, cancellation, rescheduling, completion/no-show, and conflict errors.
+   - [x] Add role/ownership and inactive-assignment UI coverage.
+   - [x] Confirm RED behavior.
+   - **RED evidence:** `pnpm vitest run tests/unit/components/instructor/InstructorAppointmentPanel.test.tsx` failed before assertions because the planned `InstructorAppointmentPanel` component did not exist; `pnpm typecheck` reported the same missing module. The contract covers slot publishing, assignment/checkpoint selection, booked student/status display, confirmation-gated cancellation, replacement-slot rescheduling, completion/no-show actions, timezone labels, empty/loading/error/retry states, and generic unauthorized/inactive-context handling.
 
 - [ ] **Task 7.2: Instructor slot and appointment UI (GREEN)**
   - [ ] Implement the assignment consultation scheduling surface using existing instructor consultation patterns.
