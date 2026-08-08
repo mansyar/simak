@@ -241,9 +241,9 @@
 
 ## Phase 6: Student appointment experience
 
-- [ ] **Task 6.1: Student UI tests (RED)**
-  - [ ] Add component/route tests for available slots, timezone display, booking, conflict feedback, booked appointment details, cancellation, rescheduling, completed/no-show states, and empty/error/loading states.
-  - [ ] Add tests for the explicit consultation evidence action.
+- [~] **Task 6.1: Student UI tests (RED)**
+  - [~] Add component/route tests for available slots, timezone display, booking, conflict feedback, booked appointment details, cancellation, rescheduling, completed/no-show states, and empty/error/loading states.
+  - [~] Add tests for the explicit consultation evidence action.
   - [ ] Confirm RED behavior.
 
 - [ ] **Task 6.2: Student booking and management UI (GREEN)**
