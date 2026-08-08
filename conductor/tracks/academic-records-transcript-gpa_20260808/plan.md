@@ -25,12 +25,12 @@
 
 ## Phase 1: Schema and Immutable Academic Records
 
-- [~] Task: Write failing persistence and constraint tests
-  - [ ] Test academic-record fields and source-release/policy references.
-  - [ ] Test immutable historical rows and active-version uniqueness.
-  - [ ] Test the single transcript-source assignment rule for a section.
-  - [ ] Test indexes and foreign-key behavior for student, section, term, assignment, and policy lookups.
-- [ ] Task: Implement the academic-record data model
+- [x] Task: Write failing persistence and constraint tests [a96c9ac]
+  - [x] Test academic-record fields and source-release/policy references.
+  - [x] Test immutable historical rows and active-version uniqueness.
+  - [x] Test the single transcript-source assignment rule for a section.
+  - [x] Test indexes and foreign-key behavior for student, section, term, assignment, and policy lookups.
+- [~] Task: Implement the academic-record data model
   - [ ] Add course-credit and versioned grading-policy persistence using approved Drizzle patterns.
   - [ ] Add the explicit section transcript-source association with safe validation.
   - [ ] Add immutable academic-record tables, enums, constraints, indexes, and migration.
