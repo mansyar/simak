@@ -21,6 +21,8 @@ export const TABLES_TO_TRUNCATE = [
   'email_queue',
   'feedback_snippets',
   'audit_log',
+  'academic_records',
+  'academic_record_policies',
   'interventions',
   'notifications',
   'extension_requests',

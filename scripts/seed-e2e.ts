@@ -33,6 +33,11 @@ import {
   courses,
   courseSections,
   sectionEnrollments,
+  academicRecordPolicies,
+  academicRecords,
+  assignmentGradeConfig,
+  finalGrades,
+  gradeReleaseSnapshots,
 } from '../src/db/schema/index';
 import { hashPassword } from 'better-auth/crypto';
 import crypto from 'node:crypto';
@@ -157,6 +162,16 @@ async function seedTemplateAndAssignment(): Promise<void> {
       status: 'active',
     })
     .returning({ id: academicTerms.id });
+  const [policy] = await db
+    .insert(academicRecordPolicies)
+    .values({
+      version: 1,
+      effectiveTermId: term.id,
+      gradePoints: { A: 4, B: 3, C: 2, D: 1, F: 0 },
+      roundingScale: 2,
+      isActive: true,
+    })
+    .returning({ version: academicRecordPolicies.version });
   const [course] = await db
     .insert(courses)
     .values({ code: 'E2E-THESIS', name: 'E2E Thesis Course', credits: '3.00' })
@@ -278,6 +293,7 @@ async function seedTemplateAndAssignment(): Promise<void> {
       sectionId: section.id,
       mode: 'individual',
       status: 'active',
+      isTranscriptSource: true,
     })
     .returning();
 
@@ -290,6 +306,93 @@ async function seedTemplateAndAssignment(): Promise<void> {
   });
 
   console.log(`[E2E Seed] Student enrolled: ${studentUser.email}.`);
+
+  const releasedAt = new Date('2026-06-30T12:00:00.000Z');
+  await db.insert(assignmentGradeConfig).values({
+    assignmentId: assignment.id,
+    releaseStatus: 'published',
+    activeReleaseVersion: 1,
+    publishedAt: releasedAt,
+  });
+
+  const snapshots = await db
+    .insert(gradeReleaseSnapshots)
+    .values([
+      {
+        assignmentId: assignment.id,
+        studentId: studentUser.id,
+        releaseVersion: 1,
+        numericScore: '93.75',
+        letterGrade: 'A',
+        status: 'complete',
+        contributingCheckpoints: [],
+        publishedAt: releasedAt,
+      },
+      ...(student2User
+        ? [
+            {
+              assignmentId: assignment.id,
+              studentId: student2User.id,
+              releaseVersion: 1,
+              numericScore: '88.00',
+              letterGrade: 'B',
+              status: 'complete' as const,
+              contributingCheckpoints: [],
+              publishedAt: releasedAt,
+            },
+          ]
+        : []),
+    ])
+    .returning({ id: gradeReleaseSnapshots.id, studentId: gradeReleaseSnapshots.studentId });
+
+  await db.insert(finalGrades).values([
+    {
+      assignmentId: assignment.id,
+      studentId: studentUser.id,
+      numericScore: '93.75',
+      letterGrade: 'A',
+      status: 'complete',
+      contributingCheckpoints: [],
+      computedAt: releasedAt,
+      updatedAt: releasedAt,
+    },
+    ...(student2User
+      ? [
+          {
+            assignmentId: assignment.id,
+            studentId: student2User.id,
+            numericScore: '88.00',
+            letterGrade: 'B',
+            status: 'complete' as const,
+            contributingCheckpoints: [],
+            computedAt: releasedAt,
+            updatedAt: releasedAt,
+          },
+        ]
+      : []),
+  ]);
+
+  await db.insert(academicRecords).values(
+    snapshots.map((snapshot) => ({
+      studentId: snapshot.studentId,
+      courseId: course.id,
+      courseSectionId: section.id,
+      termId: term.id,
+      sourceAssignmentId: assignment.id,
+      sourceSnapshotId: snapshot.id,
+      sourceReleaseVersion: 1,
+      policyVersion: policy.version,
+      recordVersion: 1,
+      numericScore: snapshot.studentId === studentUser.id ? '93.75' : '88.00',
+      letterGrade: snapshot.studentId === studentUser.id ? 'A' : 'B',
+      status: 'complete' as const,
+      credits: '3.00',
+      gradePoints: snapshot.studentId === studentUser.id ? '4.00' : '3.00',
+      publishedAt: releasedAt,
+      createdAt: releasedAt,
+    })),
+  );
+  console.log('[E2E Seed] Published academic records created.');
 
   // --- Create per-student checkpoints ---
   for (const cp of E2E_TEMPLATE_CHECKPOINTS) {

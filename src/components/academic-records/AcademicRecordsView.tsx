@@ -109,7 +109,7 @@ function RecordCard({ record, showMetadata }: { record: AcademicRecord; showMeta
           <p className="font-mono text-xs font-semibold tracking-wide text-primary">
             {record.courseCode}
           </p>
-          <h3 className="font-medium text-foreground">{record.courseName}</h3>
+          <h2 className="font-medium text-foreground">{record.courseName}</h2>
           <p className="text-sm text-muted-foreground">
             {record.termName} · {t('academicRecords.section')} {record.sectionCode}
           </p>
