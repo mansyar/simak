@@ -157,7 +157,7 @@
   - **Automated evidence:** 82 focused appointment/UI tests passed; real PostgreSQL integration coverage passed 4/4; consultation regression coverage passed 55/55; typecheck, targeted lint, and diff checks passed. Task 3.4 commit: `53c1b577`.
   - **Manual verification:** User explicitly confirmed the publish → book → reschedule → cancel → complete → explicit consultation record → verify flow and that verified counts/gating remain unchanged until consultation verification.
   - **Verification note:** Phase 3 checkpoint accepted on 2026-08-08; appointment outcomes remain separate from consultation evidence, verification, and gating.
-  - **Checkpoint commit:** Pending.
+  - **Checkpoint commit:** `9519720c`.
 
 ## Phase 4: Notifications and reminders
 
@@ -169,13 +169,13 @@
   - **RED evidence:** `pnpm vitest run tests/unit/lib/appointment-notification-locales.test.ts` failed all 3 tests because appointment lifecycle/reminder notification keys and email subject keys were absent from both locale files.
   - **GREEN evidence:** Locale, appointment notification, and email-queue schema suites passed 12/12; `pnpm check:i18n`, `pnpm typecheck`, targeted `oxlint`, and `git diff --check` passed.
   - **Implementation notes:** Added seven lifecycle/reminder notification event pairs and six email subject keys to both locale sources, regenerated `src/i18n/types.ts`, and extended the existing text-backed email template/type unions. No database migration was required because `email_queue.template_type` is a typed text column rather than a PostgreSQL enum.
-  - **Implementation commit:** Pending.
+  - **Implementation commit:** `b4e2f9bf`.
 
-- [ ] **Task 4.2: Booking/lifecycle notification delivery (RED → GREEN)**
-  - [ ] Write tests for booking, cancellation, rescheduling, completion/no-show notifications and preference suppression.
-  - [ ] Confirm RED behavior.
-  - [ ] Implement post-commit in-app notification creation and email queue enqueueing.
-  - [ ] Ensure notification/email failure cannot roll back a committed appointment mutation.
+- [~] **Task 4.2: Booking/lifecycle notification delivery (RED → GREEN)**
+  - [~] Write tests for booking, cancellation, rescheduling, completion/no-show notifications and preference suppression.
+  - [~] Confirm RED behavior.
+  - [~] Implement post-commit in-app notification creation and email queue enqueueing.
+  - [~] Ensure notification/email failure cannot roll back a committed appointment mutation.
 
 - [ ] **Task 4.3: 24-hour and 1-hour reminder scanner (RED → GREEN)**
   - [ ] Write tests for both reminder windows, UTC comparisons, timezone-independent trigger behavior, repeated scans, boundary times, cancelled appointments, and completed/no-show appointments.
