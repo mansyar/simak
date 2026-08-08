@@ -222,10 +222,13 @@
   - **Implementation notes:** Extended the existing optional event end-time contract and emits UTC `DTEND` only for appointment events, preserving CRLF formatting, RFC 5545 escaping/folding, stable UIDs, and all existing route cache/content-type/rate-limit/credential behavior.
   - **Implementation commit:** `d7280db1`.
 
-- [~] **Task 5.3: Calendar route regression/security coverage**
-  - [~] Extend route tests for valid/invalid/revoked credentials, generic unauthorized responses, no enumeration, and mixed deadline/appointment feeds.
-  - [ ] Confirm the regression tests pass without weakening existing feed security.
-  - [ ] Run the focused calendar suite and relevant integration tests.
+- [x] **Task 5.3: Calendar route regression/security coverage**
+  - [x] Extend route tests for valid/invalid/revoked credentials, generic unauthorized responses, no enumeration, and mixed deadline/appointment feeds.
+  - [x] Confirm the regression tests pass without weakening existing feed security.
+  - [x] Run the focused calendar suite and relevant integration tests.
+  - **GREEN evidence:** Calendar selector, route-security, and serializer suites passed 17/17; the real-PostgreSQL calendar feed lifecycle integration test passed 1/1. Scoped V8 coverage across the route, selector, and serializer passed at 94.59% statements, 89.58% branches, 94.11% functions, and 94.28% lines. `pnpm typecheck`, targeted `oxlint`, and `git diff --check` passed.
+  - **Implementation notes:** Added a mixed deadline/appointment route regression while retaining the existing missing/malformed/revoked/inactive credential generic response cases, bearer/query token paths, student ownership rate-limit key, private no-store headers, and token non-disclosure. No route security behavior was weakened or changed.
+  - **Implementation commit:** Pending (test/regression evidence only).
 
 - [ ] **Phase 5 Verification & Checkpoint**
   - [ ] Run calendar selector/serializer/route tests, typecheck, and lint.
