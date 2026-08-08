@@ -199,6 +199,12 @@ export function AcademicRecordsView({
   onPageChange,
 }: AcademicRecordsViewProps) {
   const { t } = useI18n();
+  const subtitle =
+    role === 'student'
+      ? t('academicRecords.subtitle.student')
+      : role === 'instructor'
+        ? t('academicRecords.subtitle.instructor')
+        : t('academicRecords.subtitle.admin');
 
   if (isServerError(data)) {
     return (
@@ -222,9 +228,7 @@ export function AcademicRecordsView({
           <h1 id="academic-records-title" className="mt-2 text-3xl font-semibold tracking-tight">
             {t('academicRecords.title')}
           </h1>
-          <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-            {t(`academicRecords.subtitle.${role}` as never)}
-          </p>
+          <p className="mt-2 max-w-2xl text-sm text-muted-foreground">{subtitle}</p>
         </div>
         {terms.length > 0 && onTermChange && (
           <label className="grid gap-1 text-sm font-medium">
