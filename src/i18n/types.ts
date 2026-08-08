@@ -1224,6 +1224,34 @@ export type Translation = {
         title: string
         message: string
       }
+      appointment_booked: {
+        title: string
+        message: string
+      }
+      appointment_cancelled: {
+        title: string
+        message: string
+      }
+      appointment_rescheduled: {
+        title: string
+        message: string
+      }
+      appointment_completed: {
+        title: string
+        message: string
+      }
+      appointment_no_show: {
+        title: string
+        message: string
+      }
+      appointment_reminder_24h: {
+        title: string
+        message: string
+      }
+      appointment_reminder_1h: {
+        title: string
+        message: string
+      }
     }
   }
   emails: {
@@ -1244,6 +1272,12 @@ export type Translation = {
       discussionReply: string
       twoFactorEnabled: string
       twoFactorDisabled: string
+      appointmentBooked: string
+      appointmentCancelled: string
+      appointmentRescheduled: string
+      appointmentCompleted: string
+      appointmentNoShow: string
+      appointmentReminder: string
     }
   }
   errors: {

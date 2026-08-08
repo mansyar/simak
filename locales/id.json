@@ -1218,6 +1218,34 @@
       "discussion_reply": {
         "title": "Balasan Diskusi Baru",
         "message": "{authorName} membalas di checkpoint \"{checkpointName}\" ({assignmentTitle}): \"{messagePreview}\""
+      },
+      "appointment_booked": {
+        "title": "Janji Temu Dipesan",
+        "message": "Janji temu #{appointmentId} untuk tugas #{assignmentId} telah dipesan pada {startAt}–{endAt}."
+      },
+      "appointment_cancelled": {
+        "title": "Janji Temu Dibatalkan",
+        "message": "Janji temu #{appointmentId} untuk tugas #{assignmentId} telah dibatalkan."
+      },
+      "appointment_rescheduled": {
+        "title": "Jadwal Janji Temu Diubah",
+        "message": "Janji temu #{appointmentId} untuk tugas #{assignmentId} dijadwalkan pada {startAt}–{endAt}."
+      },
+      "appointment_completed": {
+        "title": "Janji Temu Selesai",
+        "message": "Janji temu #{appointmentId} untuk tugas #{assignmentId} telah diselesaikan."
+      },
+      "appointment_no_show": {
+        "title": "Janji Temu Ditandai Tidak Hadir",
+        "message": "Janji temu #{appointmentId} untuk tugas #{assignmentId} ditandai tidak hadir."
+      },
+      "appointment_reminder_24h": {
+        "title": "Pengingat Janji Temu",
+        "message": "Pengingat: janji temu #{appointmentId} untuk tugas #{assignmentId} dimulai pada {startAt}."
+      },
+      "appointment_reminder_1h": {
+        "title": "Pengingat Janji Temu",
+        "message": "Pengingat: janji temu #{appointmentId} untuk tugas #{assignmentId} dimulai pada {startAt}."
       }
     }
   },
@@ -1238,7 +1266,13 @@
       "studentAtRisk": "Mahasiswa Berisiko — {assignmentTitle}",
       "discussionReply": "Balasan Diskusi Baru — {assignmentTitle}",
       "twoFactorEnabled": "Autentikasi Dua Faktor Diaktifkan",
-      "twoFactorDisabled": "Autentikasi Dua Faktor Dinonaktifkan"
+      "twoFactorDisabled": "Autentikasi Dua Faktor Dinonaktifkan",
+      "appointmentBooked": "Janji Temu Dipesan — Tugas {assignmentId}",
+      "appointmentCancelled": "Janji Temu Dibatalkan — Tugas {assignmentId}",
+      "appointmentRescheduled": "Jadwal Janji Temu Diubah — Tugas {assignmentId}",
+      "appointmentCompleted": "Janji Temu Selesai — Tugas {assignmentId}",
+      "appointmentNoShow": "Janji Temu Tidak Hadir — Tugas {assignmentId}",
+      "appointmentReminder": "Pengingat Janji Temu — Tugas {assignmentId}"
     }
   },
   "errors": {

@@ -43,7 +43,7 @@ describe('EmailQueue schema', () => {
     expect(statusEnum).toEqual(expect.arrayContaining(['pending', 'processing', 'sent', 'failed']));
   });
 
-  it('should accept all template_type values including discussion_reply', async () => {
+  it('should accept all template_type values including appointment events', async () => {
     const { emailQueue } = await import('@/db/schema/email-queue');
     const templateTypeEnum = (emailQueue.templateType as any).enumValues as string[];
     expect(templateTypeEnum).toEqual(
@@ -68,8 +68,16 @@ describe('EmailQueue schema', () => {
         'student_at_risk',
         // Discussion reply (TRACK-026)
         'discussion_reply',
+        // Appointment lifecycle and reminders (TRACK-058)
+        'appointment_booked',
+        'appointment_cancelled',
+        'appointment_rescheduled',
+        'appointment_completed',
+        'appointment_no_show',
+        'appointment_reminder_24h',
+        'appointment_reminder_1h',
       ]),
     );
-    expect(templateTypeEnum).toHaveLength(15);
+    expect(templateTypeEnum).toHaveLength(22);
   });
 });

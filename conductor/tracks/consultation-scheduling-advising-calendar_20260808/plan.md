@@ -161,11 +161,15 @@
 
 ## Phase 4: Notifications and reminders
 
-- [~] **Task 4.1: Add bilingual appointment notification contracts (RED → GREEN)**
-  - [~] Write tests for notification keys, English/Indonesian parity, participant targeting, and privacy-safe content.
-  - [~] Confirm RED behavior.
-  - [ ] Add locale source keys and notification template/type mappings; regenerate i18n types.
-  - [ ] Verify `pnpm check:i18n`.
+- [x] **Task 4.1: Add bilingual appointment notification contracts (RED → GREEN)**
+  - [x] Write tests for notification keys, English/Indonesian parity, participant targeting, and privacy-safe content.
+  - [x] Confirm RED behavior.
+  - [x] Add locale source keys and notification template/type mappings; regenerate i18n types.
+  - [x] Verify `pnpm check:i18n`.
+  - **RED evidence:** `pnpm vitest run tests/unit/lib/appointment-notification-locales.test.ts` failed all 3 tests because appointment lifecycle/reminder notification keys and email subject keys were absent from both locale files.
+  - **GREEN evidence:** Locale, appointment notification, and email-queue schema suites passed 12/12; `pnpm check:i18n`, `pnpm typecheck`, targeted `oxlint`, and `git diff --check` passed.
+  - **Implementation notes:** Added seven lifecycle/reminder notification event pairs and six email subject keys to both locale sources, regenerated `src/i18n/types.ts`, and extended the existing text-backed email template/type unions. No database migration was required because `email_queue.template_type` is a typed text column rather than a PostgreSQL enum.
+  - **Implementation commit:** Pending.
 
 - [ ] **Task 4.2: Booking/lifecycle notification delivery (RED → GREEN)**
   - [ ] Write tests for booking, cancellation, rescheduling, completion/no-show notifications and preference suppression.
