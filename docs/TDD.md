@@ -1055,6 +1055,44 @@ Unique constraint on `(assignmentId, studentId)`. Indexes on `assignmentId` and 
 
 Unique constraint on `(assignmentId, releaseVersion, studentId)`. Indexes support assignment/version and student lookups. Publication inserts snapshots only for enrolled students with complete, non-null `final_grades`; recomputation cannot mutate existing rows. Withdrawal retains all snapshots, keeps the latest version for the next release, and clears only active publication visibility.
 
+#### academic_record_policies (TRACK-060: Academic Records — Transcript & GPA)
+
+| Column          | Type                         | Notes                                                                 |
+| --------------- | ---------------------------- | --------------------------------------------------------------------- |
+| id              | serial (PK)                  |                                                                       |
+| version         | integer, not null, unique    | Append-only policy version referenced by immutable academic records   |
+| effectiveTermId | integer (FK → academic_terms) | First term for which the policy is eligible                          |
+| gradePoints     | jsonb, not null              | Letter-to-point mapping; defaults to A=4, B=3, C=2, D=1, F=0         |
+| roundingScale   | integer, not null            | GPA decimal scale, constrained to 0–4; default 2                    |
+| isActive        | boolean, not null            | Policy selection flag; latest eligible active policy is used          |
+| createdAt       | timestamp, not null          | DEFAULT NOW()                                                         |
+
+Policies are versioned rather than edited in place. The server validates positive finite points, explicit mappings, and supported rounding scales before selecting the latest active policy effective no later than a section's term.
+
+#### academic_records (TRACK-060: Academic Records — Transcript & GPA)
+
+| Column                | Type                                  | Notes                                                                  |
+| --------------------- | ------------------------------------- | ---------------------------------------------------------------------- |
+| id                    | serial (PK)                           |                                                                        |
+| studentId             | text (FK → users), not null           | Student whose official record is represented                           |
+| courseId              | integer (FK → courses), not null      | Reusable course; `courses.credits` is positive and required           |
+| courseSectionId       | integer (FK → course_sections), not null | Term-specific section                                               |
+| termId               | integer (FK → academic_terms), not null | Academic term                                                       |
+| sourceAssignmentId    | integer (FK → assignments), not null  | Explicit transcript-source assignment                                  |
+| sourceSnapshotId      | integer (FK → grade_release_snapshots), nullable | Null for explicit withdrawal/incomplete outcomes              |
+| sourceReleaseVersion  | integer, nullable                     | Release version captured from the source assignment                    |
+| policyVersion         | integer (FK → academic_record_policies.version), not null | Applied policy |
+| recordVersion         | integer, not null                     | Immutable version for a student/section                                 |
+| numericScore          | numeric(5,2), nullable                | Released score; null for non-complete outcomes                          |
+| letterGrade           | text, nullable                        | Released letter; null for non-complete outcomes                         |
+| status                | academic_record_status, not null      | `complete` \| `incomplete` \| `withdrawn`                          |
+| credits               | numeric(5,2), not null                | Positive course credits captured at record creation                    |
+| gradePoints           | numeric(4,2), nullable                | Immutable mapped points; null when excluded from GPA                    |
+| publishedAt           | timestamp, nullable                   | Source publication timestamp                                            |
+| createdAt             | timestamp, not null                   | DEFAULT NOW(); no `updatedAt` by design                                |
+
+Unique constraint on `(studentId, courseSectionId, recordVersion)`. Indexes support student/term, section/student, source release, and policy lookups. A later release inserts a new record version; active reads select the newest version without mutating prior rows. Student reads are self-scoped, instructors require active enrollment in the section, and admins may view provenance metadata.
+
 ### Database Indexes
 
 | Table                | Column(s)                | Type             | Purpose                                      |
@@ -1104,7 +1142,7 @@ Unique constraint on `(assignmentId, releaseVersion, studentId)`. Indexes suppor
 | `checkpoint_discussions` | `assignmentId`, `createdAt` | composite b-tree | Instructor overview across all checkpoints (TRACK-026) |
 | `checkpoint_discussions` | `parentMessageId`       | b-tree           | Reply threading lookup (TRACK-026)            |
 
-Migrations `0024_powerful_clint_barton.sql` through `0027_daily_synch.sql` (TRACK-058) add the UTC appointment table and lifecycle enum, durable reminder tier storage, retryable `claimed_at`/nullable `sent_at` reminder claims, and the appointment status/student consistency check. Each migration has a companion rollback; the full sequence was forward-applied, inspected, rolled back, and re-applied against the disposable PostgreSQL test database.
+Migrations `0024_powerful_clint_barton.sql` through `0027_daily_synch.sql` (TRACK-058) add the UTC appointment table and lifecycle enum, durable reminder tier storage, retryable `claimed_at`/nullable `sent_at` reminder claims, and the appointment status/student consistency check. Migration `0028_flowery_cyclops.sql` (TRACK-060) adds positive course credits, the per-section transcript-source designation, versioned academic-record policies, immutable academic records, and their enum/foreign-key/index/check constraints. Its preflight aborts when existing courses would require fabricated credits; apply it only after credits are populated or in a clean prelaunch database. Each migration has a companion rollback; the full sequence was forward-applied and verified against the disposable E2E PostgreSQL database.
 
 All indexes use Drizzle's `index()` or `uniqueIndex()` API. Migrations generated with `drizzle-kit generate`. Migration `0008_deep_santa_claus.sql` (TRACK-005) added 7 new indexes and replaced 2 low-cardinality single-column indexes with composites. Migration `0009_familiar_hydra.sql` (TRACK-016) added the `resend_message_id` column to `email_queue`. Migrations `0010`–`0012` (TRACK-020) added rubric tables (`rubric_criteria`, `rubric_levels`, `review_scores`), `grading_type` pgEnum, `checkpoints.templateCheckpointId` FK + backfill, `template_checkpoints.deletedAt`, and the two rubric-related indexes. Migration `0014_sour_nightshade.sql` (TRACK-026) added the `checkpoint_discussions` table with 3 indexes. Migration `0016` (TRACK-039) added the `cleanedUpAt` timestamp column to `upload_intents`. Migration `0019_daffy_bulldozer.sql` (TRACK-051) added release state, immutable snapshots, indexes, and foreign keys; migration `0020_white_spacker_dave.sql` (TRACK-055) added the calendar feed token; migration `0021_round_mysterio.sql` (TRACK-054) added revision action items and its two composite indexes; migration `0022_search_trigram_indexes.sql` (TRACK-056) enables `pg_trgm` and adds ten GIN trigram indexes for contains-search fields, including the `CAST(details AS text)` audit expression; migration `0023_sloppy_anthem.sql` (TRACK-057) adds academic terms/courses/sections/enrollments and assignment context/mode/status, with a preflight that aborts when existing assignment rows would require fabricated context. The `0023` rollback removes those objects in reverse dependency order. Its prelaunch refusal is intentional; development and E2E reset/seed flows recreate deterministic context instead of inventing legacy facts. Companion rollbacks are kept in `drizzle/migrations/rollback/`. Each migration has a companion rollback file at `drizzle/migrations/rollback/<NNNN>_<tag>.rollback.sql`.
 

@@ -626,4 +626,10 @@ Students and instructors lack a centralized system to:
 - **Review picker** — Active snippets are searchable in the instructor review form and require explicit insertion; insertion preserves editability/focus, adds exactly one blank-line separator when needed, and leaves decisions, rubric scores, uploads, submissions, and historical comments unchanged
 - **Access and test coverage** — Instructor-only route guard, cross-instructor isolation, deterministic E2E fixtures, Playwright management/ownership/role-access/review-insertion coverage, 3,985 unit tests, 12/12 focused E2E tests across Chromium/Firefox/mobile Chromium, and coverage thresholds above 80%; the repository-wide Playwright run exceeded the environment timeout without an aggregate result
 
+### TRACK-060: Academic Records — Transcript & GPA
+
+Implemented the release-derived academic-record foundation. Courses now carry validated credits, sections can designate one transcript-source assignment, and migration 0028 adds versioned term-effective grading policies plus immutable academic records tied to their source release and policy version. The policy engine supports configurable grade-point mappings, half-up GPA rounding, repeat-attempt selection, and explicit complete/incomplete/withdrawn handling.
+
+Added transactional publication and authorized-withdrawal persistence, role-scoped student/instructor/admin server functions, and bilingual responsive routes at `/student/academic-records`, `/instructor/academic-records`, and `/admin/academic-records`. The UI includes term filtering, pagination, GPA summaries, provenance metadata for admins, status/exclusion states, and accessible loading/error/empty states. Deterministic Chromium and mobile E2E coverage verifies the student flow, admin provenance, instructor section authorization, and accessibility. Full unit/integration coverage and i18n/typecheck/format/lint gates pass against migrated disposable PostgreSQL; the default local integration database must be migrated before use.
+
 </protect>

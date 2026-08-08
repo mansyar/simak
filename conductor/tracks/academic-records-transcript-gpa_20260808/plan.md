@@ -104,19 +104,19 @@
 
 ## Phase 5: End-to-End Verification and Handoff
 
-- [~] Task: Write and run end-to-end academic-record scenarios
-  - [ ] Verify publish-to-transcript flow for a complete eligible student.
-  - [ ] Verify draft, unpublished, incomplete, withdrawn, and repeat-course behavior.
-  - [ ] Verify student, instructor, and admin authorization boundaries.
-  - [ ] Verify mobile and accessibility behavior for the primary student flow.
-- [ ] Task: Run project quality gates
-  - [ ] Run `pnpm test` and targeted integration tests where applicable.
-  - [ ] Run `pnpm test:coverage` and confirm required thresholds.
-  - [ ] Run `pnpm typecheck`.
-  - [ ] Run `pnpm lint` and `pnpm format`.
-  - [ ] Run `pnpm check:i18n` and confirm no unused or missing keys.
-- [ ] Task: Update project documentation
-  - [ ] Update the roadmap/product completion references after implementation is complete.
-  - [ ] Document any approved deviation in `tech-stack.md` before implementation resumes.
-  - [ ] Record migration, authorization, and transcript-source operational notes.
-- [ ] Task: Phase Verification & Checkpoint (Refer to `conductor/workflow.md`)
+- [x] Task: Write and run end-to-end academic-record scenarios [c539316]
+  - [x] Verify publish-to-transcript flow for a complete eligible student.
+  - [x] Verify draft, unpublished, incomplete, withdrawn, and repeat-course behavior through the release, persistence, policy, and UI regression suites.
+  - [x] Verify student, instructor, and admin authorization boundaries.
+  - [x] Verify mobile and accessibility behavior for the primary student flow.
+- [x] Task: Run project quality gates [2768999]
+  - [x] Run `pnpm test` and targeted integration tests where applicable. Unit tests passed 470 files/4,602 tests; integration tests passed 16 files/44 tests against the migrated disposable PostgreSQL database.
+  - [x] Run `pnpm test:coverage` and confirm required thresholds.
+  - [x] Run `pnpm typecheck`.
+  - [x] Run `pnpm lint` and `pnpm format`.
+  - [x] Run `pnpm check:i18n` and confirm no unused or missing keys.
+- [x] Task: Update project documentation
+  - [x] Update the roadmap/product completion references after implementation is complete.
+  - [x] Confirm no approved tech-stack deviation requires a `tech-stack.md` update.
+  - [x] Record migration, authorization, and transcript-source operational notes.
+- [~] Task: Phase Verification & Checkpoint (Refer to `conductor/workflow.md`)
