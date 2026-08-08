@@ -222,8 +222,8 @@
   - **Implementation notes:** Extended the existing optional event end-time contract and emits UTC `DTEND` only for appointment events, preserving CRLF formatting, RFC 5545 escaping/folding, stable UIDs, and all existing route cache/content-type/rate-limit/credential behavior.
   - **Implementation commit:** `d7280db1`.
 
-- [ ] **Task 5.3: Calendar route regression/security coverage**
-  - [ ] Extend route tests for valid/invalid/revoked credentials, generic unauthorized responses, no enumeration, and mixed deadline/appointment feeds.
+- [~] **Task 5.3: Calendar route regression/security coverage**
+  - [~] Extend route tests for valid/invalid/revoked credentials, generic unauthorized responses, no enumeration, and mixed deadline/appointment feeds.
   - [ ] Confirm the regression tests pass without weakening existing feed security.
   - [ ] Run the focused calendar suite and relevant integration tests.
 
