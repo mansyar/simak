@@ -228,7 +228,7 @@
   - [x] Run the focused calendar suite and relevant integration tests.
   - **GREEN evidence:** Calendar selector, route-security, and serializer suites passed 17/17; the real-PostgreSQL calendar feed lifecycle integration test passed 1/1. Scoped V8 coverage across the route, selector, and serializer passed at 94.59% statements, 89.58% branches, 94.11% functions, and 94.28% lines. `pnpm typecheck`, targeted `oxlint`, and `git diff --check` passed.
   - **Implementation notes:** Added a mixed deadline/appointment route regression while retaining the existing missing/malformed/revoked/inactive credential generic response cases, bearer/query token paths, student ownership rate-limit key, private no-store headers, and token non-disclosure. No route security behavior was weakened or changed.
-  - **Implementation commit:** Pending (test/regression evidence only).
+  - **Implementation commit:** `af33fc73` (test/regression evidence only).
 
 - [ ] **Phase 5 Verification & Checkpoint**
   - [ ] Run calendar selector/serializer/route tests, typecheck, and lint.
