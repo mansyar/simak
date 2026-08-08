@@ -59,17 +59,19 @@ export function parseAcademicRecordPolicy(input: unknown): AcademicRecordPolicy 
     }
   }
 
+  const roundingScale = candidate.roundingScale;
   if (
-    !Number.isInteger(candidate.roundingScale) ||
-    candidate.roundingScale < 0 ||
-    candidate.roundingScale > MAX_ROUNDING_SCALE
+    typeof roundingScale !== 'number' ||
+    !Number.isInteger(roundingScale) ||
+    roundingScale < 0 ||
+    roundingScale > MAX_ROUNDING_SCALE
   ) {
     throw new Error('Academic-record policy has an invalid rounding scale');
   }
 
   return {
     gradePoints: { ...gradePoints },
-    roundingScale: candidate.roundingScale,
+    roundingScale,
   };
 }
 
