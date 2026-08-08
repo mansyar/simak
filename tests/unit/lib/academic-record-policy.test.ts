@@ -102,6 +102,15 @@ describe('academic-record policy', () => {
   });
 
   describe('calculateTermGpa', () => {
+    it('uses the immutable stored grade points for released records', () => {
+      const result = calculateTermGpa([record({ gradePoints: 3.5 })], 1, policy);
+
+      expect(result).toMatchObject({
+        gpa: 3.5,
+        totalQualityPoints: 10.5,
+      });
+    });
+
     it('calculates a rounded credit-weighted term GPA', () => {
       const result = calculateTermGpa(
         [

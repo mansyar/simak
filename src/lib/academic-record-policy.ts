@@ -14,6 +14,7 @@ export type AcademicRecord = {
   status: AcademicRecordStatus;
   letterGrade: string | null;
   credits: number;
+  gradePoints?: number | null;
 };
 
 export type GpaCalculation = {
@@ -121,12 +122,15 @@ function calculateGpa(records: AcademicRecord[], policy: AcademicRecordPolicy): 
       throw new Error(`Academic record ${record.id} has invalid course credits`);
     }
 
-    if (!record.letterGrade || !Object.hasOwn(policy.gradePoints, record.letterGrade)) {
+    const gradePoints =
+      record.gradePoints ??
+      (record.letterGrade ? policy.gradePoints[record.letterGrade] : undefined);
+    if (gradePoints === undefined || !Number.isFinite(gradePoints)) {
       throw new Error(`Academic record ${record.id} has an unmapped letter grade`);
     }
 
     totalCredits += record.credits;
-    totalQualityPoints += record.credits * policy.gradePoints[record.letterGrade];
+    totalQualityPoints += record.credits * gradePoints;
   }
 
   return {
