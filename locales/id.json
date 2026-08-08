@@ -523,6 +523,8 @@
       "endsOn": "Berakhir pada",
       "courseCode": "Kode mata kuliah",
       "courseName": "Nama mata kuliah",
+      "courseCredits": "SKS mata kuliah",
+      "creditsUnit": "SKS",
       "sectionTerm": "ID semester",
       "sectionCourse": "ID mata kuliah",
       "sectionCode": "Kode kelas",

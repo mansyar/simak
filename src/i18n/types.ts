@@ -528,6 +528,8 @@ export type Translation = {
       endsOn: string
       courseCode: string
       courseName: string
+      courseCredits: string
+      creditsUnit: string
       sectionTerm: string
       sectionCourse: string
       sectionCode: string

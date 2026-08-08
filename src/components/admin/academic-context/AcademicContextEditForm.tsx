@@ -23,7 +23,12 @@ interface AcademicContextEditFormProps {
     endDate: string;
     status: AcademicTermRow['status'];
   }) => void | Promise<void>;
-  onUpdateCourse: (input: { id: number; code: string; name: string }) => void | Promise<void>;
+  onUpdateCourse: (input: {
+    id: number;
+    code: string;
+    name: string;
+    credits: number;
+  }) => void | Promise<void>;
   onUpdateSection: (input: {
     id: number;
     termId: number;
@@ -66,7 +71,12 @@ export function AcademicContextEditForm({
         status: value('status') as AcademicTermRow['status'],
       });
     } else if (target.type === 'course') {
-      await onUpdateCourse({ id: target.row.id, code: value('code'), name: value('name') });
+      await onUpdateCourse({
+        id: target.row.id,
+        code: value('code'),
+        name: value('name'),
+        credits: Number(value('credits')),
+      });
     } else if (target.type === 'section') {
       await onUpdateSection({
         id: target.row.id,
@@ -133,6 +143,12 @@ export function AcademicContextEditForm({
             name="name"
             label={t('adminAcademicContext.forms.courseName')}
             value={target.row.name}
+          />
+          <InputField
+            name="credits"
+            label={t('adminAcademicContext.forms.courseCredits')}
+            type="number"
+            value={target.row.credits}
           />
         </>
       )}

@@ -23,6 +23,7 @@ export interface CourseRow {
   id: number;
   code: string;
   name: string;
+  credits: string;
   status?: string;
 }
 
@@ -62,7 +63,7 @@ interface AcademicContextPageProps {
     startDate: string;
     endDate: string;
   }) => void | Promise<void>;
-  onCreateCourse?: (input: { code: string; name: string }) => void | Promise<void>;
+  onCreateCourse?: (input: { code: string; name: string; credits: number }) => void | Promise<void>;
   onCreateSection?: (input: {
     termId: number;
     courseId: number;
@@ -82,7 +83,12 @@ interface AcademicContextPageProps {
     endDate: string;
     status: TermStatus;
   }) => void | Promise<void>;
-  onUpdateCourse?: (input: { id: number; code: string; name: string }) => void | Promise<void>;
+  onUpdateCourse?: (input: {
+    id: number;
+    code: string;
+    name: string;
+    credits: number;
+  }) => void | Promise<void>;
   onUpdateSection?: (input: {
     id: number;
     termId: number;
@@ -161,7 +167,11 @@ export function AcademicContextPage({
         endDate: value('endDate'),
       });
     } else if (kind === 'course') {
-      void onCreateCourse?.({ code: value('code'), name: value('name') });
+      void onCreateCourse?.({
+        code: value('code'),
+        name: value('name'),
+        credits: Number(value('credits')),
+      });
     } else if (kind === 'section') {
       void onCreateSection?.({
         termId: Number(value('termId')),
@@ -266,6 +276,12 @@ export function AcademicContextPage({
                 <>
                   <Field name="code" label={t('adminAcademicContext.forms.courseCode')} required />
                   <Field name="name" label={t('adminAcademicContext.forms.courseName')} required />
+                  <Field
+                    name="credits"
+                    label={t('adminAcademicContext.forms.courseCredits')}
+                    type="number"
+                    required
+                  />
                 </>
               )}
               {openForm === 'section' && (
@@ -376,6 +392,10 @@ export function AcademicContextPage({
                   <span>{course.code}</span>
                   <span aria-hidden="true"> · </span>
                   <span>{course.name}</span>
+                  <span aria-hidden="true"> · </span>
+                  <span>
+                    {course.credits} {t('adminAcademicContext.forms.creditsUnit')}
+                  </span>
                 </>
               }
               onEdit={() => setEditTarget({ type: 'course', row: course })}

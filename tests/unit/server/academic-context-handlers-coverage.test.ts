@@ -109,7 +109,7 @@ const termInput = {
   status: 'draft',
 } as any;
 
-const courseInput = { code: 'IF101', name: 'Algorithms', description: 'Intro' } as any;
+const courseInput = { code: 'IF101', name: 'Algorithms', description: 'Intro', credits: 3 } as any;
 const sectionInput = {
   termId: 1,
   courseId: 2,

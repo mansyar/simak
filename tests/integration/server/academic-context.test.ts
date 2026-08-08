@@ -73,7 +73,7 @@ describe('academic context administration integration', () => {
     if ('error' in termResult) return;
 
     const courseResult = await createCourseHandler({
-      data: { code: `IF-${suffix}`, name: 'Integration Algorithms', description: null },
+      data: { code: `IF-${suffix}`, name: 'Integration Algorithms', description: null, credits: 3 },
     });
     expect(courseResult).toMatchObject({ course: { code: `IF-${suffix}` } });
     if ('error' in courseResult) return;
@@ -119,7 +119,7 @@ describe('academic context administration integration', () => {
     });
     if ('error' in termResult) return;
     const courseResult = await createCourseHandler({
-      data: { code: `IF-${suffix}`, name: 'Integration Algorithms', description: null },
+      data: { code: `IF-${suffix}`, name: 'Integration Algorithms', description: null, credits: 3 },
     });
     if ('error' in courseResult) return;
     const sectionResult = await createCourseSectionHandler({

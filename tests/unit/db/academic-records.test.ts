@@ -96,7 +96,7 @@ describe('academic records schema', () => {
     expect(assignments.isTranscriptSource.hasDefault).toBe(true);
 
     const sourceIndex = indexByName(assignments, 'assignments_section_transcript_source_idx');
-    expect(sourceIndex?.config.isUnique).toBe(true);
+    expect((sourceIndex?.config as any).unique).toBe(true);
     expect(sourceIndex?.config.columns.map((column: any) => column.name)).toEqual(['section_id']);
     expect((sourceIndex?.config as any).where).toBeDefined();
   });
@@ -182,6 +182,7 @@ describe('academic records migration contract', () => {
 
     const sql = readFileSync(migrationPath!, 'utf8');
     expect(sql).toMatch(/CREATE TYPE\s+"public"\."academic_record_status"/i);
+    expect(sql).toMatch(/TRACK-060 prelaunch migration requires an empty courses table/i);
     expect(sql).toMatch(/ALTER TABLE\s+"courses"\s+ADD COLUMN\s+"credits"/i);
     expect(sql).toMatch(/ALTER TABLE\s+"assignments"\s+ADD COLUMN\s+"is_transcript_source"/i);
     expect(sql).toMatch(/CREATE TABLE\s+"academic_record_policies"/i);

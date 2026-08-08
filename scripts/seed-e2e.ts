@@ -159,7 +159,7 @@ async function seedTemplateAndAssignment(): Promise<void> {
     .returning({ id: academicTerms.id });
   const [course] = await db
     .insert(courses)
-    .values({ code: 'E2E-THESIS', name: 'E2E Thesis Course' })
+    .values({ code: 'E2E-THESIS', name: 'E2E Thesis Course', credits: '3.00' })
     .returning({ id: courses.id });
   const [section] = await db
     .insert(courseSections)

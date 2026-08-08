@@ -21,7 +21,15 @@ const contextData = {
       status: 'active' as const,
     },
   ],
-  courses: [{ id: 2, code: 'CS101', name: 'Foundations of Computing', status: 'active' as const }],
+  courses: [
+    {
+      id: 2,
+      code: 'CS101',
+      name: 'Foundations of Computing',
+      credits: '3.00',
+      status: 'active' as const,
+    },
+  ],
   sections: [
     {
       id: 3,

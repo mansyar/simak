@@ -218,7 +218,9 @@ describe('academic context authorization and failure branches', () => {
     rejectNext(courseDb, { code: '23505' });
     expect(
       code(
-        await updateCourseHandler({ data: { id: 1, code: 'IF101', name: 'Algorithms' } } as any),
+        await updateCourseHandler({
+          data: { id: 1, code: 'IF101', name: 'Algorithms', credits: 3 },
+        } as any),
       ),
     ).toBe('CONFLICT');
 
@@ -238,7 +240,7 @@ describe('academic context authorization and failure branches', () => {
 
     setDb([], [{ id: 1, code: 'IF101', name: 'Algorithms' }]);
     expect(
-      await createCourseHandler({ data: { code: 'IF101', name: 'Algorithms' } } as any),
+      await createCourseHandler({ data: { code: 'IF101', name: 'Algorithms', credits: 3 } } as any),
     ).toMatchObject({ course: { id: 1 } });
   });
 });

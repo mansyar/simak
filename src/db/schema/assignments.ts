@@ -1,5 +1,6 @@
 import {
   pgTable,
+  boolean,
   text,
   timestamp,
   serial,
@@ -7,6 +8,7 @@ import {
   pgEnum,
   index,
   check,
+  uniqueIndex,
 } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
 import { users } from './users';
@@ -42,6 +44,7 @@ export const assignments = pgTable(
     sectionId: integer('section_id')
       .notNull()
       .references(() => courseSections.id),
+    isTranscriptSource: boolean('is_transcript_source').notNull().default(false),
     mode: assignmentMode('mode').notNull().default('individual'),
     status: assignmentStatus('status').notNull().default('draft'),
     createdAt: timestamp('created_at').defaultNow(),
@@ -53,6 +56,9 @@ export const assignments = pgTable(
   (table) => [
     index('assignments_instructor_id_idx').on(table.instructorId),
     index('assignments_section_id_status_idx').on(table.sectionId, table.status),
+    uniqueIndex('assignments_section_transcript_source_idx')
+      .on(table.sectionId)
+      .where(sql`${table.isTranscriptSource} = true`),
     index('assignments_title_trgm_idx').using('gin', table.title.op('gin_trgm_ops')),
     check(
       'assignments_max_extension_days_range',

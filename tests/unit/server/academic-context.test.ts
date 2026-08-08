@@ -115,7 +115,9 @@ describe('academic context schemas', () => {
   });
 
   it('validates course, section, and enrollment inputs', () => {
-    expect(CreateCourseSchema.safeParse({ code: 'IF101', name: 'Algorithms' }).success).toBe(true);
+    expect(
+      CreateCourseSchema.safeParse({ code: 'IF101', name: 'Algorithms', credits: 3 }).success,
+    ).toBe(true);
     expect(
       CreateCourseSectionSchema.safeParse({ termId: '1', courseId: '2', code: 'A' }).success,
     ).toBe(true);

@@ -197,6 +197,13 @@
       "when": 1786181283318,
       "tag": "0027_daily_synch",
       "breakpoints": true
+    },
+    {
+      "idx": 28,
+      "version": "7",
+      "when": 1786194222181,
+      "tag": "0028_flowery_cyclops",
+      "breakpoints": true
     }
   ]
 }

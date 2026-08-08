@@ -31,6 +31,7 @@ export async function createAcademicSectionFixture(
       .values({
         code: `TEST-COURSE-${suffix}`,
         name: `Test Course ${suffix}`,
+        credits: '3.00',
       })
       .returning({ id: courses.id });
 
@@ -44,16 +45,14 @@ export async function createAcademicSectionFixture(
       })
       .returning({ id: courseSections.id });
 
-    await tx
-      .insert(sectionEnrollments)
-      .values([
-        { sectionId: section.id, userId: instructorId, role: 'instructor' },
-        ...studentIds.map((userId) => ({
-          sectionId: section.id,
-          userId,
-          role: 'student' as const,
-        })),
-      ]);
+    await tx.insert(sectionEnrollments).values([
+      { sectionId: section.id, userId: instructorId, role: 'instructor' },
+      ...studentIds.map((userId) => ({
+        sectionId: section.id,
+        userId,
+        role: 'student' as const,
+      })),
+    ]);
 
     return { termId: term.id, courseId: course.id, sectionId: section.id };
   });

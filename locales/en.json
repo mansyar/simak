@@ -523,6 +523,8 @@
       "endsOn": "Ends on",
       "courseCode": "Course code",
       "courseName": "Course name",
+      "courseCredits": "Course credits",
+      "creditsUnit": "credits",
       "sectionTerm": "Term ID",
       "sectionCourse": "Course ID",
       "sectionCode": "Section code",
