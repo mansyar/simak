@@ -6,8 +6,8 @@ SIMAK has academic terms, reusable courses, course sections, section enrollments
 
 This track adds release-derived academic records for students and authorized academic staff. Official records are based only on published grade releases, never mutable working grades or provisional `final_grades`.
 
-**Type:** Feature  
-**Dependencies:** TRACK-057, TRACK-025, TRACK-051  
+**Type:** Feature
+**Dependencies:** TRACK-057, TRACK-025, TRACK-051
 **Downstream consumer:** TRACK-061 Institutional Reporting & Scheduled Delivery
 
 ## Context Anchors
