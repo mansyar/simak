@@ -4,6 +4,7 @@ import { getSessionFromHeaders } from '@/server/auth';
 import { getDb } from '@/db/index';
 import { safeAuditLog } from '@/lib/audit';
 import {
+  cancelAppointmentHandler,
   createAppointmentSlotHandler,
   listInstructorAppointmentsHandler,
 } from '@/server/appointments.server';
@@ -46,10 +47,23 @@ function createMockDb() {
     insert: vi.fn().mockReturnThis(),
     values: vi.fn().mockReturnThis(),
     returning: vi.fn().mockReturnThis(),
+    update: vi.fn().mockReturnThis(),
+    set: vi.fn().mockReturnThis(),
+    for: vi.fn().mockReturnThis(),
+    transaction: vi.fn(),
     then: vi.fn(),
   };
 
   return mockDb;
+}
+
+function queueTransactionResults(mockDb: ReturnType<typeof createMockDb>, results: unknown[]) {
+  const transactionDb = createMockDb();
+  queueResults(transactionDb, results);
+  mockDb.transaction.mockImplementation(async (callback: (tx: unknown) => unknown) =>
+    callback(transactionDb),
+  );
+  return transactionDb;
 }
 
 function queueResults(mockDb: ReturnType<typeof createMockDb>, results: unknown[]) {
@@ -263,6 +277,114 @@ describe('Appointment instructor handlers', () => {
 
       expect(result).toEqual({ error: { code: 'NOT_FOUND', message: 'Assignment not found' } });
       expect(mockDb.leftJoin).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('cancelAppointmentHandler', () => {
+    const availableAppointment = {
+      id: 201,
+      assignmentId: 10,
+      checkpointId: null,
+      instructorId: 'instructor-1',
+      studentId: null,
+      startAt: futureStart,
+      endAt: futureEnd,
+      status: 'available' as const,
+      createdAt: futureStart,
+      updatedAt: futureStart,
+    };
+    const cancelledAppointment = { ...availableAppointment, status: 'cancelled' as const };
+
+    it('cancels an authorized unbooked slot transactionally and audits only safe state changes', async () => {
+      const transactionDb = queueTransactionResults(mockDb, [
+        [availableAppointment],
+        [cancelledAppointment],
+      ]);
+
+      const result = await cancelAppointmentHandler({
+        data: { appointmentId: 201, reason: 'Private consultation notes must not be logged' },
+      });
+
+      expect(result).toEqual({
+        appointment: { ...cancelledAppointment, studentName: null, studentEmail: null },
+      });
+      expect(mockDb.transaction).toHaveBeenCalledTimes(1);
+      expect(transactionDb.update).toHaveBeenCalledTimes(1);
+      expect(safeAuditLog).toHaveBeenCalledWith('appointment.cancelled', {
+        actorId: 'instructor-1',
+        action: 'appointment.cancelled',
+        entityType: 'appointment',
+        entityId: '201',
+        details: { beforeStatus: 'available', afterStatus: 'cancelled', assignmentId: 10 },
+      });
+      expect(JSON.stringify(safeAuditLog.mock.calls[0])).not.toContain(
+        'Private consultation notes',
+      );
+    });
+
+    it('is idempotent for an already cancelled slot without duplicating an audit event', async () => {
+      const transactionDb = queueTransactionResults(mockDb, [[cancelledAppointment]]);
+
+      const result = await cancelAppointmentHandler({ data: { appointmentId: 201 } });
+
+      expect(result).toEqual({
+        appointment: { ...cancelledAppointment, studentName: null, studentEmail: null },
+      });
+      expect(transactionDb.update).not.toHaveBeenCalled();
+      expect(safeAuditLog).not.toHaveBeenCalled();
+    });
+
+    it('rejects cancellation after the slot starts', async () => {
+      const pastAppointment = {
+        ...availableAppointment,
+        startAt: new Date(Date.now() - 30 * 60_000),
+        endAt: new Date(Date.now() - 1 * 60_000),
+      };
+      const transactionDb = queueTransactionResults(mockDb, [[pastAppointment]]);
+
+      const result = await cancelAppointmentHandler({ data: { appointmentId: 201 } });
+
+      expect(result).toEqual({
+        error: { code: 'BAD_REQUEST', message: 'Appointment can no longer be cancelled' },
+      });
+      expect(transactionDb.update).not.toHaveBeenCalled();
+    });
+
+    it('rejects a booked slot in the unbooked-slot phase', async () => {
+      const transactionDb = queueTransactionResults(mockDb, [
+        [{ ...availableAppointment, status: 'booked' }],
+      ]);
+
+      const result = await cancelAppointmentHandler({ data: { appointmentId: 201 } });
+
+      expect(result).toEqual({
+        error: {
+          code: 'CONFLICT',
+          message: 'Appointment cannot be cancelled in its current state',
+        },
+      });
+      expect(transactionDb.update).not.toHaveBeenCalled();
+    });
+
+    it.each([
+      [null, 'unauthenticated'],
+      [studentSession, 'student'],
+      [{ ...instructorSession, user: { ...instructorSession.user, role: 'admin' } }, 'admin'],
+    ])('rejects %s cancellation without opening a transaction', async (session, _label) => {
+      vi.mocked(getSessionFromHeaders).mockResolvedValue(session as never);
+
+      const result = await cancelAppointmentHandler({ data: { appointmentId: 201 } });
+
+      expect(result).toEqual({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } });
+      expect(getDb).not.toHaveBeenCalled();
+    });
+
+    it('does not enumerate appointments outside the instructor authorization boundary', async () => {
+      queueTransactionResults(mockDb, [[]]);
+
+      const result = await cancelAppointmentHandler({ data: { appointmentId: 999 } });
+
+      expect(result).toEqual({ error: { code: 'NOT_FOUND', message: 'Appointment not found' } });
     });
   });
 });

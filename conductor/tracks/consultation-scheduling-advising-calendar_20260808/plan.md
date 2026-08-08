@@ -89,10 +89,11 @@
   - **Implementation commit:** `10d0314f` (`feat(track-058): add instructor appointment slot handlers`).
 
 - [ ] **Task 2.3: Cancel unbooked slots (RED → GREEN)**
-  - [ ] Write tests for valid cancellation, invalid past/status transitions, idempotency behavior, authorization, and audit payload redaction.
-  - [ ] Confirm RED behavior.
-  - [ ] Implement transactional state transition and post-commit advisory behavior.
-  - [ ] Verify cancelled slots no longer appear as bookable or conflict-reserving.
+  - [x] Write tests for valid cancellation, invalid past/status transitions, idempotency behavior, authorization, and audit payload redaction.
+  - [x] Confirm RED behavior.
+  - [~] Implement transactional state transition and post-commit advisory behavior.
+  - [~] Verify cancelled slots no longer appear as bookable or conflict-reserving.
+  - **RED evidence:** The cancellation additions to `tests/unit/server/appointments-handlers.test.ts` failed 8/8 because the server-only cancellation handler still threw its not-implemented placeholder; the existing create/list tests remained green at 14/14.
 
 - [ ] **Phase 2 Verification & Checkpoint**
   - [ ] Run focused server tests, typecheck, and lint.
