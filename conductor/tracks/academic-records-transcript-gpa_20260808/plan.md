@@ -52,12 +52,12 @@
   - [x] Test draft and unpublished grades remain unavailable.
   - [x] Test later release versions preserve history and switch the active official result.
   - [x] Test authorized withdrawal creates a visible, GPA-excluded record without fabricating a grade.
-- [~] Task: Integrate academic records with grade release
-  - [ ] Extend the existing release transaction at the server boundary without changing grade formulas.
-  - [ ] Add release preflight validation for missing, ambiguous, and incomplete source data.
-  - [ ] Add explicit withdrawal/status provenance and preserve enrollment history.
-  - [ ] Add relevant audit events and structured error handling.
-- [ ] Task: Write compatibility tests
+- [x] Task: Integrate academic records with grade release [2de7786]
+  - [x] Extend the existing release transaction at the server boundary without changing grade formulas.
+  - [x] Add release preflight validation for missing, ambiguous, and incomplete source data.
+  - [x] Add explicit withdrawal/status provenance and preserve enrollment history.
+  - [x] Add relevant audit events and structured error handling.
+- [~] Task: Write compatibility tests
   - [ ] Verify gradebook recomputation does not mutate official records.
   - [ ] Verify existing student grade visibility still uses published snapshots.
   - [ ] Verify existing analytics and grade-release flows remain compatible.
