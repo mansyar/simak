@@ -202,12 +202,15 @@
 
 ## Phase 5: Private iCalendar extension
 
-- [~] **Task 5.1: Appointment event selection (RED → GREEN)**
+- [x] **Task 5.1: Appointment event selection (RED → GREEN)**
   - [x] Write selector tests for student ownership, booked-only status, future events, active assignment authorization, cancelled omission, optional checkpoint labels, and unrelated-student isolation.
   - [x] Confirm RED behavior.
-  - [ ] Extend the existing calendar-feed selection helper without changing deadline event semantics.
-  - [ ] Verify token-owner checks remain in the route boundary.
+  - [x] Extend the existing calendar-feed selection helper without changing deadline event semantics.
+  - [x] Verify token-owner checks remain in the route boundary.
   - **RED evidence:** `pnpm vitest run tests/unit/server/calendar-feed-selection.test.ts` retained the seven existing deadline tests but failed the two new appointment tests because `buildAppointmentFeedEvents` and `CalendarAppointmentRow` were not yet exported. `pnpm typecheck` reported the same missing exports; no production changes were made.
+  - **GREEN evidence:** The selector suite passed 7/7; the existing calendar selector, route-security, and serializer regression suites passed 15/15; `pnpm typecheck`, targeted `oxlint`, and `git diff --check` passed. Scoped V8 coverage for `calendar-feed-selection.server.ts` passed at 83.33% statements, 94.11% branches, 85.71% functions, and 82.35% lines.
+  - **Implementation notes:** Added a separate appointment projection/query joined to active assignments and the authorized student's assignment membership. Selection is limited server-side to future `booked` appointments for the requested student, excludes cancelled/available/terminal/inactive/deleted contexts, retains optional checkpoint labels, and emits stable `appointment-{id}@simak` UIDs with UTC instants and end times. Existing deadline selection remains unchanged. The existing route still performs token hashing, active student ownership, rate limiting, generic unauthorized responses, and secure private headers.
+  - **Implementation commit:** Pending.
 
 - [ ] **Task 5.2: Stable appointment serialization (RED → GREEN)**
   - [ ] Write serializer tests for stable appointment UID, UTC `DTSTART`/`DTEND`, rescheduling with unchanged UID, RFC 5545 escaping/folding, and safe titles.
