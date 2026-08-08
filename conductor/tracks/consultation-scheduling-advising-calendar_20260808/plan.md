@@ -237,7 +237,7 @@
   - [x] Obtain confirmation, attach the verification note, record the checkpoint SHA, and commit the plan update.
   - **Automated verification:** Calendar selector, route-security, and serializer suites passed 17/17; the real-PostgreSQL calendar feed lifecycle integration test passed 1/1. Scoped V8 coverage across the route, selector, and serializer passed at 94.59% statements, 89.58% branches, 94.11% functions, and 94.28% lines. `pnpm typecheck`, targeted `oxlint`, and `git diff --check` passed.
   - **Manual verification:** User confirmed the private feed refresh flow: booked appointment appearance alongside deadline events, stable UID/time update after rescheduling, cancellation removal, and unchanged deadline events on 2026-08-08.
-  - **Checkpoint commit:** Pending.
+  - **Checkpoint commit:** `2802a4bf`.
 
 ## Phase 6: Student appointment experience
 
