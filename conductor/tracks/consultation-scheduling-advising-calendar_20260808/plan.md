@@ -212,12 +212,15 @@
   - **Implementation notes:** Added a separate appointment projection/query joined to active assignments and the authorized student's assignment membership. Selection is limited server-side to future `booked` appointments for the requested student, excludes cancelled/available/terminal/inactive/deleted contexts, retains optional checkpoint labels, and emits stable `appointment-{id}@simak` UIDs with UTC instants and end times. Existing deadline selection remains unchanged. The existing route still performs token hashing, active student ownership, rate limiting, generic unauthorized responses, and secure private headers.
   - **Implementation commit:** `4ea12742`.
 
-- [~] **Task 5.2: Stable appointment serialization (RED → GREEN)**
+- [x] **Task 5.2: Stable appointment serialization (RED → GREEN)**
   - [x] Write serializer tests for stable appointment UID, UTC `DTSTART`/`DTEND`, rescheduling with unchanged UID, RFC 5545 escaping/folding, and safe titles.
   - [x] Confirm RED behavior.
-  - [ ] Implement appointment event serialization using the existing feed conventions.
-  - [ ] Preserve existing cache, content-type, rate-limit, and credential secrecy behavior.
+  - [x] Implement appointment event serialization using the existing feed conventions.
+  - [x] Preserve existing cache, content-type, rate-limit, and credential secrecy behavior.
   - **RED evidence:** `pnpm vitest run tests/unit/lib/calendar-ics.test.ts` passed the three existing serializer tests and failed the new appointment contract because `DTEND` was not emitted. The test also establishes stable appointment UID and rescheduled UTC start/end expectations.
+  - **GREEN evidence:** Serializer tests passed 4/4; the selector, route-security, and serializer regression suites passed 16/16; `pnpm typecheck`, targeted `oxlint`, and `git diff --check` passed. Scoped V8 coverage for `calendar-ics.ts` passed at 100% statements, 90% branches, 100% functions, and 100% lines.
+  - **Implementation notes:** Extended the existing optional event end-time contract and emits UTC `DTEND` only for appointment events, preserving CRLF formatting, RFC 5545 escaping/folding, stable UIDs, and all existing route cache/content-type/rate-limit/credential behavior.
+  - **Implementation commit:** Pending.
 
 - [ ] **Task 5.3: Calendar route regression/security coverage**
   - [ ] Extend route tests for valid/invalid/revoked credentials, generic unauthorized responses, no enumeration, and mixed deadline/appointment feeds.
