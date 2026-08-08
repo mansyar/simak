@@ -149,13 +149,15 @@
   - **GREEN evidence:** `tests/integration/server/appointments-lifecycle.test.ts` passed 4/4 against real PostgreSQL: one-winner booking, same-target rescheduling with stable original identity, cross-assignment/soft-deleted-student non-mutation, and one-winner instructor outcome transition. `pnpm typecheck`, targeted `oxlint`, and `git diff --check` passed.
   - **Implementation notes:** Integration fixtures use unique users, active academic context, assignments, enrollment, checkpoints, and appointment rows with deterministic cleanup. Advisory audit/notification work is mocked so the assertions isolate committed mutation state. The rescheduling handler now exposes its concrete success result type instead of `unknown`, preserving type-safe integration assertions. The disposable `simak_test` database was synchronized with the current schema using `pnpm db:push`; the default local database remains pre-TRACK-057 and `pnpm db:migrate` remains blocked by its empty migration history/prelaunch prerequisite.
 
-- [~] **Phase 3 Verification & Checkpoint**
+- [x] **Phase 3 Verification & Checkpoint**
   - [x] Run focused unit/integration appointment suites and typecheck.
-  - [~] Manually execute publish → book → reschedule → cancel, plus complete → explicitly record consultation → verify.
-  - [~] Confirm verified consultation counts change only after the existing verification action.
-  - [ ] Obtain confirmation, attach the verification note, record the checkpoint SHA, and commit the plan update.
+  - [x] Manually execute publish → book → reschedule → cancel, plus complete → explicitly record consultation → verify.
+  - [x] Confirm verified consultation counts change only after the existing verification action.
+  - [x] Obtain confirmation, attach the verification note, record the checkpoint SHA, and commit the plan update.
   - **Automated evidence:** 82 focused appointment/UI tests passed; real PostgreSQL integration coverage passed 4/4; consultation regression coverage passed 55/55; typecheck, targeted lint, and diff checks passed. Task 3.4 commit: `53c1b577`.
-  - **Manual verification status:** Awaiting explicit confirmation of the end-to-end appointment and separate consultation-evidence flow.
+  - **Manual verification:** User explicitly confirmed the publish → book → reschedule → cancel → complete → explicit consultation record → verify flow and that verified counts/gating remain unchanged until consultation verification.
+  - **Verification note:** Phase 3 checkpoint accepted on 2026-08-08; appointment outcomes remain separate from consultation evidence, verification, and gating.
+  - **Checkpoint commit:** Pending.
 
 ## Phase 4: Notifications and reminders
 
