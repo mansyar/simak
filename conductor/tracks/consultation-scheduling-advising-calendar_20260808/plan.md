@@ -317,16 +317,16 @@
    - **Implementation notes:** E2E reset now clears appointment reminders, appointments, and private calendar tokens. The auth helper uses bounded DOM-content readiness instead of an unbounded network-idle wait; the appointment suite uses direct role login and a bounded network-idle readiness window before tab interaction. Expected existing hydration/date-timezone, route code-splitting, CSP, and PostgreSQL notices did not affect assertions.
    - **Implementation commit:** `ab5a3cbe`.
 
-- [ ] **Task 8.2: Regression and quality gates**
-  - [ ] Run focused unit suites.
-  - [ ] Run `pnpm test`.
+- [~] **Task 8.2: Regression and quality gates**
+  - [~] Run focused unit suites.
+  - [~] Run `pnpm test`.
   - [ ] Run `pnpm test:integration`.
   - [ ] Run `pnpm test:coverage` and confirm new modules exceed 80%.
   - [ ] Run `pnpm typecheck`.
   - [ ] Run `pnpm lint`.
   - [ ] Run `pnpm format` and inspect the resulting diff.
   - [ ] Run `pnpm check:i18n`.
-  - [ ] Run relevant accessibility/E2E checks.
+  - [~] Run relevant accessibility/E2E checks.
   - [ ] Run `pnpm build`.
 
 - [ ] **Task 8.3: Documentation and self-review**
