@@ -36,9 +36,9 @@ export async function notifyAppointmentParticipants({
   participantIds,
   startAt,
   endAt,
-}: AppointmentNotificationInput): Promise<void> {
+}: AppointmentNotificationInput): Promise<string[]> {
   const recipientIds = [...new Set(participantIds.filter(Boolean))];
-  if (recipientIds.length === 0) return;
+  if (recipientIds.length === 0) return [];
 
   const { titleKey, messageKey } = getNotificationKeys(event);
   const email = getAppointmentEmailConfig(event);
@@ -55,9 +55,12 @@ export async function notifyAppointmentParticipants({
     ...(checkpointId == null ? {} : { checkpointId }),
   };
   let db: ReturnType<typeof getDb> | undefined;
+  const failedRecipientIds = new Set<string>();
+  let databaseFailed = false;
   try {
     db = getDb();
   } catch (error) {
+    databaseFailed = true;
     logger.error({
       event: 'advisory_failed',
       handler: 'notifyAppointmentParticipants',
@@ -79,6 +82,7 @@ export async function notifyAppointmentParticipants({
             metadata,
           });
         } catch (error) {
+          failedRecipientIds.add(recipientId);
           logger.error({
             event: 'advisory_failed',
             handler: 'notifyAppointmentParticipants',
@@ -86,6 +90,8 @@ export async function notifyAppointmentParticipants({
             error: error instanceof Error ? error.message : String(error),
           });
         }
+      } else if (databaseFailed) {
+        failedRecipientIds.add(recipientId);
       }
 
       try {
@@ -98,6 +104,7 @@ export async function notifyAppointmentParticipants({
           buildBody: (locale) => buildAppointmentEmailBody(event, params, locale),
         });
       } catch (error) {
+        failedRecipientIds.add(recipientId);
         logger.error({
           event: 'advisory_failed',
           handler: 'notifyAppointmentParticipants',
@@ -108,4 +115,6 @@ export async function notifyAppointmentParticipants({
       }
     }),
   );
+
+  return [...failedRecipientIds];
 }

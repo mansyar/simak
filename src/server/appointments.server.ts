@@ -1,5 +1,5 @@
 // Server-only appointment handlers. This module must never be imported by client code.
-import { and, asc, eq, isNull, sql } from 'drizzle-orm';
+import { and, asc, eq, gt, isNull, lt, ne, sql } from 'drizzle-orm';
 import type { z } from 'zod';
 import { getDb, type Db } from '@/db/index';
 import { appointments } from '@/db/schema/appointments';
@@ -181,28 +181,57 @@ export async function createAppointmentSlotHandler(args: {
     }
 
     const db = getDb();
-    const [appointment] = await db
-      .insert(appointments)
-      .values({
-        assignmentId,
-        checkpointId,
-        instructorId: session.user.id,
-        startAt,
-        endAt,
-        status: 'available',
-      })
-      .returning({
-        id: appointments.id,
-        assignmentId: appointments.assignmentId,
-        checkpointId: appointments.checkpointId,
-        instructorId: appointments.instructorId,
-        studentId: appointments.studentId,
-        startAt: appointments.startAt,
-        endAt: appointments.endAt,
-        status: appointments.status,
-        createdAt: appointments.createdAt,
-        updatedAt: appointments.updatedAt,
-      });
+    const result = await db.transaction(async (tx) => {
+      if (typeof tx.execute === 'function') {
+        await tx.execute(
+          sql`SELECT pg_advisory_xact_lock(hashtext(${'appointments:instructor:' + session.user.id}))`,
+        );
+      }
+
+      const [overlap] = await tx
+        .select({ id: appointments.id })
+        .from(appointments)
+        .where(
+          and(
+            eq(appointments.instructorId, session.user.id),
+            ne(appointments.status, 'cancelled'),
+            lt(appointments.startAt, endAt),
+            gt(appointments.endAt, startAt),
+          ),
+        )
+        .limit(1);
+      if (overlap) {
+        return serverError(ErrorCode.CONFLICT, 'Appointment conflicts with an existing slot');
+      }
+
+      const [appointment] = await tx
+        .insert(appointments)
+        .values({
+          assignmentId,
+          checkpointId,
+          instructorId: session.user.id,
+          startAt,
+          endAt,
+          status: 'available',
+        })
+        .returning({
+          id: appointments.id,
+          assignmentId: appointments.assignmentId,
+          checkpointId: appointments.checkpointId,
+          instructorId: appointments.instructorId,
+          studentId: appointments.studentId,
+          startAt: appointments.startAt,
+          endAt: appointments.endAt,
+          status: appointments.status,
+          createdAt: appointments.createdAt,
+          updatedAt: appointments.updatedAt,
+        });
+
+      return { appointment };
+    });
+
+    if ('error' in result) return result;
+    const { appointment } = result;
 
     await safeAuditLog('appointment.created', {
       actorId: session.user.id,
@@ -260,7 +289,7 @@ export async function listInstructorAppointmentsHandler(args: {
         updatedAt: appointments.updatedAt,
       })
       .from(appointments)
-      .leftJoin(users, eq(appointments.studentId, users.id))
+      .leftJoin(users, and(eq(appointments.studentId, users.id), isNull(users.deletedAt)))
       .where(and(...conditions))
       .orderBy(asc(appointments.startAt), asc(appointments.id))
       .limit(limit)
@@ -293,7 +322,6 @@ export async function cancelAppointmentHandler(args: {
     return serverError(ErrorCode.UNAUTHORIZED, 'Unauthorized');
   }
 
-  const db = getDb();
   let auditData:
     | { assignmentId: number; beforeStatus: 'available' | 'booked'; afterStatus: 'cancelled' }
     | undefined;
@@ -310,6 +338,7 @@ export async function cancelAppointmentHandler(args: {
     | undefined;
 
   try {
+    const db = getDb();
     const result = await db.transaction(async (tx) => {
       const [appointment] = await fetchInstructorAppointmentForUpdate(
         tx,

@@ -42,6 +42,15 @@ function findAppointmentMigration(): string | null {
   return migration ?? null;
 }
 
+function findAppointmentConsistencyMigration(): string | null {
+  const migration = readdirSync(migrationsDir)
+    .filter((file) => file.endsWith('.sql'))
+    .map((file) => resolve(migrationsDir, file))
+    .find((file) => readFileSync(file, 'utf8').includes('appointments_status_student_check'));
+
+  return migration ?? null;
+}
+
 describe('appointments schema', () => {
   it('exports the appointment table and lifecycle enum', async () => {
     const { appointments, appointmentStatus } = await import('@/db/schema/appointments');
@@ -93,6 +102,7 @@ describe('appointments schema', () => {
       expect.arrayContaining([
         'appointments_time_order_check',
         'appointments_duration_range_check',
+        'appointments_status_student_check',
       ]),
     );
 
@@ -133,6 +143,12 @@ describe('appointments migration contract', () => {
     expect(sql).toMatch(/FOREIGN KEY.*"checkpoint_id".*REFERENCES.*"checkpoints"/is);
     expect(sql).toMatch(/FOREIGN KEY.*"instructor_id".*REFERENCES.*"users"/is);
     expect(sql).toMatch(/FOREIGN KEY.*"student_id".*REFERENCES.*"users"/is);
+
+    const consistencyMigrationPath = findAppointmentConsistencyMigration();
+    expect(consistencyMigrationPath).not.toBeNull();
+    expect(readFileSync(consistencyMigrationPath!, 'utf8')).toContain(
+      'appointments_status_student_check',
+    );
   });
 
   it('has a companion rollback that removes appointment indexes, table, and enum', () => {

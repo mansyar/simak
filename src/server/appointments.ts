@@ -154,6 +154,6 @@ export const getAppointmentDetail = typedServerFn({ method: 'GET' })
   .middleware(serverFnMiddlewares(RATE_LIMITS.standardRead))
   .inputValidator(AppointmentIdSchema)
   .handler(async ({ data }) => {
-    const { getAppointmentDetailHandler } = await import('./appointments-lifecycle.server');
+    const { getAppointmentDetailHandler } = await import('./appointments-detail.server');
     return getAppointmentDetailHandler({ data });
   });

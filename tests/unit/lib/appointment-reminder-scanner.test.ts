@@ -30,6 +30,11 @@ function createMockDb() {
     values: vi.fn(),
     onConflictDoNothing: vi.fn(),
     returning: vi.fn(),
+    delete: vi.fn(),
+    update: vi.fn(),
+    set: vi.fn(),
+    limit: vi.fn(),
+    for: vi.fn(),
     transaction: vi.fn(),
     then: vi.fn(),
   } as Record<string, ReturnType<typeof vi.fn>> & {
@@ -45,6 +50,11 @@ function createMockDb() {
     'values',
     'onConflictDoNothing',
     'returning',
+    'delete',
+    'update',
+    'set',
+    'limit',
+    'for',
   ]) {
     db[method].mockReturnValue(db);
   }
@@ -89,18 +99,23 @@ describe('appointment reminder scanner', () => {
     vi.clearAllMocks();
     db = createMockDb();
     vi.mocked(getDb).mockReturnValue(db as never);
-    vi.mocked(notifyAppointmentParticipants).mockResolvedValue(undefined);
+    vi.mocked(notifyAppointmentParticipants).mockResolvedValue([]);
   });
 
   it('dispatches one 24-hour and one 1-hour reminder window using UTC instants', async () => {
     queueResults(
       db,
       [appointment24h],
+      [],
+      [appointment24h],
       [
         { appointmentId: 401, participantId: 'student-1', tier: '24h' },
         { appointmentId: 401, participantId: 'instructor-1', tier: '24h' },
         { appointmentId: 401, participantId: 'student-1', tier: '24h' },
       ],
+      [],
+      [appointment1h],
+      [],
       [appointment1h],
       [
         { appointmentId: 402, participantId: 'student-1', tier: '1h' },
@@ -132,7 +147,7 @@ describe('appointment reminder scanner', () => {
   });
 
   it('does not redispatch reminders when durable deduplication returns no winners', async () => {
-    queueResults(db, [appointment24h], [], []);
+    queueResults(db, [appointment24h], [], [appointment24h], [], []);
 
     await processAppointmentReminders(now);
 
@@ -140,7 +155,7 @@ describe('appointment reminder scanner', () => {
   });
 
   it('skips candidates without a participant after the database eligibility filter', async () => {
-    queueResults(db, [{ ...appointment24h, studentId: null }], [], []);
+    queueResults(db, [{ ...appointment24h, studentId: null }], []);
 
     await processAppointmentReminders(now);
 
@@ -155,7 +170,9 @@ describe('appointment reminder scanner', () => {
       },
     );
 
-    await expect(processAppointmentReminders(now)).resolves.toBeUndefined();
+    await expect(processAppointmentReminders(now)).rejects.toThrow(
+      'One or more appointment reminder windows failed',
+    );
 
     const childLogger = vi.mocked(logger.child).mock.results[0]?.value as {
       error: ReturnType<typeof vi.fn>;
@@ -194,19 +211,115 @@ describe('appointment reminder scanner', () => {
     ).toBe(false);
   });
 
-  it('logs scan failures and does not reject the queue tick', async () => {
+  it('logs scan failures so the queue can retry the next tick', async () => {
     const error = new Error('database unavailable');
     vi.mocked(getDb).mockImplementationOnce(() => {
       throw error;
     });
 
-    await expect(processAppointmentReminders(now)).resolves.toBeUndefined();
+    await expect(processAppointmentReminders(now)).rejects.toThrow('database unavailable');
 
     const childLogger = vi.mocked(logger.child).mock.results[0]?.value as {
       error: ReturnType<typeof vi.fn>;
     };
     expect(childLogger.error).toHaveBeenCalledWith(
       expect.objectContaining({ event: 'appointment_reminder.scan_error' }),
+    );
+  });
+
+  it('rechecks locked candidates before claiming a reminder', async () => {
+    queueResults(db, [appointment24h], [], [], []);
+
+    await processAppointmentReminders(now);
+
+    expect(notifyAppointmentParticipants).not.toHaveBeenCalled();
+  });
+
+  it('releases failed participant claims while recording successful deliveries', async () => {
+    queueResults(
+      db,
+      [appointment24h],
+      [],
+      [appointment24h],
+      [
+        { appointmentId: 401, participantId: 'student-1', tier: '24h' },
+        { appointmentId: 401, participantId: 'instructor-1', tier: '24h' },
+      ],
+      [],
+      [],
+    );
+    vi.mocked(notifyAppointmentParticipants).mockResolvedValue(['student-1']);
+
+    await expect(processAppointmentReminders(now)).rejects.toThrow(
+      'One or more appointment reminder windows failed',
+    );
+
+    expect(db.delete).toHaveBeenCalled();
+    expect(db.update).toHaveBeenCalled();
+  });
+
+  it('logs thrown participant delivery failures and releases all claims', async () => {
+    queueResults(
+      db,
+      [appointment24h],
+      [],
+      [appointment24h],
+      [
+        { appointmentId: 401, participantId: 'student-1', tier: '24h' },
+        { appointmentId: 401, participantId: 'instructor-1', tier: '24h' },
+      ],
+      [],
+      [],
+    );
+    vi.mocked(notifyAppointmentParticipants).mockRejectedValueOnce(
+      new Error('notification delivery unavailable'),
+    );
+
+    await expect(processAppointmentReminders(now)).rejects.toThrow(
+      'One or more appointment reminder windows failed',
+    );
+
+    const childLogger = vi.mocked(logger.child).mock.results[0]?.value as {
+      error: ReturnType<typeof vi.fn>;
+    };
+    expect(childLogger.error).toHaveBeenCalledWith(
+      expect.objectContaining({
+        event: 'appointment_reminder.delivery_error',
+        appointmentId: 401,
+      }),
+    );
+    expect(db.delete).toHaveBeenCalled();
+  });
+
+  it('retries when recording a successful delivery fails', async () => {
+    const results = [
+      [appointment24h],
+      [],
+      [appointment24h],
+      [{ appointmentId: 401, participantId: 'student-1', tier: '24h' }],
+      [],
+    ];
+    let thenCalls = 0;
+    db.then.mockImplementation(
+      (onfulfilled: (value: unknown) => unknown, onrejected?: (reason: unknown) => unknown) => {
+        const call = thenCalls++;
+        if (call === 4) {
+          return Promise.resolve(onrejected?.(new Error('claim update unavailable')));
+        }
+
+        return Promise.resolve(results.shift() ?? []).then(onfulfilled);
+      },
+    );
+
+    await expect(processAppointmentReminders(now)).rejects.toThrow(
+      'One or more appointment reminder windows failed',
+    );
+
+    const childLogger = vi.mocked(logger.child).mock.results[0]?.value as {
+      error: ReturnType<typeof vi.fn>;
+    };
+    expect(childLogger.error).toHaveBeenCalledWith(
+      expect.objectContaining({ event: 'appointment_reminder.delivery_error' }),
     );
   });
 });

@@ -24,7 +24,8 @@ export const appointmentReminders = pgTable(
       .notNull()
       .references(() => users.id, { onDelete: 'cascade' }),
     tier: appointmentReminderTier('tier').notNull(),
-    sentAt: timestamp('sent_at', { withTimezone: true }).defaultNow().notNull(),
+    claimedAt: timestamp('claimed_at', { withTimezone: true }).defaultNow().notNull(),
+    sentAt: timestamp('sent_at', { withTimezone: true }),
   },
   (table) => [
     unique('appointment_reminders_appointment_participant_tier_unq').on(

@@ -2,7 +2,7 @@
   "track_id": "track-058",
   "track_number": "TRACK-058",
   "type": "feature",
-  "status": "pending",
+  "status": "ready_for_review",
   "created_at": "2026-08-08T00:00:00Z",
   "updated_at": "2026-08-08T00:00:00Z",
   "dependencies": ["TRACK-055", "TRACK-057"],

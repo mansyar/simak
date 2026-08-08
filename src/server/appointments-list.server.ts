@@ -36,7 +36,7 @@ function appointmentProjection() {
   return {
     id: appointments.id,
     assignmentId: appointments.assignmentId,
-    checkpointId: appointments.checkpointId,
+    checkpointId: checkpoints.id,
     checkpointName: checkpoints.name,
     instructorId: appointments.instructorId,
     studentId: appointments.studentId,

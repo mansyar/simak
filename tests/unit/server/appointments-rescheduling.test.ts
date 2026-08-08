@@ -359,4 +359,15 @@ describe('Appointment rescheduling', () => {
     expect(result).toEqual({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } });
     expect(getDb).not.toHaveBeenCalled();
   });
+
+  it('does not let a student reschedule another student appointment in the same assignment', async () => {
+    const transactionDb = queueTransaction(mockDb, [[]]);
+
+    const result = await rescheduleAppointmentHandler({
+      data: { appointmentId: 401, replacementAppointmentId: 402 },
+    });
+
+    expect(result).toEqual({ error: { code: 'NOT_FOUND', message: 'Appointment not found' } });
+    expect(transactionDb.update).not.toHaveBeenCalled();
+  });
 });

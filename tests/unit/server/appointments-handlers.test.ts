@@ -107,15 +107,16 @@ describe('Appointment instructor handlers', () => {
         createdAt: futureStart,
         updatedAt: futureStart,
       };
-      queueResults(mockDb, [[{ id: 10, sectionId: 2 }], [{ id: 4 }], [appointment]]);
+      queueResults(mockDb, [[{ id: 10, sectionId: 2 }], [{ id: 4 }]]);
+      const transactionDb = queueTransactionResults(mockDb, [[], [appointment]]);
 
       const result = await createAppointmentSlotHandler({ data: validData });
 
       expect(result).toEqual({
         appointment: { ...appointment, studentName: null, studentEmail: null },
       });
-      expect(mockDb.insert).toHaveBeenCalledTimes(1);
-      expect(mockDb.values).toHaveBeenCalledWith({
+      expect(transactionDb.insert).toHaveBeenCalledTimes(1);
+      expect(transactionDb.values).toHaveBeenCalledWith({
         assignmentId: 10,
         checkpointId: 4,
         instructorId: 'instructor-1',
@@ -148,14 +149,15 @@ describe('Appointment instructor handlers', () => {
         createdAt: futureStart,
         updatedAt: futureStart,
       };
-      queueResults(mockDb, [[{ id: 10, sectionId: 2 }], [appointment]]);
+      queueResults(mockDb, [[{ id: 10, sectionId: 2 }], [{ id: 4 }]]);
+      const transactionDb = queueTransactionResults(mockDb, [[], [appointment]]);
 
       const result = await createAppointmentSlotHandler({
         data: { assignmentId: 10, startAt: futureStart, endAt: futureEnd },
       });
 
       expect(result).toHaveProperty('appointment.id', 102);
-      expect(mockDb.values).toHaveBeenCalledWith(
+      expect(transactionDb.values).toHaveBeenCalledWith(
         expect.objectContaining({ assignmentId: 10, checkpointId: undefined }),
       );
     });
@@ -226,6 +228,18 @@ describe('Appointment instructor handlers', () => {
 
       expect(result).toEqual({ error: { code: 'NOT_FOUND', message: 'Checkpoint not found' } });
       expect(mockDb.insert).not.toHaveBeenCalled();
+    });
+
+    it('rejects a slot that overlaps another active instructor slot', async () => {
+      queueResults(mockDb, [[{ id: 10, sectionId: 2 }], [{ id: 4 }]]);
+      const transactionDb = queueTransactionResults(mockDb, [[{ id: 99 }]]);
+
+      const result = await createAppointmentSlotHandler({ data: validData });
+
+      expect(result).toEqual({
+        error: { code: 'CONFLICT', message: 'Appointment conflicts with an existing slot' },
+      });
+      expect(transactionDb.insert).not.toHaveBeenCalled();
     });
   });
 

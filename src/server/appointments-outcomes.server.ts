@@ -100,7 +100,6 @@ async function transitionAppointmentOutcome(
     return serverError(ErrorCode.UNAUTHORIZED, 'Unauthorized');
   }
 
-  const db = getDb();
   let auditData:
     | {
         actorId: string;
@@ -122,6 +121,7 @@ async function transitionAppointmentOutcome(
     | undefined;
 
   try {
+    const db = getDb();
     const result = await db.transaction(async (tx) => {
       const appointment = await fetchInstructorAppointmentForOutcome(
         tx,

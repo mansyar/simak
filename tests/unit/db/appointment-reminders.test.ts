@@ -38,12 +38,14 @@ describe('appointment reminders schema', () => {
     expect(appointmentReminders).toHaveProperty('appointmentId');
     expect(appointmentReminders).toHaveProperty('participantId');
     expect(appointmentReminders).toHaveProperty('tier');
+    expect(appointmentReminders).toHaveProperty('claimedAt');
     expect(appointmentReminders).toHaveProperty('sentAt');
     expect(appointmentReminderTier.enumValues).toEqual(['24h', '1h']);
     expect(appointmentReminders.appointmentId.notNull).toBe(true);
     expect(appointmentReminders.participantId.notNull).toBe(true);
     expect(appointmentReminders.tier.notNull).toBe(true);
-    expect(appointmentReminders.sentAt.hasDefault).toBe(true);
+    expect(appointmentReminders.claimedAt.hasDefault).toBe(true);
+    expect(appointmentReminders.sentAt.notNull).toBe(false);
     expect(foreignTableNames(appointmentReminders)).toEqual(
       expect.arrayContaining(['appointments', 'users']),
     );

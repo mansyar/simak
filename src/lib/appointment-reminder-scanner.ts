@@ -1,4 +1,4 @@
-import { aliasedTable, and, eq, gt, isNotNull, isNull, lte } from 'drizzle-orm';
+import { aliasedTable, and, eq, gt, inArray, isNotNull, isNull, lt, lte } from 'drizzle-orm';
 import { getDb } from '@/db/index';
 import { appointmentReminders } from '@/db/schema/appointment-reminders';
 import { appointments } from '@/db/schema/appointments';
@@ -101,11 +101,12 @@ export async function processAppointmentReminders(now = new Date()): Promise<voi
       event: 'appointment_reminder.scan_error',
       error: error instanceof Error ? error.message : String(error),
     });
-    return;
+    throw error;
   }
 
   const instructorUsers = aliasedTable(users, 'appointment_reminder_instructor');
   const studentUsers = aliasedTable(users, 'appointment_reminder_student');
+  let scanFailed = false;
 
   for (const window of REMINDER_WINDOWS) {
     try {
@@ -152,57 +153,184 @@ export async function processAppointmentReminders(now = new Date()): Promise<voi
       );
       if (candidates.length === 0) continue;
 
-      const winners = await db.transaction(async (tx) => {
-        const reminderRows = candidates.flatMap((candidate) => [
+      const { winners, lockedCandidates } = await db.transaction(async (tx) => {
+        const staleClaimCutoff = new Date(now.getTime() - 10 * 60 * 1000);
+        await tx
+          .delete(appointmentReminders)
+          .where(
+            and(
+              isNull(appointmentReminders.sentAt),
+              lt(appointmentReminders.claimedAt, staleClaimCutoff),
+            ),
+          );
+
+        const lockedRows = await tx
+          .select({
+            appointmentId: appointments.id,
+            assignmentId: appointments.assignmentId,
+            checkpointId: appointments.checkpointId,
+            instructorId: appointments.instructorId,
+            studentId: appointments.studentId,
+            startAt: appointments.startAt,
+            endAt: appointments.endAt,
+            status: appointments.status,
+          })
+          .from(appointments)
+          .innerJoin(assignments, eq(appointments.assignmentId, assignments.id))
+          .innerJoin(
+            assignmentStudents,
+            and(
+              eq(assignmentStudents.assignmentId, appointments.assignmentId),
+              eq(assignmentStudents.studentId, appointments.studentId),
+            ),
+          )
+          .innerJoin(instructorUsers, eq(appointments.instructorId, instructorUsers.id))
+          .innerJoin(studentUsers, eq(appointments.studentId, studentUsers.id))
+          .where(
+            and(
+              inArray(
+                appointments.id,
+                candidates.map((candidate) => candidate.appointmentId),
+              ),
+              eq(appointments.status, 'booked'),
+              isNotNull(appointments.studentId),
+              gt(appointments.startAt, bounds.lower),
+              lte(appointments.startAt, bounds.upper),
+              eq(assignments.status, 'active'),
+              isNull(assignments.deletedAt),
+              isNull(instructorUsers.deletedAt),
+              isNull(studentUsers.deletedAt),
+            ),
+          )
+          .for('update', { of: appointments });
+        const lockedCandidates = lockedRows.filter(
+          (appointment): appointment is AppointmentReminderCandidate =>
+            appointment.studentId !== null &&
+            isAppointmentReminderEligible(appointment, now, window.tier),
+        );
+        const reminderRows = lockedCandidates.flatMap((candidate) => [
           {
             appointmentId: candidate.appointmentId,
             participantId: candidate.studentId,
             tier: window.tier,
+            claimedAt: now,
           },
           {
             appointmentId: candidate.appointmentId,
             participantId: candidate.instructorId,
             tier: window.tier,
+            claimedAt: now,
           },
         ]);
 
-        return tx
-          .insert(appointmentReminders)
-          .values(reminderRows)
-          .onConflictDoNothing({
-            target: [
-              appointmentReminders.appointmentId,
-              appointmentReminders.participantId,
-              appointmentReminders.tier,
-            ],
-          })
-          .returning({
-            appointmentId: appointmentReminders.appointmentId,
-            participantId: appointmentReminders.participantId,
-            tier: appointmentReminders.tier,
-          });
+        const winners =
+          lockedCandidates.length === 0
+            ? []
+            : await tx
+                .insert(appointmentReminders)
+                .values(reminderRows)
+                .onConflictDoNothing({
+                  target: [
+                    appointmentReminders.appointmentId,
+                    appointmentReminders.participantId,
+                    appointmentReminders.tier,
+                  ],
+                })
+                .returning({
+                  appointmentId: appointmentReminders.appointmentId,
+                  participantId: appointmentReminders.participantId,
+                  tier: appointmentReminders.tier,
+                });
+
+        return { winners, lockedCandidates };
       });
 
-      const groupedWinners = groupWinners(winners, candidates);
-      await Promise.allSettled(
-        groupedWinners.map(({ candidate, tier, participantIds }) =>
-          notifyAppointmentParticipants({
-            event: windowFor(tier).event,
-            appointmentId: candidate.appointmentId,
-            assignmentId: candidate.assignmentId,
-            checkpointId: candidate.checkpointId,
-            participantIds,
-            startAt: candidate.startAt,
-            endAt: candidate.endAt,
-          }),
-        ),
+      const groupedWinners = groupWinners(winners, lockedCandidates);
+      const deliveryResults = await Promise.allSettled(
+        groupedWinners.map(async ({ candidate, tier, participantIds }) => {
+          let failedParticipantIds: string[] = [];
+          try {
+            failedParticipantIds =
+              (await notifyAppointmentParticipants({
+                event: windowFor(tier).event,
+                appointmentId: candidate.appointmentId,
+                assignmentId: candidate.assignmentId,
+                checkpointId: candidate.checkpointId,
+                participantIds,
+                startAt: candidate.startAt,
+                endAt: candidate.endAt,
+              })) ?? [];
+          } catch (error) {
+            failedParticipantIds = participantIds;
+            scanFailed = true;
+            scanLogger.error({
+              event: 'appointment_reminder.delivery_error',
+              appointmentId: candidate.appointmentId,
+              tier,
+              error: error instanceof Error ? error.message : String(error),
+            });
+          }
+
+          if (failedParticipantIds.length > 0) {
+            scanFailed = true;
+            scanLogger.error({
+              event: 'appointment_reminder.delivery_partial_failure',
+              appointmentId: candidate.appointmentId,
+              tier,
+              participantIds: failedParticipantIds,
+            });
+          }
+
+          const claimFilter = and(
+            eq(appointmentReminders.appointmentId, candidate.appointmentId),
+            eq(appointmentReminders.tier, tier),
+            inArray(appointmentReminders.participantId, failedParticipantIds),
+          );
+          if (failedParticipantIds.length > 0) {
+            await db.delete(appointmentReminders).where(claimFilter);
+          }
+
+          const deliveredParticipantIds = participantIds.filter(
+            (participantId) => !failedParticipantIds.includes(participantId),
+          );
+          if (deliveredParticipantIds.length === 0) return;
+
+          await db
+            .update(appointmentReminders)
+            .set({ sentAt: new Date() })
+            .where(
+              and(
+                eq(appointmentReminders.appointmentId, candidate.appointmentId),
+                eq(appointmentReminders.tier, tier),
+                inArray(appointmentReminders.participantId, deliveredParticipantIds),
+              ),
+            );
+        }),
       );
+      const deliveryFailure = deliveryResults.find(
+        (result): result is PromiseRejectedResult => result.status === 'rejected',
+      );
+      if (deliveryFailure) {
+        scanFailed = true;
+        scanLogger.error({
+          event: 'appointment_reminder.delivery_error',
+          error:
+            deliveryFailure.reason instanceof Error
+              ? deliveryFailure.reason.message
+              : String(deliveryFailure.reason),
+        });
+      }
     } catch (error) {
+      scanFailed = true;
       scanLogger.error({
         event: 'appointment_reminder.scan_error',
         tier: window.tier,
         error: error instanceof Error ? error.message : String(error),
       });
     }
+  }
+
+  if (scanFailed) {
+    throw new Error('One or more appointment reminder windows failed');
   }
 }

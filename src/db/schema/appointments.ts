@@ -62,5 +62,9 @@ export const appointments = pgTable(
       'appointments_duration_range_check',
       sql`${table.endAt} - ${table.startAt} >= INTERVAL '15 minutes' AND ${table.endAt} - ${table.startAt} <= INTERVAL '120 minutes'`,
     ),
+    check(
+      'appointments_status_student_check',
+      sql`(${table.status} = 'available' AND ${table.studentId} IS NULL) OR (${table.status} IN ('booked', 'completed', 'no_show') AND ${table.studentId} IS NOT NULL) OR ${table.status} = 'cancelled'`,
+    ),
   ],
 );

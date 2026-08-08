@@ -91,7 +91,6 @@ export async function cancelStudentAppointmentHandler(args: {
     return serverError(ErrorCode.UNAUTHORIZED, 'Unauthorized');
   }
 
-  const db = getDb();
   let auditData:
     | { assignmentId: number; beforeStatus: 'booked'; afterStatus: 'cancelled' }
     | undefined;
@@ -108,6 +107,7 @@ export async function cancelStudentAppointmentHandler(args: {
     | undefined;
 
   try {
+    const db = getDb();
     const result = await db.transaction(async (tx) => {
       const [appointment] = await fetchStudentAppointmentForUpdate(
         tx,

@@ -1,5 +1,5 @@
 // Server-only appointment rescheduling handler.
-import { aliasedTable, and, eq, gt, inArray, isNull, lt, ne } from 'drizzle-orm';
+import { aliasedTable, and, eq, gt, inArray, isNull, lt, ne, or } from 'drizzle-orm';
 import type { z } from 'zod';
 import { getDb, type Db } from '@/db/index';
 import { academicTerms, courseSections, sectionEnrollments } from '@/db/schema/academic-context';
@@ -52,6 +52,8 @@ async function fetchStudentAppointmentsForUpdate(
   appointmentIds: [number, number],
   studentId: string,
 ) {
+  const [originalId, replacementId] = appointmentIds;
+
   return tx
     .select(appointmentSelection())
     .from(appointments)
@@ -85,7 +87,10 @@ async function fetchStudentAppointmentsForUpdate(
     )
     .where(
       and(
-        inArray(appointments.id, appointmentIds),
+        or(
+          and(eq(appointments.id, originalId), eq(appointments.studentId, studentId)),
+          and(eq(appointments.id, replacementId), isNull(appointments.studentId)),
+        ),
         eq(assignments.status, 'active'),
         isNull(assignments.deletedAt),
         eq(courseSections.status, 'active'),
@@ -185,7 +190,6 @@ export async function rescheduleAppointmentHandler(args: {
     return serverError(ErrorCode.UNAUTHORIZED, 'Unauthorized');
   }
 
-  const db = getDb();
   let auditData:
     | {
         assignmentId: number;
@@ -209,6 +213,7 @@ export async function rescheduleAppointmentHandler(args: {
     | undefined;
 
   try {
+    const db = getDb();
     const result = await db.transaction(async (tx) => {
       const appointmentIds: [number, number] = [
         args.data.appointmentId,

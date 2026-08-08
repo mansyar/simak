@@ -17,6 +17,10 @@ import { bookAppointmentHandler } from '@/server/appointments-lifecycle.server';
 import { rescheduleAppointmentHandler } from '@/server/appointments-rescheduling.server';
 import { completeAppointmentHandler } from '@/server/appointments-outcomes.server';
 import {
+  createAppointmentSlotHandler,
+  listInstructorAppointmentsHandler,
+} from '@/server/appointments.server';
+import {
   createAcademicSectionFixture,
   deleteAcademicSectionFixture,
   type AcademicSectionFixture,
@@ -233,6 +237,32 @@ describe('appointment PostgreSQL concurrency and authorization', () => {
     expect(cancelled).toEqual({ status: 'cancelled', studentId: fixture.studentId });
   });
 
+  it('allows only one concurrent overlapping slot for an instructor', async () => {
+    const startAt = new Date(Date.now() + 5 * 60 * 60 * 1000);
+    const endAt = new Date(startAt.getTime() + 30 * 60 * 1000);
+    vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(
+      session(fixture.instructorId, 'instructor'),
+    );
+
+    const results = await Promise.all([
+      createAppointmentSlotHandler({
+        data: { assignmentId: fixture.assignmentId, startAt, endAt },
+      }),
+      createAppointmentSlotHandler({
+        data: { assignmentId: fixture.assignmentId, startAt, endAt },
+      }),
+    ]);
+
+    expect(results.filter((result) => 'appointment' in result)).toHaveLength(1);
+    expect(results.filter((result) => 'error' in result)).toHaveLength(1);
+
+    const rows = await db
+      .select({ id: appointments.id })
+      .from(appointments)
+      .where(eq(appointments.assignmentId, fixture.assignmentId));
+    expect(rows).toHaveLength(1);
+  });
+
   it('serializes concurrent rescheduling to the same replacement and preserves identity', async () => {
     const replacementStartAt = new Date(Date.now() + 4 * 60 * 60 * 1000);
     const replacementEndAt = new Date(replacementStartAt.getTime() + 30 * 60 * 1000);
@@ -301,6 +331,33 @@ describe('appointment PostgreSQL concurrency and authorization', () => {
       );
     expect(rows).toHaveLength(2);
     expect(rows.every((row) => row.studentId === null)).toBe(true);
+  });
+
+  it('does not expose soft-deleted student PII in instructor appointment lists', async () => {
+    const appointmentId = await createAppointment(fixture.assignmentId, fixture.instructorId, {
+      studentId: fixture.studentId,
+      checkpointId: fixture.checkpointId,
+      status: 'booked',
+    });
+    await db.update(users).set({ deletedAt: new Date() }).where(eq(users.id, fixture.studentId));
+    vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(
+      session(fixture.instructorId, 'instructor'),
+    );
+
+    const result = await listInstructorAppointmentsHandler({
+      data: { assignmentId: fixture.assignmentId, page: 1, limit: 20 },
+    });
+
+    expect('appointments' in result).toBe(true);
+    if ('appointments' in result) {
+      expect(result.appointments).toContainEqual(
+        expect.objectContaining({
+          id: appointmentId,
+          studentName: null,
+          studentEmail: null,
+        }),
+      );
+    }
   });
 
   it('allows only one concurrent instructor outcome transition', async () => {

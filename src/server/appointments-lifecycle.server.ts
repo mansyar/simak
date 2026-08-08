@@ -187,7 +187,6 @@ export async function bookAppointmentHandler(args: {
     return serverError(ErrorCode.UNAUTHORIZED, 'Unauthorized');
   }
 
-  const db = getDb();
   let auditData:
     | {
         assignmentId: number;
@@ -209,6 +208,7 @@ export async function bookAppointmentHandler(args: {
     | undefined;
 
   try {
+    const db = getDb();
     const result = await db.transaction(async (tx) => {
       const appointment = await fetchStudentAppointmentForUpdate(
         tx,
@@ -344,10 +344,3 @@ export async function bookAppointmentHandler(args: {
     });
   }
 }
-
-async function appointmentLifecycleHandlerNotImplemented(_context: unknown): Promise<never> {
-  throw new Error('Appointment lifecycle handler is not implemented');
-}
-
-export const rescheduleAppointmentHandler = appointmentLifecycleHandlerNotImplemented;
-export const getAppointmentDetailHandler = appointmentLifecycleHandlerNotImplemented;

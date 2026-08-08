@@ -176,7 +176,7 @@ describe('appointment participant notifications', () => {
         startAt: new Date('2026-08-08T12:00:00.000Z'),
         endAt: new Date('2026-08-08T13:00:00.000Z'),
       }),
-    ).resolves.toBeUndefined();
+    ).resolves.toEqual(['student-1']);
 
     expect(logger.error).toHaveBeenCalledWith(
       expect.objectContaining({
