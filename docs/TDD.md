@@ -65,6 +65,7 @@ Throughout this document, features are tagged as:
 
 / (authenticated — student)
 ├── /student                              → Student sidebar layout
+│   ├── /student/academic-records          → Official transcript, term GPA, cumulative GPA, and calculation summary (TRACK-060) [v1]
 │   ├── /student/dashboard                → Student dashboard with summary widgets [v1]
 │   ├── /student/settings                 → Student settings hub plus timezone and private calendar-feed controls [v1]
 │   ├── /student/assignments              → Assignment list [v1]
@@ -76,6 +77,7 @@ Throughout this document, features are tagged as:
 
 / (authenticated — instructor)
 ├── /instructor                           → Instructor sidebar layout
+│   ├── /instructor/academic-records       → Section-scoped released academic records and provenance (TRACK-060) [v1]
 │   ├── /instructor/dashboard             → Instructor dashboard with summary widgets [v1]
 │   ├── /instructor/settings              → Settings hub (profile, password, appearance, accessibility) [v1]
 │   ├── /instructor/assignments           → All assignments [v1]
@@ -90,6 +92,7 @@ Throughout this document, features are tagged as:
 
 / (authenticated — admin)
 ├── /admin                                → Admin sidebar layout
+│   ├── /admin/academic-records            → Authorized transcript records, source, and policy metadata (TRACK-060) [v1]
 │   ├── /admin/dashboard                  → Admin dashboard with system metrics [v1]
 │   ├── /admin/settings                   → Settings hub (profile, password, appearance, accessibility) [v1]
 │   ├── /admin/users                      → User management [v1]
@@ -137,6 +140,7 @@ simak/
 │   │   │   └── feedback-snippets/ → Private snippet management page, form, and cards (TRACK-049)
 │   │   ├── reviews/          → Review dialog, review queue, feedback upload, DeadlineManager, ReviewFilePreview (PDF + DOCX inline preview via mammoth.js), RubricScoringSection (instructor scoring UI), RubricResultView (student view), RevisionActionPlanEditor, ReviewHistory action-plan display
 │   │   ├── gradebook/        → GradebookTable, GradeConfigSummary, GradeSettingsDialog, GradeReleaseControls, StudentFinalGradeCard, GradebookExportButtons, RecomputeGradesButton
+│   │   ├── academic-records/ → AcademicRecordsView, transcript rows, GPA summaries, status/provenance details, loading, empty, error, and unavailable states (TRACK-060)
 │   │   ├── consultations/    → Log form, consultation list, progress bar, verification queue item, verification dialog
 │   │   ├── interventions/    → Intervention list, filters, live-risk context, form, and loading skeleton
 │   │   ├── discussions/      → DiscussionPanel (ScrollArea, Avatar, message bubbles, optimistic mutations, 30s refetchInterval)
@@ -222,9 +226,12 @@ simak/
 │   │   ├── gradebook.ts         → Gradebook and release server-fn stubs (student grade, gradebook, config, recompute, preflight, publish, withdraw) + Zod schemas
 │   │   ├── gradebook.server.ts  → Server-only gradebook handlers (student active-snapshot gating, gradebook view, config upsert, batch recompute)
 │   │   ├── gradebook-extras.server.ts → Owner-locked release preflight, publication, withdrawal, versioning, and audit handlers
+│   │   ├── academic-records.ts   → Client-safe role-scoped transcript/GPA query stubs and Zod schemas (TRACK-060)
+│   │   ├── academic-records.server.ts → Transactional academic-record persistence helpers used by release/withdrawal flows
+│   │   ├── academic-records-extras.server.ts → Student, instructor, and admin academic-record query handlers with server-side scope checks
     │   │   └── health.server.ts    → Health check handler (runHealthChecks — DB, R2, email queue checks with 2s timeouts, generic error messages)
 │   ├── db/
-│   │   ├── schema/           → Drizzle schema (split by domain, including revision action items)
+│   │   ├── schema/           → Drizzle schema (split by domain, including academic context, gradebook, academic records, and revision action items)
 │   │   ├── index.ts          → Database client — postgres.js + Drizzle with explicit pool config (`max`/`idle_timeout`/`connect_timeout`/`max_lifetime`/`prepare`), `onnotice` routed through pino, `getDb()` uses `getEnv()`. `closeDb()` closes the pool via `client.end()` for graceful shutdown. (TRACK-042, TRACK-045)
 │   │   └── migrate.ts        → Migration runner
 │   ├── auth/
@@ -251,6 +258,7 @@ simak/
     │   │   ├── r2-cleanup.ts    → `processOrphanedR2Objects(actorId)` — periodic scanner for orphaned R2 objects (runs in email-queue tick loop, 6h throttle, `Promise.allSettled` parallel deletes, no-op if R2 not configured)
 │   │   ├── toast.ts          → Toast helpers (showSuccessToast, showErrorToast) — wraps sonner
 │   │   ├── grade-computation.ts → Pure grade computation engine (computeFinalGrade, types: GradingScheme, CheckpointGradeInput, FinalGradeResult, ContributingCheckpoint, AssignmentGradeConfig). No DB access.
+│   │   ├── academic-record-policy.ts → Pure policy parser, credit validation, term/cumulative GPA calculation, repeat selection, and half-up rounding (TRACK-060). No DB access.
 │   │   ├── route-utils.ts    → Role-based dashboard routing utility
     │   │   ├── role-permissions.ts → Canonical CREATION_ALLOWED_ROLES (shared by user creation + bulk import)
     │   │   ├── session-guards.ts → Shared client-safe type-guard functions (isAdmin, isInstructor, isStudent, isAuthenticated) — accept `NonNullableSession | null`, return `session is NonNullableSession` (TRACK-031)
@@ -278,7 +286,7 @@ simak/
 ├── tests/
 │   ├── unit/                 → Vitest unit tests
 │   ├── integration/          → Vitest integration tests
-│   └── e2e/                  → Playwright E2E tests (chromium + firefox + mobile-chrome, covering public/authentication, all role workflows, mobile layouts, settings, imports, reviews, discussions, timezone/calendar, grading, and @axe-core/playwright a11y scans; the final Chromium verification ran 104 tests)
+│   └── e2e/                  → Playwright E2E tests (chromium + firefox + mobile-chrome, covering public/authentication, all role workflows, academic records/transcript GPA, mobile layouts, settings, imports, reviews, discussions, timezone/calendar, grading, and @axe-core/playwright a11y scans)
 ├── docker/
 │   └── Dockerfile
 ├── drizzle.config.ts
@@ -1093,6 +1101,13 @@ Policies are versioned rather than edited in place. The server validates positiv
 
 Unique constraint on `(studentId, courseSectionId, recordVersion)`. Indexes support student/term, section/student, source release, and policy lookups. A later release inserts a new record version; active reads select the newest version without mutating prior rows. Student reads are self-scoped, instructors require active enrollment in the section, and admins may view provenance metadata.
 
+#### Academic-record policy and GPA behavior (TRACK-060)
+
+- `src/lib/academic-record-policy.ts` is a pure, database-free policy engine. It validates positive finite course credits and explicit grade-point mappings, supports a rounding scale from 0 through 4, and rounds with decimal half-up semantics rather than JavaScript's binary `toFixed` behavior.
+- Term GPA is the credit-weighted mean of `complete` records in the selected term. Cumulative GPA selects the latest eligible complete attempt per course using deterministic term and publication/version ordering. All historical attempts remain available for transcript display; `incomplete` and `withdrawn` records are excluded from both GPA calculations.
+- Release and withdrawal handlers persist academic records in the same transaction as the authoritative release state. The source assignment, release snapshot/version, policy version, captured credits, status, and publication time are stored as provenance. A later release appends a new record version; no update path exists for an existing record.
+- The client-safe `src/server/academic-records.ts` exposes rate-limited GET stubs for student, instructor, and admin reads. Server-only handlers enforce session/role, student self-scope, instructor active-section scope, admin access, pagination, and term/section/student/status filters before returning transcript rows and GPA summaries.
+
 ### Database Indexes
 
 | Table                | Column(s)                | Type             | Purpose                                      |
@@ -1119,6 +1134,11 @@ Unique constraint on `(studentId, courseSectionId, recordVersion)`. Indexes supp
 | `final_grades`       | `studentId`              | b-tree           | Student grade lookup (TRACK-025)             |
 | `grade_release_snapshots` | `assignmentId`, `releaseVersion` | composite b-tree | Active release snapshot lookup (TRACK-051) |
 | `grade_release_snapshots` | `studentId`            | b-tree           | Student snapshot lookup (TRACK-051)         |
+| `academic_record_policies` | `effectiveTermId`, `isActive` | composite b-tree | Select latest active policy effective for a term (TRACK-060) |
+| `academic_records`      | `studentId`, `termId`  | composite b-tree | Student transcript and term GPA lookup (TRACK-060) |
+| `academic_records`      | `courseSectionId`, `studentId` | composite b-tree | Instructor section scope and history lookup (TRACK-060) |
+| `academic_records`      | `sourceAssignmentId`, `sourceReleaseVersion` | composite b-tree | Source release provenance and version lookup (TRACK-060) |
+| `academic_records`      | `policyVersion`        | b-tree           | Policy provenance lookup (TRACK-060)        |
 | `audit_log`          | `createdAt`              | b-tree           | Time-ordered queries                         |
 | `audit_log`          | `action`                 | b-tree           | Type filtering                               |
 | `audit_log`          | `entityType`, `entityId` | composite b-tree | Entity-specific history                      |
@@ -1176,6 +1196,9 @@ Admin       (creates Instructors and Students)
 | Verify consultations                | —          | —     | ✓          | —       |
 | View own progress                   | —          | —     | —          | ✓       |
 | View all progress                   | —          | —     | ✓          | —       |
+| View own academic records            | —          | —     | —          | ✓       |
+| View section academic records        | —          | —     | ✓          | —       |
+| View authorized academic records and provenance | ✓ | ✓ | —          | —       |
 | List students (assignment creation) | —          | —     | ✓          | —       |
 | View system analytics               | ✓          | ✓     | —          | —       |
 | Read audit logs                     | ✓          | ✓     | —          | —       |
