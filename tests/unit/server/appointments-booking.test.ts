@@ -96,6 +96,10 @@ function queueConcurrentTransactions(mockDb: MockDb, queues: unknown[][]) {
 }
 
 function successfulBookingQueue(checkpoint = false) {
+  const bookedResult = checkpoint
+    ? bookedAppointment
+    : { ...bookedAppointment, checkpointId: null };
+
   return [
     [availableAppointment],
     [{ id: 'instructor-1' }],
@@ -104,7 +108,7 @@ function successfulBookingQueue(checkpoint = false) {
     ...(checkpoint ? [[{ id: 7 }]] : []),
     [],
     [],
-    [bookedAppointment],
+    [bookedResult],
   ];
 }
 
@@ -182,7 +186,13 @@ describe('Student appointment booking handler', () => {
   });
 
   it('rejects a checkpoint that is not owned by the student in the appointment assignment', async () => {
-    const transactionDb = queueTransaction(mockDb, [[availableAppointment], []]);
+    const transactionDb = queueTransaction(mockDb, [
+      [availableAppointment],
+      [{ id: 'instructor-1' }],
+      [{ id: 'student-1' }],
+      [{ id: 501 }],
+      [],
+    ]);
 
     const result = await bookAppointmentHandler({
       data: { appointmentId: 301, checkpointId: 999 },
@@ -253,7 +263,7 @@ describe('Student appointment booking handler', () => {
   it('allows one winner when concurrent requests race for the same slot', async () => {
     const transactions = queueConcurrentTransactions(mockDb, [
       successfulBookingQueue(),
-      [{ ...bookedAppointment, checkpointId: null }],
+      [[{ ...bookedAppointment, checkpointId: null }]],
     ]);
 
     const results = await Promise.all([

@@ -109,12 +109,14 @@
 
 ## Phase 3: Student booking and appointment lifecycle
 
-- [~] **Task 3.1: Direct booking with race-safe conflict checks (RED → GREEN)**
+- [x] **Task 3.1: Direct booking with race-safe conflict checks (RED → GREEN)**
   - [x] Write integration tests for eligible student booking, ineligible student rejection, single-winner concurrent booking, instructor overlap, student overlap, and cancelled-slot reuse.
   - [x] Confirm RED behavior.
-  - [~] Implement transactional slot locking, participant conflict checks, assignment/checkpoint validation, and `available → booked` transition.
-  - [~] Verify the original slot remains unchanged on rejected races/conflicts.
+  - [x] Implement transactional slot locking, participant conflict checks, assignment/checkpoint validation, and `available → booked` transition.
+  - [x] Verify the original slot remains unchanged on rejected races/conflicts.
   - **RED evidence:** `pnpm vitest run tests/unit/server/appointments-booking.test.ts` failed 12/12 because `bookAppointmentHandler` was still the not-implemented lifecycle placeholder.
+  - **GREEN evidence:** 12/12 booking tests, 42/42 combined appointment contract/handler tests, `pnpm typecheck`, and targeted `oxlint` passed; scoped lifecycle coverage is 87.03% statements, 82.5% branches, 83.33% functions, and 90.38% lines.
+  - **Implementation notes:** Student booking locks the authorized appointment, instructor user, student user, and assignment enrollment in one transaction; it rechecks active context/status, validates the optional student-owned checkpoint, excludes cancelled records by querying only `booked` conflicts, guards the final update, and audits only safe appointment state.
 
 - [ ] **Task 3.2: Cancellation and rescheduling (RED → GREEN)**
   - [ ] Write tests for student/instructor cancellation, future-only rules, selecting another available slot, instructor time changes, target-slot locking, conflict rejection, and preservation of the original appointment on failure.
