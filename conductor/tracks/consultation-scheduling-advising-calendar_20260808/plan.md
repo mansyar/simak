@@ -105,7 +105,7 @@
   - [x] Obtain explicit user confirmation, attach the verification note, record the checkpoint SHA, and commit the plan update.
   - **Manual verification:** User explicitly confirmed the authorized create → inspect → list → cancel flow, idempotent repeat cancellation, and generic unauthorized access behavior.
   - **Verification note:** Phase 2 checkpoint accepted on 2026-08-08 after automated and manual verification; appointments remain separate from consultation evidence and gating.
-  - **Checkpoint commit:** pending plan commit.
+  - **Checkpoint commit:** `e7c01f13` (`docs(track-058): checkpoint phase 2 instructor slots`).
 
 ## Phase 3: Student booking and appointment lifecycle
 
