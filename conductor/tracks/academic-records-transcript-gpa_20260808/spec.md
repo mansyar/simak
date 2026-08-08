@@ -38,13 +38,23 @@ This track adds release-derived academic records for students and authorized aca
 5. Incomplete and withdrawn outcomes remain visible but are excluded from GPA calculations.
 6. Students see their own records, admins/superadmins may access authorized records, and instructors may access only students in their authorized sections.
 
+## Policy Contract
+
+- The initial grade-point defaults are `A = 4.0`, `B = 3.0`, `C = 2.0`, `D = 1.0`, and `F = 0.0`. Institutions may configure additional letter grades, such as plus/minus grades, but every letter that can appear in a released snapshot must have an explicit point value. An unmapped letter is invalid; it never silently falls back to zero.
+- The released assignment snapshot remains the source of the numeric score and letter grade. Transcript policy maps that released letter to grade points; it does not recalculate the assignment score or grade boundaries.
+- Course credits belong to the reusable `courses` catalog record and are positive values. Existing courses without an explicitly configured credit value remain valid catalog records but produce an `unavailable` transcript result until an administrator configures credits; the system must not fabricate a default credit value during migration.
+- Grading policies are append-only, versioned records with an effective academic term. A record uses the latest active policy whose effective term is no later than the section term, and stores that policy version permanently. Activating a later policy never rewrites existing records.
+- GPA values use decimal arithmetic and are rounded half-up to two decimal places. Term GPA is the weighted mean of eligible records in the selected term. Cumulative GPA selects the latest eligible attempt per course, ordered by term start date, term ID, publication timestamp, and record ID, all descending.
+- `complete` is sourced from an eligible published complete snapshot. `incomplete` and `withdrawn` require an explicit authorized academic-record outcome and are visible but excluded from GPA. `unavailable` is a response-level state for missing, draft, unpublished, ambiguous, or unconfigured records and is never persisted as an academic result. `in_progress` is never an official transcript outcome.
+- For a student/course pair, a newer source release creates a new immutable record version. The active version is selected by source release version, publication timestamp, and record ID, in descending order; historical versions remain auditable.
+
 ## Functional Requirements
 
 ### FR-1: Academic Record Creation
 
 1. A course section can have at most one explicitly designated transcript-source assignment.
 2. The system must prevent an official course record when the source assignment is missing, ambiguous, unpublished, or ineligible.
-3. Create official course records only from published, eligible grade-release snapshots or an explicitly authorized withdrawal outcome.
+3. Create official course records only from published, eligible grade-release snapshots or an explicitly authorized incomplete or withdrawal outcome.
 4. Associate every record with the student, academic term, course section, course identity, source assignment, source release version where applicable, applied policy version, credits, numeric score where applicable, letter grade where applicable, grade points where applicable, academic status, and publication timestamp.
 5. Record creation and grade-release integration must be transactional.
 6. Releasing a newer result creates a new immutable record version rather than mutating historical rows.
