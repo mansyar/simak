@@ -39,15 +39,15 @@
   - [x] Test creation from an eligible published snapshot.
   - [x] Test creation of a new immutable version when a later release supersedes a prior one.
   - [x] Test rejection of missing, ambiguous, draft, unpublished, and ineligible sources.
-- [~] Task: Implement record persistence services
-  - [ ] Implement transactional academic-record creation and active-version selection.
-  - [ ] Persist source assignment, release version, policy version, status, credits, and calculated values.
-  - [ ] Ensure existing grade snapshots remain unchanged.
-- [ ] Task: Phase Verification & Checkpoint (Refer to `conductor/workflow.md`)
+- [x] Task: Implement record persistence services [584d7d5]
+  - [x] Implement transactional academic-record creation and active-version selection.
+  - [x] Persist source assignment, release version, policy version, status, credits, and calculated values.
+  - [x] Ensure existing grade snapshots remain unchanged.
+- [x] Task: Phase Verification & Checkpoint (Refer to `conductor/workflow.md`) [584d7d5]
 
 ## Phase 2: Grade Release and Enrollment Integration
 
-- [ ] Task: Write failing integration tests for official record creation
+- [~] Task: Write failing integration tests for official record creation
   - [ ] Test publishing a designated assignment creates records only for eligible enrolled students.
   - [ ] Test draft and unpublished grades remain unavailable.
   - [ ] Test later release versions preserve history and switch the active official result.
