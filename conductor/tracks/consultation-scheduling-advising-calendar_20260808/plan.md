@@ -303,7 +303,7 @@
    - [x] Obtain confirmation, attach the verification note, record the checkpoint SHA, and commit the plan update.
    - **Automated verification:** Instructor panel and assignment-route suites passed 9/9; the expanded panel quality suite passed 8/8. Full unit verification passed 462 files and 4,551 tests. Scoped panel coverage passed 93.22% statements, 80.30% branches, 96.77% functions, and 94.44% lines. `pnpm check:i18n`, `pnpm typecheck`, targeted `oxlint`, formatting, and `git diff --check` passed.
    - **Manual verification:** User confirmed on 2026-08-08 that the instructor scheduling surface works at approximately 320px/mobile and desktop widths in light/dark mode; keyboard reaches 44px controls and destructive confirmation; publish → student visibility → reschedule → cancel → post-end complete/no-show works; invalid windows/conflicts provide feedback without stale state; and inactive/unowned assignment authorization remains server-enforced.
-   - **Checkpoint commit:** Pending plan SHA record.
+   - **Checkpoint commit:** `fd481aef`.
 
 ## Phase 8: End-to-end validation and completion
 
