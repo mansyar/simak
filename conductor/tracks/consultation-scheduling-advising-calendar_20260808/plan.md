@@ -290,15 +290,19 @@
    - **Automated verification:** Instructor panel and instructor assignment route suites passed 9/9; `pnpm typecheck`, `pnpm check:i18n`, targeted `oxlint`, formatting, and `git diff --check` passed. The implementation stayed within the 500-line modularity limit.
    - **Implementation commit:** `80e7c83e` (with the RED contract commit `a3e79b38`).
 
-- [~] **Task 7.3: UI quality verification**
-   - [~] Run instructor component/route tests, accessibility checks, i18n parity, lint, and typecheck.
-   - [~] Verify appointment state changes are reflected without stale client cache data.
+- [x] **Task 7.3: UI quality verification**
+   - [x] Run instructor component/route tests, accessibility checks, i18n parity, lint, and typecheck.
+   - [x] Verify appointment state changes are reflected without stale client cache data.
+   - **Verification notes:** Instructor panel tests passed 8/8, including invalid-window rejection, conflict feedback, terminal status labels, fallback checkpoint labels, post-mutation list refresh, and the 44px checkpoint control assertion. Instructor panel and assignment-route suites passed 9/9. Scoped V8 coverage for `InstructorAppointmentPanel.tsx` passed at 93.22% statements, 80.30% branches, 96.77% functions, and 94.44% lines. `pnpm test` passed 462 files and 4,551 tests; `pnpm check:i18n`, `pnpm typecheck`, targeted `oxlint`, formatting, and `git diff --check` passed. Accessibility verification is assertion-based (semantic status/dialog behavior, keyboard-reachable controls, and touch-target sizing); no full axe scan was claimed here.
+   - **Implementation/test commits:** `80e7c83e`, `0df25cb7`, and `84e27164`.
 
-- [ ] **Phase 7 Verification & Checkpoint**
-  - [ ] Run the exact focused instructor UI test command and announce it before execution.
-  - [ ] Manually test slot publish, student booking visibility, reschedule, cancel, complete/no-show, and conflict feedback.
-  - [ ] Verify responsive behavior, dark mode, keyboard use, and destructive-action confirmation.
-  - [ ] Obtain confirmation, attach the verification note, record the checkpoint SHA, and commit the plan update.
+- [~] **Phase 7 Verification & Checkpoint**
+   - [x] Run the exact focused instructor UI test command and announce it before execution.
+   - [~] Manually test slot publish, student booking visibility, reschedule, cancel, complete/no-show, and conflict feedback.
+   - [~] Verify responsive behavior, dark mode, keyboard use, and destructive-action confirmation.
+   - [ ] Obtain confirmation, attach the verification note, record the checkpoint SHA, and commit the plan update.
+   - **Automated verification:** Instructor panel and assignment-route suites passed 9/9; the expanded panel quality suite passed 8/8. Full unit verification passed 462 files and 4,551 tests. Scoped panel coverage passed 93.22% statements, 80.30% branches, 96.77% functions, and 94.44% lines. `pnpm check:i18n`, `pnpm typecheck`, targeted `oxlint`, formatting, and `git diff --check` passed.
+   - **Manual verification:** Pending explicit confirmation of the instructor lifecycle and responsive/accessibility flow.
 
 ## Phase 8: End-to-end validation and completion
 
