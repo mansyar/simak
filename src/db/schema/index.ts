@@ -10,6 +10,7 @@ export * from './submissions';
 export * from './rubrics';
 export * from './consultations';
 export * from './appointments';
+export * from './appointment-reminders';
 export * from './notifications';
 export * from './audit-log';
 export * from './extensions';
@@ -32,6 +33,7 @@ import { submissions, reviews } from './submissions';
 import { rubricCriteria, rubricLevels, reviewScores } from './rubrics';
 import { consultations } from './consultations';
 import { appointments } from './appointments';
+import { appointmentReminders } from './appointment-reminders';
 import { notifications } from './notifications';
 import { extensionRequests } from './extensions';
 import { emailQueue } from './email-queue';
@@ -77,6 +79,7 @@ export const usersRelations = relations(users, ({ many }) => ({
   consultationsAsVerifier: many(consultations),
   appointmentsAsInstructor: many(appointments, { relationName: 'appointmentInstructor' }),
   appointmentsAsStudent: many(appointments, { relationName: 'appointmentStudent' }),
+  appointmentRemindersAsParticipant: many(appointmentReminders),
   twoFactor: many(twoFactor),
   finalGrades: many(finalGrades),
   gradeReleaseSnapshots: many(gradeReleaseSnapshots),
@@ -300,6 +303,17 @@ export const appointmentsRelations = relations(appointments, ({ one }) => ({
   student: one(users, {
     relationName: 'appointmentStudent',
     fields: [appointments.studentId],
+    references: [users.id],
+  }),
+}));
+
+export const appointmentRemindersRelations = relations(appointmentReminders, ({ one }) => ({
+  appointment: one(appointments, {
+    fields: [appointmentReminders.appointmentId],
+    references: [appointments.id],
+  }),
+  participant: one(users, {
+    fields: [appointmentReminders.participantId],
     references: [users.id],
   }),
 }));
