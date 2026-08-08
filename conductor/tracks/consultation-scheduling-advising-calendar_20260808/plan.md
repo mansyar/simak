@@ -275,10 +275,10 @@
 
 ## Phase 7: Instructor scheduling experience
 
-- [ ] **Task 7.1: Instructor UI tests (RED)**
-  - [ ] Add tests for slot creation, assignment/checkpoint selection, duration/time validation, slot listing, cancellation, rescheduling, completion/no-show, and conflict errors.
-  - [ ] Add role/ownership and inactive-assignment UI coverage.
-  - [ ] Confirm RED behavior.
+- [~] **Task 7.1: Instructor UI tests (RED)**
+   - [~] Add tests for slot creation, assignment/checkpoint selection, duration/time validation, slot listing, cancellation, rescheduling, completion/no-show, and conflict errors.
+   - [~] Add role/ownership and inactive-assignment UI coverage.
+   - [ ] Confirm RED behavior.
 
 - [ ] **Task 7.2: Instructor slot and appointment UI (GREEN)**
   - [ ] Implement the assignment consultation scheduling surface using existing instructor consultation patterns.
