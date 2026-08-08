@@ -191,11 +191,14 @@
   - **Implementation notes:** Added `appointment_reminders` durable rows with a PostgreSQL `appointment_reminder_tier` enum, participant/tier uniqueness, foreign keys, indexes, and forward/rollback migrations. The scanner evaluates booked active appointments in UTC half-open 24-hour and 1-hour windows, atomically claims student/instructor reminder rows with `ON CONFLICT DO NOTHING`, groups claimed participants, and dispatches through the existing preference-aware notification/email helper. `email-queue-init` invokes it on its existing 30-second tick with an independent hourly throttle; scanner, deduplication, and delivery failures are advisory and cannot stop queue processing. Direct `simak_test` apply/inspect/rollback/re-apply verification confirmed migration behavior.
   - **Implementation commits:** `0e32cfb6` (persistence), `6c9a3662` (scanner/queue integration).
 
-- [ ] **Phase 4 Verification & Checkpoint**
-  - [ ] Run focused notification/reminder tests, i18n parity, and typecheck.
-  - [ ] Manually book a future appointment and verify participant notifications plus at-most-once reminder behavior using test fixtures.
-  - [ ] Confirm disabled email/in-app preferences are respected.
-  - [ ] Obtain confirmation, attach the verification note, record the checkpoint SHA, and commit the plan update.
+- [x] **Phase 4 Verification & Checkpoint**
+  - [x] Run focused notification/reminder tests, i18n parity, and typecheck.
+  - [x] Manually book a future appointment and verify participant notifications plus at-most-once reminder behavior using test fixtures.
+  - [x] Confirm disabled email/in-app preferences are respected.
+  - [x] Confirm cancelled/completed/no-show appointments do not trigger reminders and notification failures do not interrupt queue processing.
+  - **Automated verification:** Appointment schema tests passed 4/4; notification/email and lifecycle suites passed 77/77; reminder scanner/email-queue suites passed 28/28; `pnpm check:i18n`, `pnpm typecheck`, targeted `oxlint`, and `git diff --check` passed. Scoped V8 coverage passed at 97% statements, 83.01% branches, 100% functions, and 100% lines. Disposable `simak_test` migration apply/inspect/rollback/re-apply was verified.
+  - **Manual verification:** User confirmed the future booking notification flow, 24-hour/1-hour at-most-once reminder behavior, independent email/in-app preference suppression, terminal-status reminder exclusion, and advisory notification failure isolation on 2026-08-08.
+  - **Checkpoint commit:** Pending.
 
 ## Phase 5: Private iCalendar extension
 
