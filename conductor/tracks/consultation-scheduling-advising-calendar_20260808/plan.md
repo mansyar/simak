@@ -179,13 +179,13 @@
   - **RED evidence:** The new appointment email body import failed because `src/lib/appointment-email.ts` was absent; the delivery assertions also confirmed lifecycle notification delivery had not yet enqueued participant emails (2 delivery assertions failed while 4 existing helper tests passed).
   - **GREEN evidence:** Seven focused suites passed 77/77 tests, covering appointment email rendering, participant notification delivery, email preference suppression, booking/cancellation/rescheduling/completion/no-show event assertions, and schema contracts. `pnpm check:i18n`, `pnpm typecheck`, targeted `oxlint`, and `git diff --check` passed. Scoped V8 coverage across appointment notification/email and event-email modules passed global thresholds at 97.43% statements, 80.76% branches, 83.33% functions, and 97.22% lines.
   - **Implementation notes:** Added localized appointment email configuration/body rendering, extended the existing participant helper to enqueue preference-aware email after in-app work, isolated each channel and database acquisition as advisory work, and retained `void` post-commit calls from mutation handlers so committed appointment state is never rolled back by notification failures. Email subjects/body parameters contain appointment/assignment/time identifiers only; consultation notes and tokens are excluded.
-  - **Implementation commit:** Pending.
+  - **Implementation commit:** `9c7c996f`.
 
-- [ ] **Task 4.3: 24-hour and 1-hour reminder scanner (RED → GREEN)**
-  - [ ] Write tests for both reminder windows, UTC comparisons, timezone-independent trigger behavior, repeated scans, boundary times, cancelled appointments, and completed/no-show appointments.
-  - [ ] Confirm RED behavior.
-  - [ ] Implement the scanner using the existing background processor boundary and a durable deduplication mechanism.
-  - [ ] Verify failures are logged and isolated from email queue processing.
+- [~] **Task 4.3: 24-hour and 1-hour reminder scanner (RED → GREEN)**
+  - [~] Write tests for both reminder windows, UTC comparisons, timezone-independent trigger behavior, repeated scans, boundary times, cancelled appointments, and completed/no-show appointments.
+  - [~] Confirm RED behavior.
+  - [~] Implement the scanner using the existing background processor boundary and a durable deduplication mechanism.
+  - [~] Verify failures are logged and isolated from email queue processing.
 
 - [ ] **Phase 4 Verification & Checkpoint**
   - [ ] Run focused notification/reminder tests, i18n parity, and typecheck.
