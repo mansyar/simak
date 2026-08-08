@@ -25,7 +25,7 @@
 
 ## Phase 1: Schema and Immutable Academic Records
 
-- [ ] Task: Write failing persistence and constraint tests
+- [~] Task: Write failing persistence and constraint tests
   - [ ] Test academic-record fields and source-release/policy references.
   - [ ] Test immutable historical rows and active-version uniqueness.
   - [ ] Test the single transcript-source assignment rule for a section.
