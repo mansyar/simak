@@ -242,9 +242,10 @@
 ## Phase 6: Student appointment experience
 
 - [~] **Task 6.1: Student UI tests (RED)**
-  - [~] Add component/route tests for available slots, timezone display, booking, conflict feedback, booked appointment details, cancellation, rescheduling, completed/no-show states, and empty/error/loading states.
-  - [~] Add tests for the explicit consultation evidence action.
-  - [ ] Confirm RED behavior.
+  - [x] Add component/route tests for available slots, timezone display, booking, conflict feedback, booked appointment details, cancellation, rescheduling, completed/no-show states, and empty/error/loading states.
+  - [x] Add tests for the explicit consultation evidence action.
+  - [x] Confirm RED behavior.
+  - **RED evidence:** `pnpm vitest run tests/unit/components/student/StudentAppointmentPanel.test.tsx` failed before assertions because the planned `StudentAppointmentPanel` component did not exist; `pnpm typecheck` reported the same missing module. The RED contract covers available/booked rendering, timezone labeling, booking/conflict handling, confirmation-gated cancellation, stable-ID rescheduling, terminal outcome display, loading/error/empty states, and explicit consultation recording.
 
 - [ ] **Task 6.2: Student booking and management UI (GREEN)**
   - [ ] Implement responsive assignment-level slot and appointment views using existing UI primitives.
