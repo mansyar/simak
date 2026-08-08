@@ -137,6 +137,7 @@
   - [~] Implement lifecycle transitions and an explicit action that opens/prefills the existing consultation evidence flow without auto-verification.
   - [~] Verify existing consultation verification and gating tests remain green.
   - **RED evidence:** `pnpm vitest run tests/unit/server/appointments-completion.test.ts` executed 9 tests and all failed against the existing `appointmentLifecycleHandlerNotImplemented` placeholder.
+  - **Linkage RED evidence:** The consultation form regression test fails because `ConsultationForm` has no appointment-supplied checkpoint prefill prop; the existing selector defaults to its first option.
 
 - [ ] **Task 3.4: Transaction and authorization integration coverage**
   - [ ] Add database-backed tests for concurrent booking/rescheduling and stale transition handling.

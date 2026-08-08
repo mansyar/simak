@@ -104,6 +104,19 @@ describe('ConsultationForm', () => {
     expect(screen.getByText('Chapter 1')).toBeDefined();
   });
 
+  it('should preselect the checkpoint supplied by an appointment evidence action', () => {
+    render(
+      <ConsultationForm
+        assignmentId={1}
+        checkpoints={checkpoints}
+        initialCheckpointId={2}
+        onSuccess={onSuccess}
+      />,
+    );
+
+    expect((screen.getAllByTestId('select')[0] as HTMLSelectElement).value).toBe('2');
+  });
+
   it('should render session type selector', () => {
     render(<ConsultationForm assignmentId={1} checkpoints={checkpoints} onSuccess={onSuccess} />);
     expect(screen.getByText('Session Type')).toBeDefined();
