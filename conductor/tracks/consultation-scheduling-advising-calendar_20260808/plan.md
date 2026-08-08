@@ -161,9 +161,9 @@
 
 ## Phase 4: Notifications and reminders
 
-- [ ] **Task 4.1: Add bilingual appointment notification contracts (RED → GREEN)**
-  - [ ] Write tests for notification keys, English/Indonesian parity, participant targeting, and privacy-safe content.
-  - [ ] Confirm RED behavior.
+- [~] **Task 4.1: Add bilingual appointment notification contracts (RED → GREEN)**
+  - [~] Write tests for notification keys, English/Indonesian parity, participant targeting, and privacy-safe content.
+  - [~] Confirm RED behavior.
   - [ ] Add locale source keys and notification template/type mappings; regenerate i18n types.
   - [ ] Verify `pnpm check:i18n`.
 
