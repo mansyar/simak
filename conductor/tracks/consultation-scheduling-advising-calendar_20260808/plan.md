@@ -365,7 +365,7 @@
 - [x] Migration and rollback are tested.
 - [x] Required quality gates pass with new-code coverage above 80%.
   - [x] Every completed task and phase has a recorded commit SHA and git note.
-  - [ ] Final review approves the track before archive.
+  - [x] Final review approves the track before archive.
 
 ## Phase: Review Fixes
 
