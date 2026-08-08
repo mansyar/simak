@@ -61,11 +61,11 @@
   - [x] Verify gradebook recomputation does not mutate official records.
   - [x] Verify existing student grade visibility still uses published snapshots.
   - [x] Verify existing analytics and grade-release flows remain compatible.
-- [~] Task: Phase Verification & Checkpoint (Refer to `conductor/workflow.md`)
+- [x] Task: Phase Verification & Checkpoint (Refer to `conductor/workflow.md`) [2de7786]
 
 ## Phase 3: Policy Engine and Role-Scoped Server Functions
 
-- [ ] Task: Write failing server-function tests
+- [~] Task: Write failing server-function tests
   - [ ] Test student self-access and denial of another student’s records.
   - [ ] Test instructor access limited to authorized sections.
   - [ ] Test admin/superadmin access and policy/source metadata visibility.
