@@ -1,7 +1,10 @@
 /** @vitest-environment node */
 
 import { describe, expect, it, vi } from 'vitest';
-import { persistAcademicRecordsForRelease } from '@/server/academic-records.server';
+import {
+  persistAcademicRecordsForRelease,
+  persistWithdrawnAcademicRecordsForReleaseInTransaction,
+} from '@/server/academic-records.server';
 
 const assignmentContext = {
   id: 42,
@@ -172,6 +175,49 @@ describe('persistAcademicRecordsForRelease', () => {
       }),
     ]);
     expect(result).toMatchObject({ releaseVersion: 2, createdCount: 1 });
+  });
+
+  it('creates a withdrawn record version without fabricating a grade', async () => {
+    const mock = createMockDb([
+      [assignmentContext],
+      [{ id: assignmentContext.id }],
+      [publishedConfig],
+      [policy],
+      [
+        {
+          id: 901,
+          studentId: 'student-1',
+          sourceAssignmentId: assignmentContext.id,
+          sourceSnapshotId: completeSnapshot.id,
+          sourceReleaseVersion: 1,
+          recordVersion: 1,
+          status: 'complete',
+        },
+      ],
+    ]);
+
+    const result = await persistWithdrawnAcademicRecordsForReleaseInTransaction(mock.db as never, {
+      assignmentId: assignmentContext.id,
+      releaseVersion: 1,
+      reason: 'Correction required',
+      actorId: 'instructor-1',
+    });
+
+    expect(mock.insertedValues).toEqual([
+      [
+        expect.objectContaining({
+          studentId: 'student-1',
+          sourceSnapshotId: null,
+          sourceReleaseVersion: 1,
+          recordVersion: 2,
+          numericScore: null,
+          letterGrade: null,
+          status: 'withdrawn',
+          gradePoints: null,
+        }),
+      ],
+    ]);
+    expect(result).toMatchObject({ releaseVersion: 1, createdCount: 1, activeRecordIds: [900] });
   });
 
   it.each([

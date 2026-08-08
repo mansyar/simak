@@ -71,7 +71,12 @@ function createMockDb() {
   };
 }
 
-const assignment = { id: 1, instructorId: 'instructor-1' };
+const assignment = {
+  id: 1,
+  instructorId: 'instructor-1',
+  sectionId: 7,
+  isTranscriptSource: true,
+};
 const draftConfig = {
   releaseStatus: 'draft',
   activeReleaseVersion: null,

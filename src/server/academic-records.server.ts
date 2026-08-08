@@ -38,9 +38,11 @@ type SnapshotRow = {
 type ExistingRecordRow = {
   id: number;
   studentId: string;
+  sourceAssignmentId?: number;
   sourceSnapshotId: number | null;
   sourceReleaseVersion: number | null;
   recordVersion: number;
+  status?: 'complete' | 'incomplete' | 'withdrawn';
 };
 
 type AcademicRecordReleaseInput = {
@@ -163,9 +165,11 @@ export async function persistAcademicRecordsForReleaseInTransaction(
     .select({
       id: academicRecords.id,
       studentId: academicRecords.studentId,
+      sourceAssignmentId: academicRecords.sourceAssignmentId,
       sourceSnapshotId: academicRecords.sourceSnapshotId,
       sourceReleaseVersion: academicRecords.sourceReleaseVersion,
       recordVersion: academicRecords.recordVersion,
+      status: academicRecords.status,
     })
     .from(academicRecords)
     .where(eq(academicRecords.courseSectionId, assignment.sectionId))) as ExistingRecordRow[];
@@ -234,6 +238,155 @@ export async function persistAcademicRecordsForReleaseInTransaction(
     skippedCount: snapshots.length - values.length,
     recordIds: (inserted as Array<{ id: number }>).map((record) => record.id),
     activeRecordIds,
+  };
+}
+
+type AcademicRecordWithdrawalInput = AcademicRecordReleaseInput & {
+  reason: string;
+  actorId: string;
+};
+
+/** Persist an authorized withdrawal as a new, GPA-excluded immutable version. */
+export async function persistWithdrawnAcademicRecordsForReleaseInTransaction(
+  db: Tx,
+  input: AcademicRecordWithdrawalInput,
+) {
+  validateReleaseInput(input);
+  if (!input.reason.trim() || !input.actorId) {
+    throw new Error('An authorized withdrawal reason is required');
+  }
+
+  const assignment = await getAssignmentContext(db, input.assignmentId);
+  if (!assignment) {
+    throw new Error('Assignment not found');
+  }
+
+  const sourceAssignments = await db
+    .select({ id: assignments.id })
+    .from(assignments)
+    .where(
+      and(
+        eq(assignments.sectionId, assignment.sectionId),
+        eq(assignments.isTranscriptSource, true),
+      ),
+    );
+
+  if (sourceAssignments.length !== 1 || sourceAssignments[0]?.id !== input.assignmentId) {
+    throw new Error('A section must have exactly one transcript-source assignment');
+  }
+
+  const [releaseConfig] = await db
+    .select({
+      releaseStatus: assignmentGradeConfig.releaseStatus,
+      activeReleaseVersion: assignmentGradeConfig.activeReleaseVersion,
+    })
+    .from(assignmentGradeConfig)
+    .where(eq(assignmentGradeConfig.assignmentId, input.assignmentId))
+    .limit(1);
+  assertPublishedRelease(releaseConfig as ReleaseConfigRow | undefined, input.releaseVersion);
+
+  const [policyRow] = await db
+    .select({
+      gradePoints: academicRecordPolicies.gradePoints,
+      roundingScale: academicRecordPolicies.roundingScale,
+      version: academicRecordPolicies.version,
+    })
+    .from(academicRecordPolicies)
+    .innerJoin(academicTerms, eq(academicTerms.id, academicRecordPolicies.effectiveTermId))
+    .where(
+      and(
+        eq(academicRecordPolicies.isActive, true),
+        lte(academicTerms.startDate, assignment.termStartDate),
+      ),
+    )
+    .orderBy(
+      desc(academicTerms.startDate),
+      desc(academicRecordPolicies.version),
+      desc(academicRecordPolicies.id),
+    )
+    .limit(1);
+
+  if (!policyRow) {
+    throw new Error('No active academic-record policy is configured for this term');
+  }
+  parseAcademicRecordPolicy({
+    gradePoints: policyRow.gradePoints,
+    roundingScale: policyRow.roundingScale,
+  });
+
+  const credits = String(assignment.credits);
+  if (!isValidCourseCredits(Number(credits))) {
+    throw new Error('Course credits must be positive');
+  }
+
+  const existingRecords = (await db
+    .select({
+      id: academicRecords.id,
+      studentId: academicRecords.studentId,
+      sourceAssignmentId: academicRecords.sourceAssignmentId,
+      sourceSnapshotId: academicRecords.sourceSnapshotId,
+      sourceReleaseVersion: academicRecords.sourceReleaseVersion,
+      recordVersion: academicRecords.recordVersion,
+      status: academicRecords.status,
+    })
+    .from(academicRecords)
+    .where(eq(academicRecords.courseSectionId, assignment.sectionId))) as ExistingRecordRow[];
+
+  const nextVersionByStudent = new Map<string, number>();
+  const withdrawnStudents = new Set<string>();
+  const sourceStudents = new Set<string>();
+  for (const record of existingRecords) {
+    nextVersionByStudent.set(
+      record.studentId,
+      Math.max(nextVersionByStudent.get(record.studentId) ?? 0, record.recordVersion),
+    );
+
+    if (
+      record.sourceAssignmentId === input.assignmentId &&
+      record.sourceReleaseVersion === input.releaseVersion
+    ) {
+      if (record.status === 'complete') sourceStudents.add(record.studentId);
+      if (record.status === 'withdrawn') withdrawnStudents.add(record.studentId);
+    }
+  }
+
+  const publishedAt = new Date();
+  const values = [...sourceStudents].flatMap((studentId) => {
+    if (withdrawnStudents.has(studentId)) return [];
+
+    const recordVersion = (nextVersionByStudent.get(studentId) ?? 0) + 1;
+    nextVersionByStudent.set(studentId, recordVersion);
+    return [
+      {
+        studentId,
+        courseId: assignment.courseId,
+        courseSectionId: assignment.sectionId,
+        termId: assignment.termId,
+        sourceAssignmentId: input.assignmentId,
+        sourceSnapshotId: null,
+        sourceReleaseVersion: input.releaseVersion,
+        policyVersion: policyRow.version,
+        recordVersion,
+        numericScore: null,
+        letterGrade: null,
+        status: 'withdrawn' as const,
+        credits,
+        gradePoints: null,
+        publishedAt,
+      },
+    ];
+  });
+
+  const inserted = values.length ? await db.insert(academicRecords).values(values).returning() : [];
+  const persisted = [...existingRecords, ...(inserted as ExistingRecordRow[])];
+
+  return {
+    success: true as const,
+    assignmentId: input.assignmentId,
+    releaseVersion: input.releaseVersion,
+    createdCount: values.length,
+    recordIds: (inserted as Array<{ id: number }>).map((record) => record.id),
+    activeRecordIds: selectActiveRecordIds(persisted),
   };
 }
 
