@@ -65,12 +65,12 @@
 
 ## Phase 3: Policy Engine and Role-Scoped Server Functions
 
-- [~] Task: Write failing server-function tests
-  - [ ] Test student self-access and denial of another student’s records.
-  - [ ] Test instructor access limited to authorized sections.
-  - [ ] Test admin/superadmin access and policy/source metadata visibility.
-  - [ ] Test term and cumulative GPA responses and transparent calculation inputs.
-- [ ] Task: Implement academic-record policy services
+- [x] Task: Write failing server-function tests [b92a8e9]
+  - [x] Test student self-access and denial of another student’s records.
+  - [x] Test instructor access limited to authorized sections.
+  - [x] Test admin/superadmin access and policy/source metadata visibility.
+  - [x] Test term and cumulative GPA responses and transparent calculation inputs.
+- [~] Task: Implement academic-record policy services
   - [ ] Implement grade-point mapping, configured rounding, credits, and status eligibility.
   - [ ] Implement term GPA and cumulative GPA using immutable records.
   - [ ] Implement latest-eligible-repeat selection with deterministic ordering.
