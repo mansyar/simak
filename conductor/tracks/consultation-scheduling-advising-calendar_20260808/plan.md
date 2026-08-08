@@ -281,10 +281,10 @@
    - [x] Confirm RED behavior.
    - **RED evidence:** `pnpm vitest run tests/unit/components/instructor/InstructorAppointmentPanel.test.tsx` failed before assertions because the planned `InstructorAppointmentPanel` component did not exist; `pnpm typecheck` reported the same missing module. The contract covers slot publishing, assignment/checkpoint selection, booked student/status display, confirmation-gated cancellation, replacement-slot rescheduling, completion/no-show actions, timezone labels, empty/loading/error/retry states, and generic unauthorized/inactive-context handling.
 
-- [ ] **Task 7.2: Instructor slot and appointment UI (GREEN)**
-  - [ ] Implement the assignment consultation scheduling surface using existing instructor consultation patterns.
-  - [ ] Add mobile-friendly list/forms, status presentation, confirmation dialogs, accessible labels, and bilingual messages.
-  - [ ] Ensure the instructor cannot modify appointments outside server-authorized assignments.
+- [~] **Task 7.2: Instructor slot and appointment UI (GREEN)**
+   - [~] Implement the assignment consultation scheduling surface using existing instructor consultation patterns.
+   - [~] Add mobile-friendly list/forms, status presentation, confirmation dialogs, accessible labels, and bilingual messages.
+   - [~] Ensure the instructor cannot modify appointments outside server-authorized assignments.
 
 - [ ] **Task 7.3: UI quality verification**
   - [ ] Run instructor component/route tests, accessibility checks, i18n parity, lint, and typecheck.
