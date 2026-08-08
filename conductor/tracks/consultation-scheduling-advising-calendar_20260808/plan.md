@@ -117,6 +117,7 @@
   - **RED evidence:** `pnpm vitest run tests/unit/server/appointments-booking.test.ts` failed 12/12 because `bookAppointmentHandler` was still the not-implemented lifecycle placeholder.
   - **GREEN evidence:** 12/12 booking tests, 42/42 combined appointment contract/handler tests, `pnpm typecheck`, and targeted `oxlint` passed; scoped lifecycle coverage is 87.03% statements, 82.5% branches, 83.33% functions, and 90.38% lines.
   - **Implementation notes:** Student booking locks the authorized appointment, instructor user, student user, and assignment enrollment in one transaction; it rechecks active context/status, validates the optional student-owned checkpoint, excludes cancelled records by querying only `booked` conflicts, guards the final update, and audits only safe appointment state.
+  - **Implementation commit:** `bb75b022` (`feat(track-058): add race-safe student booking`).
 
 - [ ] **Task 3.2: Cancellation and rescheduling (RED → GREEN)**
   - [ ] Write tests for student/instructor cancellation, future-only rules, selecting another available slot, instructor time changes, target-slot locking, conflict rejection, and preservation of the original appointment on failure.
