@@ -3,7 +3,7 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { ButtonHTMLAttributes, ReactNode } from 'react';
 
-const { api, mockFormatAppointmentRange } = vi.hoisted(() => ({
+const { api, mockFormatAppointmentRange, mockValidateAppointmentWindow } = vi.hoisted(() => ({
   api: {
     listInstructorAppointments: vi.fn(),
     createAppointmentSlot: vi.fn(),
@@ -17,12 +17,13 @@ const { api, mockFormatAppointmentRange } = vi.hoisted(() => ({
     endLabel: 'Aug 9, 2026, 9:00 AM',
     timeZone: 'America/New_York',
   })),
+  mockValidateAppointmentWindow: vi.fn(() => ({ valid: true })),
 }));
 
 vi.mock('@/server/appointments', () => api);
 vi.mock('@/lib/appointment-policies', () => ({
   formatAppointmentRange: mockFormatAppointmentRange,
-  validateAppointmentWindow: vi.fn(() => ({ valid: true })),
+  validateAppointmentWindow: mockValidateAppointmentWindow,
 }));
 vi.mock('@/routes/__root', () => ({
   useI18n: () => ({
@@ -138,6 +139,7 @@ function renderPanel() {
 describe('InstructorAppointmentPanel', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockValidateAppointmentWindow.mockReturnValue({ valid: true });
     api.listInstructorAppointments.mockResolvedValue({
       appointments: [available, booked, replacement],
       total: 3,
@@ -245,5 +247,63 @@ describe('InstructorAppointmentPanel', () => {
     api.listInstructorAppointments.mockResolvedValue({ appointments: [], total: 0 });
     fireEvent.click(screen.getByRole('button', { name: 'Retry' }));
     expect(await screen.findByText('No appointments found')).toBeTruthy();
+  });
+
+  it('rejects invalid windows before publishing', async () => {
+    mockValidateAppointmentWindow.mockReturnValue({ valid: false });
+    renderPanel();
+
+    fireEvent.change(await screen.findByLabelText('Start time'), {
+      target: { value: '2026-08-11T08:00' },
+    });
+    fireEvent.change(screen.getByLabelText('End time'), {
+      target: { value: '2026-08-11T09:00' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'Publish slot' }));
+
+    expect(await screen.findByText('Choose a valid future slot.')).toBeTruthy();
+    expect(api.createAppointmentSlot).not.toHaveBeenCalled();
+  });
+
+  it('shows conflict feedback for rejected mutations', async () => {
+    const conflict = { error: { code: 'CONFLICT', message: 'Conflict' } };
+    api.createAppointmentSlot.mockResolvedValueOnce(conflict);
+    renderPanel();
+
+    fireEvent.change(await screen.findByLabelText('Start time'), {
+      target: { value: '2026-08-11T08:00' },
+    });
+    fireEvent.change(screen.getByLabelText('End time'), {
+      target: { value: '2026-08-11T09:00' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'Publish slot' }));
+    expect(
+      await screen.findAllByText('This appointment conflicts with another booking.'),
+    ).toHaveLength(1);
+
+    api.rescheduleAppointment.mockResolvedValueOnce(conflict);
+    fireEvent.change(screen.getByLabelText('Replacement slot'), { target: { value: '202' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Reschedule appointment' }));
+    expect(
+      await screen.findAllByText('This appointment conflicts with another booking.'),
+    ).toHaveLength(1);
+  });
+
+  it('renders terminal statuses and fallback checkpoint names', async () => {
+    api.listInstructorAppointments.mockResolvedValueOnce({
+      appointments: [
+        { ...available, checkpointName: null },
+        { ...available, id: 301, status: 'cancelled' as const },
+        { ...available, id: 302, status: 'completed' as const },
+        { ...available, id: 303, status: 'no_show' as const },
+      ],
+      total: 4,
+    });
+    renderPanel();
+
+    expect(await screen.findByText('Proposal')).toBeTruthy();
+    expect(screen.getByText('Cancelled')).toBeTruthy();
+    expect(screen.getByText('Completed')).toBeTruthy();
+    expect(screen.getByText('No-show')).toBeTruthy();
   });
 });
