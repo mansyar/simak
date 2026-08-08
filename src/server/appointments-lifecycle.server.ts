@@ -349,7 +349,5 @@ async function appointmentLifecycleHandlerNotImplemented(_context: unknown): Pro
   throw new Error('Appointment lifecycle handler is not implemented');
 }
 
-export const listAvailableAppointmentsHandler = appointmentLifecycleHandlerNotImplemented;
-export const listStudentAppointmentsHandler = appointmentLifecycleHandlerNotImplemented;
 export const rescheduleAppointmentHandler = appointmentLifecycleHandlerNotImplemented;
 export const getAppointmentDetailHandler = appointmentLifecycleHandlerNotImplemented;

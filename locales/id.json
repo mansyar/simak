@@ -1275,6 +1275,35 @@
       "appointmentReminder": "Pengingat Janji Temu — Tugas {assignmentId}"
     }
   },
+  "appointments": {
+    "student": {
+      "title": "Janji Temu",
+      "availableSlots": "Slot tersedia",
+      "yourAppointments": "Janji temu Anda",
+      "book": "Pesan",
+      "reschedule": "Jadwalkan ulang",
+      "cancel": "Batalkan",
+      "cancelTitle": "Batalkan janji temu?",
+      "cancelDescription": "Janji temu ini akan dibatalkan.",
+      "confirm": "Konfirmasi",
+      "keep": "Pertahankan janji temu",
+      "timeZone": "Zona waktu: {timeZone}",
+      "empty": "Belum ada slot janji temu",
+      "noBooked": "Belum ada janji temu yang dipesan",
+      "loading": "Memuat janji temu",
+      "error": "Janji temu tidak dapat dimuat",
+      "retry": "Coba lagi",
+      "conflict": "Janji temu ini bertabrakan dengan pemesanan lain.",
+      "booked": "Dipesan",
+      "available": "Tersedia",
+      "cancelled": "Dibatalkan",
+      "completed": "Selesai",
+      "noShow": "Tidak hadir",
+      "checkpoint": "Checkpoint (opsional)",
+      "noCheckpoint": "Tidak ada checkpoint tertentu",
+      "recordConsultation": "Catat konsultasi"
+    }
+  },
   "errors": {
     "fetchFailed": "Gagal memuat data. Silakan coba lagi."
   },

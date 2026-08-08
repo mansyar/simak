@@ -10,6 +10,7 @@ import { StudentAssignmentLoadingSkeleton } from '@/components/student/assignmen
 import { ConsultationForm } from '@/components/consultations/ConsultationForm';
 import { ConsultationList } from '@/components/consultations/ConsultationList';
 import { ConsultationProgress } from '@/components/consultations/ConsultationProgress';
+import { StudentAppointmentPanel } from '@/components/student/appointments/StudentAppointmentPanel';
 import { Pagination } from '@/components/ui/pagination';
 import { Tabs } from '@/components/ui/tabs';
 import { ExtensionRequestForm } from '@/components/student/extensions/ExtensionRequestForm';
@@ -95,6 +96,7 @@ function AssignmentDetailPage() {
   const [consultationTotal, setConsultationTotal] = useState(0);
   const [extensionPage, setExtensionPage] = useState(1);
   const [extensionTotal, setExtensionTotal] = useState(0);
+  const [consultationCheckpointId, setConsultationCheckpointId] = useState<number | undefined>();
   const [extensionItems, setExtensionItems] = useState<
     {
       id: number;
@@ -223,6 +225,7 @@ function AssignmentDetailPage() {
   }));
 
   const handleConsultationSuccess = async () => {
+    setConsultationCheckpointId(undefined);
     setLoadingConsultations(true);
     // Refresh consultation data
     const consResult = await listConsultations({
@@ -301,6 +304,11 @@ function AssignmentDetailPage() {
 
         {activeTab === 'consultations' && (
           <div className="space-y-6">
+            <StudentAppointmentPanel
+              assignmentId={assignment.id}
+              checkpoints={checkpoints.map((cp) => ({ id: cp.id, name: cp.name }))}
+              onRecordConsultation={setConsultationCheckpointId}
+            />
             {sideDataError === 'consultations' ? (
               <ErrorState
                 title={t('errors.fetchFailed')}
@@ -332,6 +340,7 @@ function AssignmentDetailPage() {
                   <ConsultationForm
                     assignmentId={assignment.id}
                     checkpoints={checkpoints.map((cp) => ({ id: cp.id, name: cp.name }))}
+                    initialCheckpointId={consultationCheckpointId}
                     onSuccess={handleConsultationSuccess}
                   />
                 </div>

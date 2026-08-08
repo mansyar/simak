@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const { api, mockFormatAppointmentRange } = vi.hoisted(() => ({
+const { api, mockFormatAppointmentRange, mockUseStudentTimezone } = vi.hoisted(() => ({
   api: {
     listAvailableAppointments: vi.fn(),
     listStudentAppointments: vi.fn(),
@@ -15,12 +15,14 @@ const { api, mockFormatAppointmentRange } = vi.hoisted(() => ({
     endLabel: 'Aug 9, 2026, 9:00 AM',
     timeZone: 'America/New_York',
   })),
+  mockUseStudentTimezone: vi.fn(() => ({ timezone: 'America/New_York', hydrated: true })),
 }));
 
 vi.mock('@/server/appointments', () => api);
 vi.mock('@/lib/appointment-policies', () => ({
   formatAppointmentRange: mockFormatAppointmentRange,
 }));
+vi.mock('@/hooks/use-student-timezone', () => ({ useStudentTimezone: mockUseStudentTimezone }));
 vi.mock('@/routes/__root', () => ({
   useI18n: () => ({
     locale: 'en',
@@ -41,14 +43,17 @@ vi.mock('@/routes/__root', () => ({
         'studentAppointments.noBooked': 'No booked appointments yet',
         'studentAppointments.loading': 'Loading appointments',
         'studentAppointments.error': 'Unable to load appointments',
+        'studentAppointments.retry': 'Retry',
         'studentAppointments.conflict': 'This appointment conflicts with another booking.',
         'studentAppointments.booked': 'Booked',
         'studentAppointments.available': 'Available',
+        'studentAppointments.cancelled': 'Cancelled',
         'studentAppointments.completed': 'Completed',
         'studentAppointments.noShow': 'No-show',
         'studentAppointments.recordConsultation': 'Record consultation',
       };
-      let value = translations[key] ?? key;
+      const translationKey = key.replace('appointments.student.', 'studentAppointments.');
+      let value = translations[translationKey] ?? key;
       for (const [name, replacement] of Object.entries(params ?? {})) {
         value = value.replace(`{${name}}`, replacement);
       }
@@ -117,7 +122,7 @@ describe('StudentAppointmentPanel', () => {
     expect(await screen.findByRole('heading', { name: 'Appointments' })).toBeDefined();
     expect(screen.getByText('Available slots')).toBeDefined();
     expect(screen.getByText('Your appointments')).toBeDefined();
-    expect(screen.getByText('Time zone: America/New_York')).toBeDefined();
+    expect(screen.getAllByText('Time zone: America/New_York')).toHaveLength(2);
     expect(screen.getByText('Booked')).toBeDefined();
     expect(mockFormatAppointmentRange).toHaveBeenCalled();
   });
@@ -134,6 +139,19 @@ describe('StudentAppointmentPanel', () => {
     });
     expect(api.listAvailableAppointments).toHaveBeenCalledTimes(2);
     expect(api.listStudentAppointments).toHaveBeenCalledTimes(2);
+  });
+
+  it('allows choosing an optional checkpoint for an assignment-wide slot', async () => {
+    api.listAvailableAppointments.mockResolvedValue({
+      appointments: [{ ...available, id: 102, checkpointId: null, checkpointName: null }],
+      total: 1,
+    });
+    renderPanel();
+
+    const checkpointSelect = await screen.findByRole('combobox');
+    expect(checkpointSelect.className).toContain('min-h-11');
+    fireEvent.change(checkpointSelect, { target: { value: '7' } });
+    expect((checkpointSelect as HTMLSelectElement).value).toBe('7');
   });
 
   it('shows a conflict message when booking is rejected by the server', async () => {
@@ -154,6 +172,9 @@ describe('StudentAppointmentPanel', () => {
     expect(screen.getByRole('dialog')).toBeDefined();
     expect(screen.getByText('Cancel appointment?')).toBeDefined();
 
+    fireEvent.click(screen.getByRole('button', { name: 'Keep appointment' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Cancel' }));
+
     fireEvent.click(screen.getByRole('button', { name: 'Confirm' }));
 
     await waitFor(() => {
@@ -171,6 +192,19 @@ describe('StudentAppointmentPanel', () => {
         data: { appointmentId: 201, replacementAppointmentId: 101 },
       });
     });
+  });
+
+  it('shows a conflict message when rescheduling is rejected', async () => {
+    api.rescheduleAppointment.mockResolvedValue({
+      error: { code: 'CONFLICT', message: 'overlap' },
+    });
+    renderPanel();
+
+    fireEvent.click(await screen.findByRole('button', { name: 'Reschedule' }));
+
+    expect(
+      await screen.findByText('This appointment conflicts with another booking.'),
+    ).toBeDefined();
   });
 
   it('shows terminal outcomes and offers explicit consultation evidence recording only', async () => {
@@ -192,6 +226,17 @@ describe('StudentAppointmentPanel', () => {
     expect(api.bookAppointment).not.toHaveBeenCalled();
   });
 
+  it('renders cancelled appointments as terminal history', async () => {
+    api.listAvailableAppointments.mockResolvedValue({ appointments: [], total: 0 });
+    api.listStudentAppointments.mockResolvedValue({
+      appointments: [{ ...booked, status: 'cancelled' as const }],
+      total: 1,
+    });
+    renderPanel();
+
+    expect(await screen.findByText('Cancelled')).toBeDefined();
+  });
+
   it('renders loading, empty, and error states', async () => {
     let resolveAvailable: ((value: { appointments: []; total: number }) => void) | undefined;
     api.listAvailableAppointments.mockReturnValue(
@@ -200,15 +245,21 @@ describe('StudentAppointmentPanel', () => {
       }),
     );
     api.listStudentAppointments.mockResolvedValue({ appointments: [], total: 0 });
-    renderPanel();
+    const view = renderPanel();
     expect(screen.getByText('Loading appointments')).toBeDefined();
 
     resolveAvailable?.({ appointments: [], total: 0 });
     expect(await screen.findByText('No appointment slots available')).toBeDefined();
 
+    view.unmount();
     api.listAvailableAppointments.mockRejectedValue(new Error('network'));
     api.listStudentAppointments.mockRejectedValue(new Error('network'));
-    fireEvent.click(screen.getByRole('button', { name: 'Retry' }));
+    renderPanel();
     expect(await screen.findByText('Unable to load appointments')).toBeDefined();
+
+    api.listAvailableAppointments.mockResolvedValue({ appointments: [], total: 0 });
+    api.listStudentAppointments.mockResolvedValue({ appointments: [], total: 0 });
+    fireEvent.click(screen.getByRole('button', { name: 'Retry' }));
+    expect(await screen.findByText('Available slots')).toBeDefined();
   });
 });

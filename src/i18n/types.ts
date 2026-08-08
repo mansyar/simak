@@ -1280,6 +1280,35 @@ export type Translation = {
       appointmentReminder: string
     }
   }
+  appointments: {
+    student: {
+      title: string
+      availableSlots: string
+      yourAppointments: string
+      book: string
+      reschedule: string
+      cancel: string
+      cancelTitle: string
+      cancelDescription: string
+      confirm: string
+      keep: string
+      timeZone: string
+      empty: string
+      noBooked: string
+      loading: string
+      error: string
+      retry: string
+      conflict: string
+      booked: string
+      available: string
+      cancelled: string
+      completed: string
+      noShow: string
+      checkpoint: string
+      noCheckpoint: string
+      recordConsultation: string
+    }
+  }
   errors: {
     fetchFailed: string
   }

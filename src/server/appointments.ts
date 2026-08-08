@@ -1,6 +1,10 @@
 // Client-safe server function wrappers. Handler implementations live in appointments.server.ts.
 import { RATE_LIMITS } from '@/lib/rate-limiter';
-import { appointmentStatusSchema, appointmentWindowSchema } from '@/lib/appointment-policies';
+import {
+  appointmentStatusSchema,
+  appointmentWindowSchema,
+  type AppointmentStatus,
+} from '@/lib/appointment-policies';
 import { serverFnMiddlewares, typedServerFn } from '@/lib/server-fn';
 import { z } from 'zod';
 
@@ -51,6 +55,25 @@ export const RescheduleAppointmentSchema = AppointmentIdSchema.extend({
 export const CompleteAppointmentSchema = AppointmentIdSchema;
 export const MarkAppointmentNoShowSchema = AppointmentIdSchema;
 
+export type AppointmentListItem = {
+  id: number;
+  assignmentId: number;
+  checkpointId: number | null;
+  checkpointName: string | null;
+  instructorId: string;
+  studentId: string | null;
+  startAt: Date;
+  endAt: Date;
+  status: AppointmentStatus;
+};
+
+export type AppointmentListResponse = {
+  appointments: AppointmentListItem[];
+  total: number;
+  page: number;
+  limit: number;
+};
+
 export const createAppointmentSlot = typedServerFn({ method: 'POST' })
   .middleware(serverFnMiddlewares(RATE_LIMITS.destructive))
   .inputValidator(CreateAppointmentSlotSchema)
@@ -79,7 +102,7 @@ export const listAvailableAppointments = typedServerFn({ method: 'GET' })
   .middleware(serverFnMiddlewares(RATE_LIMITS.standardRead))
   .inputValidator(ListAvailableAppointmentsSchema)
   .handler(async ({ data }) => {
-    const { listAvailableAppointmentsHandler } = await import('./appointments-lifecycle.server');
+    const { listAvailableAppointmentsHandler } = await import('./appointments-list.server');
     return listAvailableAppointmentsHandler({ data });
   });
 
@@ -87,7 +110,7 @@ export const listStudentAppointments = typedServerFn({ method: 'GET' })
   .middleware(serverFnMiddlewares(RATE_LIMITS.standardRead))
   .inputValidator(ListStudentAppointmentsSchema)
   .handler(async ({ data }) => {
-    const { listStudentAppointmentsHandler } = await import('./appointments-lifecycle.server');
+    const { listStudentAppointmentsHandler } = await import('./appointments-list.server');
     return listStudentAppointmentsHandler({ data });
   });
 

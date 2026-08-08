@@ -1275,6 +1275,35 @@
       "appointmentReminder": "Appointment Reminder — Assignment {assignmentId}"
     }
   },
+  "appointments": {
+    "student": {
+      "title": "Appointments",
+      "availableSlots": "Available slots",
+      "yourAppointments": "Your appointments",
+      "book": "Book",
+      "reschedule": "Reschedule",
+      "cancel": "Cancel",
+      "cancelTitle": "Cancel appointment?",
+      "cancelDescription": "This appointment will be cancelled.",
+      "confirm": "Confirm",
+      "keep": "Keep appointment",
+      "timeZone": "Time zone: {timeZone}",
+      "empty": "No appointment slots available",
+      "noBooked": "No booked appointments yet",
+      "loading": "Loading appointments",
+      "error": "Unable to load appointments",
+      "retry": "Retry",
+      "conflict": "This appointment conflicts with another booking.",
+      "booked": "Booked",
+      "available": "Available",
+      "cancelled": "Cancelled",
+      "completed": "Completed",
+      "noShow": "No-show",
+      "checkpoint": "Checkpoint (optional)",
+      "noCheckpoint": "No specific checkpoint",
+      "recordConsultation": "Record consultation"
+    }
+  },
   "errors": {
     "fetchFailed": "Failed to load data. Please try again."
   },
