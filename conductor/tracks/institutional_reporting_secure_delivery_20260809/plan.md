@@ -71,7 +71,7 @@
   - [x] Implement responsive shadcn/Tailwind report controls using established route and form patterns
   - [x] Verify keyboard access, labels, focus behavior, touch targets, and reduced-motion behavior
   - [x] Run focused component and i18n tests
-- [ ] Task: Build report history and artifact actions
+- [~] Task: Build report history and artifact actions
   - [ ] Write failing tests for pending, processing, completed, failed, and expired displays
   - [ ] Write failing tests for authorized download and eligible retry actions
   - [ ] Implement status polling or explicit refresh using established TanStack Query patterns
