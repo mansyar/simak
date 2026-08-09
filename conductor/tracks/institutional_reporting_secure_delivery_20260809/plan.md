@@ -17,11 +17,11 @@
   - [x] Add the Drizzle schema, constraints, indexes, relations, and migration
   - [x] Add cleanup-safe and concurrency-safe state-transition constraints
   - [x] Run schema and migration-focused tests
-- [~] Task: Implement report-job transition helpers
-  - [ ] Write failing unit and integration tests for valid transitions, stale updates, retries, completion, failure, and expiry
-  - [ ] Implement transactional transition helpers using guarded updates or row locking
-  - [ ] Verify rendering and R2 operations occur outside database transactions
-  - [ ] Refactor and run focused tests
+- [x] Task: Implement report-job transition helpers (5ad2837)
+  - [x] Write failing unit and integration tests for valid transitions, stale updates, retries, completion, failure, and expiry
+  - [x] Implement transactional transition helpers using guarded updates or row locking
+  - [x] Verify rendering and R2 operations occur outside database transactions
+  - [x] Refactor and run focused tests
 - [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
 
 ## Phase 3 — Report Data and Authorization
