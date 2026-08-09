@@ -46,7 +46,12 @@ describe('report job transitions integration', () => {
       .values({
         reportType: 'analytics_summary',
         requesterId,
-        parameters: {},
+        parameters: {
+          termId: null,
+          courseId: null,
+          sectionId: null,
+          cohort: null,
+        },
         locale: 'en',
       })
       .returning();
