@@ -12,11 +12,11 @@
 
 ## Phase 2 — Durable Report Jobs and Database Integrity
 
-- [~] Task: Add report-job persistence
-  - [ ] Write failing schema tests for report type, requester, normalized parameters, locale, state, artifact metadata, failure metadata, timestamps, and 30-day expiry
-  - [ ] Add the Drizzle schema, constraints, indexes, relations, and migration
-  - [ ] Add cleanup-safe and concurrency-safe state-transition constraints
-  - [ ] Run schema and migration-focused tests
+- [x] Task: Add report-job persistence (dcddaec)
+  - [x] Write failing schema tests for report type, requester, normalized parameters, locale, state, artifact metadata, failure metadata, timestamps, and 30-day expiry
+  - [x] Add the Drizzle schema, constraints, indexes, relations, and migration
+  - [x] Add cleanup-safe and concurrency-safe state-transition constraints
+  - [x] Run schema and migration-focused tests
 - [ ] Task: Implement report-job transition helpers
   - [ ] Write failing unit and integration tests for valid transitions, stale updates, retries, completion, failure, and expiry
   - [ ] Implement transactional transition helpers using guarded updates or row locking
