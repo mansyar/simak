@@ -2,12 +2,12 @@
 
 ## Phase 1 — Architecture and PDF Renderer Decision
 
-- [ ] Task: Define report contracts and renderer compatibility criteria
-  - [ ] Write failing contract tests for the three allowlisted report types, role availability, normalized filters, locales, job states, and expiry calculation
-  - [ ] Implement the minimum shared report types and pure policy helpers
-  - [ ] Evaluate server-side PDF candidates against Node 20, ESM, Docker/Coolify, bilingual font embedding, multi-page tables, security, maintenance, and bundle constraints
-  - [ ] Record the renderer decision and rationale in `conductor/tech-stack.md` before adding the dependency
-  - [ ] Refactor and run focused tests
+- [x] Task: Define report contracts and renderer compatibility criteria (4ca8f4b)
+  - [x] Write failing contract tests for the three allowlisted report types, role availability, normalized filters, locales, job states, and expiry calculation
+  - [x] Implement the minimum shared report types and pure policy helpers
+  - [x] Evaluate server-side PDF candidates against Node 20, ESM, Docker/Coolify, bilingual font embedding, multi-page tables, security, maintenance, and bundle constraints
+  - [x] Record the renderer decision and rationale in `conductor/tech-stack.md` before adding the dependency
+  - [x] Refactor and run focused tests
 - [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
 
 ## Phase 2 — Durable Report Jobs and Database Integrity
