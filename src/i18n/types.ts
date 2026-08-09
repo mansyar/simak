@@ -109,6 +109,7 @@ export type Translation = {
     dashboard: string
     users: string
     templates: string
+    academicRecords: string
     auditLog: string
     emailQueue: string
     analytics: string
@@ -119,6 +120,7 @@ export type Translation = {
   instructorSidebar: {
     dashboard: string
     assignments: string
+    academicRecords: string
     reviews: string
     interventions: string
     feedbackSnippets: string
@@ -705,6 +707,7 @@ export type Translation = {
   studentSidebar: {
     dashboard: string
     assignments: string
+    academicRecords: string
     settings: string
     branding: string
     sectionMain: string
@@ -725,15 +728,25 @@ export type Translation = {
     qualityPoints: string
     termFilter: string
     allTerms: string
+    sectionFilter: string
     section: string
+    student: string
     score: string
     letterGrade: string
     gradePoints: string
+    publishedAt: string
+    notAvailable: string
     recordList: string
     pagination: string
     previous: string
     next: string
-    empty: string
+    noTerms: string
+    noTermsDescription: string
+    noRecords: string
+    noRecordsDescription: string
+    noFilterResults: string
+    noFilterResultsDescription: string
+    resultsUpdated: string
     loadError: string
     gpaExcluded: string
     sourceAssignment: string

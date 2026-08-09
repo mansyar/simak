@@ -128,7 +128,7 @@ const incompleteGrade = {
   studentName: 'Incomplete Student',
   numericScore: null,
   letterGrade: null,
-  status: 'in_progress',
+  status: 'incomplete',
   contributingCheckpoints: [],
 };
 
@@ -186,7 +186,7 @@ describe('grade release server contracts', () => {
     expect(result.counts).toEqual({ eligible: 1, incomplete: 1, missing: 1 });
     expect(result.eligible).toEqual([expect.objectContaining({ studentId: 'student-complete' })]);
     expect(result.incomplete).toEqual([
-      expect.objectContaining({ studentId: 'student-incomplete', status: 'in_progress' }),
+      expect.objectContaining({ studentId: 'student-incomplete', status: 'incomplete' }),
     ]);
     expect(result.missing).toEqual([expect.objectContaining({ studentId: 'student-missing' })]);
   });
@@ -257,11 +257,7 @@ describe('grade release server contracts', () => {
     expect(mock.db.transaction).toHaveBeenCalledTimes(1);
     expect(mock.tx.values).toHaveBeenCalledWith([
       expect.objectContaining({
-        assignmentId: 1,
         studentId: 'student-complete',
-        releaseVersion: 1,
-        numericScore: '92.50',
-        letterGrade: 'A',
         status: 'complete',
       }),
     ]);

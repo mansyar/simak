@@ -1,0 +1,4 @@
+-- ROLLBACK NOT POSSIBLE: data loss irreversible
+-- Migration 0029 permits incomplete snapshots and legacy null course credits while adding
+-- immutable provenance. Restoring the prior NOT NULL constraints or removing those protections
+-- cannot be done safely after valid post-migration data has been written.

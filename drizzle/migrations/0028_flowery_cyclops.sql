@@ -1,9 +1,3 @@
-DO $$
-BEGIN
-  IF EXISTS (SELECT 1 FROM "courses") THEN
-    RAISE EXCEPTION 'TRACK-060 prelaunch migration requires an empty courses table; credits cannot be fabricated for existing courses';
-  END IF;
-END $$;--> statement-breakpoint
 CREATE TYPE "public"."academic_record_status" AS ENUM('complete', 'incomplete', 'withdrawn');--> statement-breakpoint
 CREATE TABLE "academic_record_policies" (
 	"id" serial PRIMARY KEY NOT NULL,
@@ -41,7 +35,7 @@ CREATE TABLE "academic_records" (
 );
 --> statement-breakpoint
 ALTER TABLE "assignments" ADD COLUMN "is_transcript_source" boolean DEFAULT false NOT NULL;--> statement-breakpoint
-ALTER TABLE "courses" ADD COLUMN "credits" numeric(5, 2) NOT NULL;--> statement-breakpoint
+ALTER TABLE "courses" ADD COLUMN "credits" numeric(5, 2);--> statement-breakpoint
 ALTER TABLE "academic_record_policies" ADD CONSTRAINT "academic_record_policies_effective_term_id_academic_terms_id_fk" FOREIGN KEY ("effective_term_id") REFERENCES "public"."academic_terms"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "academic_records" ADD CONSTRAINT "academic_records_student_id_users_id_fk" FOREIGN KEY ("student_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "academic_records" ADD CONSTRAINT "academic_records_course_id_courses_id_fk" FOREIGN KEY ("course_id") REFERENCES "public"."courses"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
@@ -56,4 +50,4 @@ CREATE INDEX "academic_records_section_student_idx" ON "academic_records" USING 
 CREATE INDEX "academic_records_source_idx" ON "academic_records" USING btree ("source_assignment_id","source_release_version");--> statement-breakpoint
 CREATE INDEX "academic_records_policy_version_idx" ON "academic_records" USING btree ("policy_version");--> statement-breakpoint
 CREATE UNIQUE INDEX "assignments_section_transcript_source_idx" ON "assignments" USING btree ("section_id") WHERE "assignments"."is_transcript_source" = true;--> statement-breakpoint
-ALTER TABLE "courses" ADD CONSTRAINT "courses_credits_positive" CHECK ("courses"."credits" > 0);
+ALTER TABLE "courses" ADD CONSTRAINT "courses_credits_positive" CHECK ("courses"."credits" IS NULL OR "courses"."credits" > 0);

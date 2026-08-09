@@ -96,6 +96,14 @@ describe('AdminSidebar', () => {
     expect(templatesLink.textContent).toBe('adminSidebar.templates');
   });
 
+  it('should render the academic records link', () => {
+    mockLocation.mockReturnValue({ pathname: '/admin/dashboard' });
+    render(<AdminSidebar isOpen={true} onClose={vi.fn()} />);
+
+    const academicRecordsLink = screen.getByTestId('sidebar-link-/admin/academic-records');
+    expect(academicRecordsLink.textContent).toBe('adminSidebar.academicRecords');
+  });
+
   it('should highlight the currently active route', () => {
     mockLocation.mockReturnValue({ pathname: '/admin/dashboard' });
     render(<AdminSidebar isOpen={true} onClose={vi.fn()} />);

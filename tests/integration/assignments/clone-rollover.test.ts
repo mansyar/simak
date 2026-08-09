@@ -1,5 +1,5 @@
 /** @vitest-environment node */
-import { and, eq, inArray, ne } from 'drizzle-orm';
+import { and, eq, inArray, ne, sql } from 'drizzle-orm';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { getDb } from '@/db/index';
 import {
@@ -67,10 +67,10 @@ let sourceFixture: AcademicSectionFixture;
 let targetFixture: AcademicSectionFixture;
 let unauthorizedFixture: AcademicSectionFixture;
 
-function getHandler(name: 'cloneAssignmentHandler' | 'rolloverAssignmentHandler') {
+function getHandler(name: 'cloneAssignmentHandler' | 'rolloverAssignmentHandler'): CloneHandler {
   const handler = handlers[name] as CloneHandler | undefined;
   expect(typeof handler).toBe('function');
-  return handler;
+  return handler as CloneHandler;
 }
 
 function expectError(result: unknown, code: ErrorCode) {
@@ -111,7 +111,6 @@ beforeEach(async () => {
       role: 'student',
     },
   ]);
-
   sourceFixture = await createAcademicSectionFixture(db, `${runId}-source`, instructorId, [
     sourceStudentId,
   ]);
@@ -124,7 +123,6 @@ beforeEach(async () => {
     otherInstructorId,
     [outsiderStudentId],
   );
-
   const [template] = await db
     .insert(assignmentTemplates)
     .values({
@@ -134,7 +132,6 @@ beforeEach(async () => {
     })
     .returning({ id: assignmentTemplates.id });
   templateId = template.id;
-
   const [templateCheckpoint] = await db
     .insert(templateCheckpoints)
     .values({
@@ -144,7 +141,6 @@ beforeEach(async () => {
       estimatedDuration: 14,
     })
     .returning({ id: templateCheckpoints.id });
-
   const [sourceAssignment] = await db
     .insert(assignments)
     .values({
@@ -161,7 +157,6 @@ beforeEach(async () => {
     })
     .returning({ id: assignments.id });
   sourceAssignmentId = sourceAssignment.id;
-
   await db.insert(assignmentStudents).values({
     assignmentId: sourceAssignmentId,
     studentId: sourceStudentId,
@@ -220,11 +215,25 @@ afterEach(async () => {
   const assignmentIds = assignmentRows.map((row) => row.id);
 
   if (assignmentIds.length > 0) {
-    await db.delete(checkpoints).where(inArray(checkpoints.assignmentId, assignmentIds));
-    await db
-      .delete(assignmentStudents)
-      .where(inArray(assignmentStudents.assignmentId, assignmentIds));
-    await db.delete(assignments).where(inArray(assignments.id, assignmentIds));
+    await db.transaction(async (tx) => {
+      await tx.execute(
+        sql`ALTER TABLE "grade_release_snapshots" DISABLE TRIGGER "grade_release_snapshots_immutable_trigger"`,
+      );
+      try {
+        await tx.delete(checkpoints).where(inArray(checkpoints.assignmentId, assignmentIds));
+        await tx
+          .delete(assignmentStudents)
+          .where(inArray(assignmentStudents.assignmentId, assignmentIds));
+        await tx
+          .delete(gradeReleaseSnapshots)
+          .where(inArray(gradeReleaseSnapshots.assignmentId, assignmentIds));
+        await tx.delete(assignments).where(inArray(assignments.id, assignmentIds));
+      } finally {
+        await tx.execute(
+          sql`ALTER TABLE "grade_release_snapshots" ENABLE TRIGGER "grade_release_snapshots_immutable_trigger"`,
+        );
+      }
+    });
   }
   await db.delete(templateCheckpoints).where(eq(templateCheckpoints.templateId, templateId));
   await db.delete(assignmentTemplates).where(eq(assignmentTemplates.id, templateId));
@@ -252,8 +261,6 @@ describe('assignment clone and semester rollover', () => {
       session: {} as any,
     } as any);
     const handler = getHandler('cloneAssignmentHandler');
-    if (!handler) return;
-
     const result = await handler({
       data: {
         sourceAssignmentId,
@@ -265,7 +272,6 @@ describe('assignment clone and semester rollover', () => {
     });
     expect(result).toMatchObject({ success: true });
     const targetId = (result as { assignmentId: number }).assignmentId;
-
     const [target] = await db
       .select({
         templateId: assignments.templateId,
@@ -309,7 +315,6 @@ describe('assignment clone and semester rollover', () => {
         .from(gradeReleaseSnapshots)
         .where(eq(gradeReleaseSnapshots.assignmentId, targetId)),
     ).toHaveLength(0);
-
     const source = await db
       .select({ status: assignments.status, sectionId: assignments.sectionId })
       .from(assignments)
@@ -323,8 +328,6 @@ describe('assignment clone and semester rollover', () => {
       session: {} as any,
     } as any);
     const handler = getHandler('rolloverAssignmentHandler');
-    if (!handler) return;
-
     const result = await handler({
       data: {
         sourceAssignmentId,
@@ -456,7 +459,6 @@ describe('assignment clone and semester rollover', () => {
       session: {} as any,
     } as any);
     const handler = getHandler('cloneAssignmentHandler');
-    if (!handler) return;
     const results = await Promise.all([
       handler({
         data: {

@@ -204,6 +204,13 @@
       "when": 1786194222181,
       "tag": "0028_flowery_cyclops",
       "breakpoints": true
+    },
+    {
+      "idx": 29,
+      "version": "7",
+      "when": 1791301914003,
+      "tag": "0029_left_boomerang",
+      "breakpoints": true
     }
   ]
 }

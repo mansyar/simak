@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute, useRouter } from '@tanstack/react-router';
 import { z } from 'zod';
 import { AcademicRecordsView } from '@/components/academic-records/AcademicRecordsView';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -32,7 +32,13 @@ export const Route = createFileRoute('/_authenticated/admin/academic-records')({
 function AcademicRecordsLoading() {
   const { t } = useI18n();
   return (
-    <div className="space-y-6" aria-busy="true" aria-label={t('academicRecords.title')}>
+    <div
+      role="status"
+      aria-live="polite"
+      className="space-y-6"
+      aria-busy="true"
+      aria-label={t('academicRecords.title')}
+    >
       <Skeleton className="h-24 w-full" />
       <div className="grid gap-4 md:grid-cols-2">
         <Skeleton className="h-28" />
@@ -46,6 +52,7 @@ function AcademicRecordsLoading() {
 function AdminAcademicRecordsRoute() {
   const search = Route.useSearch();
   const navigate = Route.useNavigate();
+  const router = useRouter();
   const data = Route.useLoaderData() as AcademicRecordsResult;
 
   return (
@@ -60,6 +67,7 @@ function AdminAcademicRecordsRoute() {
         navigate({ search: (previous) => ({ ...previous, termId, page: 1 }) })
       }
       onPageChange={(page) => navigate({ search: (previous) => ({ ...previous, page }) })}
+      onRetry={() => router.invalidate()}
     />
   );
 }

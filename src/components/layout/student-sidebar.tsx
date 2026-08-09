@@ -1,6 +1,14 @@
 import { useLocation, Link, useRouter } from '@tanstack/react-router';
 import { useI18n } from '../../routes/__root';
-import { LayoutDashboard, ClipboardList, Settings, LogOut, X, GraduationCap } from 'lucide-react';
+import {
+  LayoutDashboard,
+  ClipboardList,
+  Settings,
+  LogOut,
+  X,
+  GraduationCap,
+  ScrollText,
+} from 'lucide-react';
 import { authClient } from '../../lib/auth-client';
 import { useMobileDrawer } from '../../hooks/use-mobile-drawer';
 
@@ -20,6 +28,11 @@ export function StudentSidebar({ isOpen, onClose }: StudentSidebarProps) {
   const mainLinks = [
     { to: '/student/dashboard', label: 'studentSidebar.dashboard', icon: LayoutDashboard },
     { to: '/student/assignments', label: 'studentSidebar.assignments', icon: ClipboardList },
+    {
+      to: '/student/academic-records',
+      label: 'studentSidebar.academicRecords',
+      icon: ScrollText,
+    },
   ] as const;
 
   const preferenceLinks = [

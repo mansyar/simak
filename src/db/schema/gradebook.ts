@@ -1,4 +1,5 @@
 import {
+  check,
   pgTable,
   text,
   timestamp,
@@ -10,6 +11,7 @@ import {
   unique,
   index,
 } from 'drizzle-orm/pg-core';
+import { sql } from 'drizzle-orm';
 import { assignments } from './assignments';
 import { users } from './users';
 
@@ -87,8 +89,8 @@ export const gradeReleaseSnapshots = pgTable(
       .notNull()
       .references(() => users.id),
     releaseVersion: integer('release_version').notNull(),
-    numericScore: numeric('numeric_score', { precision: 5, scale: 2 }).notNull(),
-    letterGrade: text('letter_grade').notNull(),
+    numericScore: numeric('numeric_score', { precision: 5, scale: 2 }),
+    letterGrade: text('letter_grade'),
     status: finalGradeStatus('status').notNull(),
     contributingCheckpoints: jsonb('contributing_checkpoints').notNull(),
     publishedAt: timestamp('published_at').notNull(),
@@ -104,5 +106,12 @@ export const gradeReleaseSnapshots = pgTable(
       table.releaseVersion,
     ),
     index('grade_release_snapshots_student_id_idx').on(table.studentId),
+    check(
+      'grade_release_snapshots_published_outcome_check',
+      sql`(
+        (${table.status} = 'complete' AND ${table.numericScore} IS NOT NULL AND ${table.letterGrade} IS NOT NULL)
+        OR (${table.status} = 'incomplete' AND ${table.numericScore} IS NULL AND ${table.letterGrade} IS NULL)
+      )`,
+    ),
   ],
 );

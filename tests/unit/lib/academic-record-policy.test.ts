@@ -98,6 +98,7 @@ describe('academic-record policy', () => {
       expect(isValidCourseCredits(-1)).toBe(false);
       expect(isValidCourseCredits(Number.NaN)).toBe(false);
       expect(isValidCourseCredits(Number.POSITIVE_INFINITY)).toBe(false);
+      expect(isValidCourseCredits(0.001)).toBe(false);
     });
   });
 
@@ -154,6 +155,19 @@ describe('academic-record policy', () => {
 
       expect(result.eligibleRecordIds).toEqual([1]);
       expect(result.gpa).toBe(4);
+    });
+
+    it('rounds exact decimal half cases upward without binary floating-point drift', () => {
+      const result = calculateTermGpa(
+        [
+          record({ id: 1, credits: 0.01, gradePoints: 2.34 }),
+          record({ id: 2, credits: 0.01, gradePoints: 2.35 }),
+        ],
+        1,
+        policy,
+      );
+
+      expect(result.gpa).toBe(2.35);
     });
   });
 

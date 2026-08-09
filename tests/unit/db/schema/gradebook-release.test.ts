@@ -40,11 +40,16 @@ describe('Grade release schema', () => {
     expect(gradeReleaseSnapshots).toHaveProperty('publishedAt');
 
     expect(gradeReleaseSnapshots.releaseVersion.notNull).toBe(true);
-    expect(gradeReleaseSnapshots.numericScore.notNull).toBe(true);
-    expect(gradeReleaseSnapshots.letterGrade.notNull).toBe(true);
+    expect(gradeReleaseSnapshots.numericScore.notNull).toBe(false);
+    expect(gradeReleaseSnapshots.letterGrade.notNull).toBe(false);
     expect(gradeReleaseSnapshots.status.notNull).toBe(true);
     expect(gradeReleaseSnapshots.contributingCheckpoints.notNull).toBe(true);
     expect(gradeReleaseSnapshots.publishedAt.notNull).toBe(true);
+    expect(
+      getTableConfig(gradeReleaseSnapshots).checks.some(
+        (check) => check.name === 'grade_release_snapshots_published_outcome_check',
+      ),
+    ).toBe(true);
   });
 
   it('enforces versioned student uniqueness and lookup indexes', async () => {

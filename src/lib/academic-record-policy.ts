@@ -58,6 +58,11 @@ export function parseAcademicRecordPolicy(input: unknown): AcademicRecordPolicy 
     if (!letterGrade.trim() || !Number.isFinite(points) || points < 0 || points > 4) {
       throw new Error(`Invalid grade points for ${letterGrade}`);
     }
+    try {
+      decimalToMinorUnits(points, 'grade points');
+    } catch {
+      throw new Error(`Invalid grade points for ${letterGrade}`);
+    }
   }
 
   const roundingScale = candidate.roundingScale;
@@ -77,7 +82,12 @@ export function parseAcademicRecordPolicy(input: unknown): AcademicRecordPolicy 
 }
 
 export function isValidCourseCredits(credits: number): boolean {
-  return Number.isFinite(credits) && credits > 0;
+  if (!Number.isFinite(credits)) return false;
+  try {
+    return decimalToMinorUnits(credits, 'course credits') > 0n;
+  } catch {
+    return false;
+  }
 }
 
 export function calculateTermGpa(
@@ -114,11 +124,17 @@ export function calculateCumulativeGpa(
 function calculateGpa(records: AcademicRecord[], policy: AcademicRecordPolicy): GpaCalculation {
   const eligibleRecords = records.filter((record) => record.status === 'complete');
 
-  let totalCredits = 0;
-  let totalQualityPoints = 0;
+  let totalCreditsMinor = 0n;
+  let totalQualityPointsMinor = 0n;
 
   for (const record of eligibleRecords) {
-    if (!isValidCourseCredits(record.credits)) {
+    let creditsMinor: bigint;
+    try {
+      creditsMinor = decimalToMinorUnits(record.credits, 'course credits');
+    } catch {
+      creditsMinor = 0n;
+    }
+    if (creditsMinor <= 0n) {
       throw new Error(`Academic record ${record.id} has invalid course credits`);
     }
 
@@ -129,15 +145,25 @@ function calculateGpa(records: AcademicRecord[], policy: AcademicRecordPolicy): 
       throw new Error(`Academic record ${record.id} has an unmapped letter grade`);
     }
 
-    totalCredits += record.credits;
-    totalQualityPoints += record.credits * gradePoints;
+    let gradePointsMinor: bigint;
+    try {
+      gradePointsMinor = decimalToMinorUnits(gradePoints, 'grade points');
+    } catch {
+      throw new Error(`Academic record ${record.id} has invalid grade points`);
+    }
+
+    totalCreditsMinor += creditsMinor;
+    totalQualityPointsMinor += creditsMinor * gradePointsMinor;
   }
+
+  const totalCredits = Number(totalCreditsMinor) / 100;
+  const totalQualityPoints = Number(totalQualityPointsMinor) / 10_000;
 
   return {
     gpa:
       totalCredits === 0
         ? null
-        : roundHalfUp(totalQualityPoints / totalCredits, policy.roundingScale),
+        : roundHalfUp(totalQualityPointsMinor, totalCreditsMinor, policy.roundingScale),
     totalCredits,
     totalQualityPoints,
     eligibleRecordIds: eligibleRecords.map((record) => record.id),
@@ -171,7 +197,43 @@ function toTimestamp(value: string | Date): number {
   return timestamp;
 }
 
-function roundHalfUp(value: number, scale: number): number {
-  const factor = 10 ** scale;
-  return Math.floor(value * factor + 0.5 + Number.EPSILON) / factor;
+function roundHalfUp(qualityPointsMinor: bigint, creditsMinor: bigint, scale: number): number {
+  const factor = 10n ** BigInt(scale);
+  const denominator = creditsMinor * 100n;
+  const scaledNumerator = qualityPointsMinor * factor;
+  let rounded = scaledNumerator / denominator;
+  if ((scaledNumerator % denominator) * 2n >= denominator) rounded += 1n;
+  return Number(rounded) / Number(factor);
+}
+
+function decimalToMinorUnits(value: number, label: string): bigint {
+  if (!Number.isFinite(value)) throw new Error(`${label} must be finite`);
+
+  const match = String(value).match(/^([+-]?)(\d+)(?:\.(\d*))?(?:e([+-]?\d+))?$/i);
+  if (!match) throw new Error(`${label} must be a decimal`);
+
+  const sign = match[1] === '-' ? -1n : 1n;
+  const integerPart = match[2];
+  const fractionPart = match[3] ?? '';
+  const exponent = Number(match[4] ?? 0);
+  const digits = integerPart + fractionPart;
+  const decimalIndex = integerPart.length + exponent;
+  let wholePart: string;
+  let fractionalPart: string;
+
+  if (decimalIndex <= 0) {
+    wholePart = '0';
+    fractionalPart = '0'.repeat(-decimalIndex) + digits;
+  } else if (decimalIndex >= digits.length) {
+    wholePart = digits.padEnd(decimalIndex, '0');
+    fractionalPart = '';
+  } else {
+    wholePart = digits.slice(0, decimalIndex);
+    fractionalPart = digits.slice(decimalIndex);
+  }
+
+  fractionalPart = fractionalPart.replace(/0+$/, '');
+  if (fractionalPart.length > 2) throw new Error(`${label} supports at most two decimals`);
+  const minorDigits = `${wholePart}${fractionalPart.padEnd(2, '0')}`;
+  return sign * BigInt(minorDigits || '0');
 }

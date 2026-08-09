@@ -96,7 +96,12 @@ function validSelectResults(
 
 async function runPersistence(
   overrides: Parameters<typeof validSelectResults>[0] = {},
-  input: { assignmentId: number; releaseVersion: number } = {
+  input: {
+    assignmentId: number;
+    releaseVersion: number;
+    actorId?: string;
+    incompleteReasons?: Record<string, string>;
+  } = {
     assignmentId: assignmentContext.id,
     releaseVersion: 1,
   },
@@ -177,6 +182,38 @@ describe('persistAcademicRecordsForRelease', () => {
     expect(result).toMatchObject({ releaseVersion: 2, createdCount: 1 });
   });
 
+  it('persists an incomplete snapshot with explicit outcome provenance', async () => {
+    const incompleteSnapshot = {
+      ...completeSnapshot,
+      status: 'incomplete' as const,
+      numericScore: null,
+      letterGrade: null,
+    };
+    const { insertedValues, result } = await runPersistence(
+      { snapshots: [incompleteSnapshot] },
+      {
+        assignmentId: assignmentContext.id,
+        releaseVersion: 1,
+        actorId: 'admin-1',
+        incompleteReasons: { 'student-1': 'Approved extension pending completion' },
+      },
+    );
+
+    expect(insertedValues[0]).toEqual([
+      expect.objectContaining({
+        studentId: 'student-1',
+        sourceSnapshotId: 100,
+        status: 'incomplete',
+        numericScore: null,
+        letterGrade: null,
+        gradePoints: null,
+        outcomeReason: 'Approved extension pending completion',
+        outcomeActorId: 'admin-1',
+      }),
+    ]);
+    expect(result).toMatchObject({ releaseVersion: 1, createdCount: 1 });
+  });
+
   it('creates a withdrawn record version without fabricating a grade', async () => {
     const mock = createMockDb([
       [assignmentContext],
@@ -192,6 +229,7 @@ describe('persistAcademicRecordsForRelease', () => {
           sourceReleaseVersion: 1,
           recordVersion: 1,
           status: 'complete',
+          publishedAt: new Date('2026-01-01T00:00:00Z'),
         },
       ],
     ]);
@@ -242,13 +280,13 @@ describe('persistAcademicRecordsForRelease', () => {
       message: 'active release version',
     },
     {
-      label: 'ineligible snapshot',
+      label: 'incomplete snapshot without an actor',
       overrides: {
         snapshots: [
           { ...completeSnapshot, status: 'incomplete', numericScore: null, letterGrade: null },
         ],
       },
-      message: 'No eligible published grade snapshots',
+      message: 'Incomplete academic records require an authorized actor and reason',
     },
   ])('$label is rejected', async ({ overrides, message }) => {
     await expect(runPersistence(overrides)).rejects.toThrow(message);

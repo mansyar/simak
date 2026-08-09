@@ -58,6 +58,19 @@ export const PreflightGradeReleaseSchema = z.object({
 export const PublishGradeReleaseSchema = z.object({
   assignmentId: z.number().int().positive(),
   confirmed: z.literal(true),
+  incompleteOutcomes: z
+    .array(
+      z.object({
+        studentId: z.string().trim().min(1),
+        reason: z.string().trim().min(1).max(1000),
+      }),
+    )
+    .max(500)
+    .default([])
+    .refine(
+      (outcomes) => new Set(outcomes.map((outcome) => outcome.studentId)).size === outcomes.length,
+      'Incomplete outcomes must identify unique students',
+    ),
 });
 
 export const WithdrawGradeReleaseSchema = z.object({

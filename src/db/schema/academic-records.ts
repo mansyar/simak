@@ -67,7 +67,7 @@ export const academicRecords = pgTable(
       .notNull()
       .references(() => assignments.id),
     sourceSnapshotId: integer('source_snapshot_id').references(() => gradeReleaseSnapshots.id),
-    sourceReleaseVersion: integer('source_release_version'),
+    sourceReleaseVersion: integer('source_release_version').notNull(),
     policyVersion: integer('policy_version')
       .notNull()
       .references(() => academicRecordPolicies.version),
@@ -77,7 +77,9 @@ export const academicRecords = pgTable(
     status: academicRecordStatus('status').notNull(),
     credits: numeric('credits', { precision: 5, scale: 2 }).notNull(),
     gradePoints: numeric('grade_points', { precision: 4, scale: 2 }),
-    publishedAt: timestamp('published_at'),
+    outcomeReason: text('outcome_reason'),
+    outcomeActorId: text('outcome_actor_id').references(() => users.id),
+    publishedAt: timestamp('published_at').notNull(),
     createdAt: timestamp('created_at').defaultNow().notNull(),
   },
   (table) => [
@@ -92,5 +94,29 @@ export const academicRecords = pgTable(
     index('academic_records_policy_version_idx').on(table.policyVersion),
     check('academic_records_record_version_positive', sql`${table.recordVersion} >= 1`),
     check('academic_records_credits_positive', sql`${table.credits} > 0`),
+    check(
+      'academic_records_complete_source_required',
+      sql`${table.status} <> 'complete' OR (
+        ${table.sourceSnapshotId} IS NOT NULL
+        AND ${table.sourceReleaseVersion} IS NOT NULL
+        AND ${table.numericScore} IS NOT NULL
+        AND ${table.letterGrade} IS NOT NULL
+        AND ${table.gradePoints} IS NOT NULL
+      )`,
+    ),
+    check(
+      'academic_records_non_complete_outcome_required',
+      sql`${table.status} = 'complete' OR (
+        ${table.outcomeReason} IS NOT NULL
+        AND ${table.outcomeActorId} IS NOT NULL
+        AND ${table.numericScore} IS NULL
+        AND ${table.letterGrade} IS NULL
+        AND ${table.gradePoints} IS NULL
+      )`,
+    ),
+    check(
+      'academic_records_withdrawn_source_absent',
+      sql`${table.status} <> 'withdrawn' OR ${table.sourceSnapshotId} IS NULL`,
+    ),
   ],
 );

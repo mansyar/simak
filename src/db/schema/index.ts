@@ -430,6 +430,10 @@ export const academicRecordsRelations = relations(academicRecords, ({ one }) => 
     fields: [academicRecords.sourceSnapshotId],
     references: [gradeReleaseSnapshots.id],
   }),
+  outcomeActor: one(users, {
+    fields: [academicRecords.outcomeActorId],
+    references: [users.id],
+  }),
   policy: one(academicRecordPolicies, {
     fields: [academicRecords.policyVersion],
     references: [academicRecordPolicies.version],

@@ -203,7 +203,7 @@ export async function getStudentFinalGradeHandler({ data }: { data: { assignment
       return {
         available: true as const,
         releaseVersion: snapshot.releaseVersion,
-        numericScore: Number(snapshot.numericScore),
+        numericScore: snapshot.numericScore === null ? null : Number(snapshot.numericScore),
         letterGrade: snapshot.letterGrade,
         status: snapshot.status,
         contributingCheckpoints: parseContributingCheckpoints(snapshot.contributingCheckpoints),

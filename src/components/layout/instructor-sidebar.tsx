@@ -11,6 +11,7 @@ import {
   BarChart3,
   LifeBuoy,
   MessageSquare,
+  ScrollText,
 } from 'lucide-react';
 import { authClient } from '../../lib/auth-client';
 import { useMobileDrawer } from '../../hooks/use-mobile-drawer';
@@ -31,6 +32,11 @@ export function InstructorSidebar({ isOpen, onClose }: InstructorSidebarProps) {
   const mainLinks = [
     { to: '/instructor/dashboard', label: 'instructorSidebar.dashboard', icon: LayoutDashboard },
     { to: '/instructor/assignments', label: 'instructorSidebar.assignments', icon: ClipboardList },
+    {
+      to: '/instructor/academic-records',
+      label: 'instructorSidebar.academicRecords',
+      icon: ScrollText,
+    },
     { to: '/instructor/reviews', label: 'instructorSidebar.reviews', icon: ClipboardCheck },
     {
       to: '/instructor/interventions',

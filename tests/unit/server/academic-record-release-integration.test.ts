@@ -95,7 +95,7 @@ const incompleteGrade = {
   studentName: 'Incomplete Student',
   numericScore: null,
   letterGrade: null,
-  status: 'in_progress',
+  status: 'incomplete',
   contributingCheckpoints: [],
 };
 const missingGrade = {
@@ -147,7 +147,40 @@ describe('grade-release and academic-record integration', () => {
     ]);
     expect(academicRecords.persistAcademicRecordsForReleaseInTransaction).toHaveBeenCalledWith(
       mock.tx,
-      { assignmentId: 1, releaseVersion: 1 },
+      { assignmentId: 1, releaseVersion: 1, actorId: 'instructor-1' },
+    );
+  });
+
+  it('publishes an incomplete outcome only when explicitly authorized with a reason', async () => {
+    mock.enqueue([assignment], [draftConfig], [eligibleGrade, incompleteGrade], [], []);
+
+    const result = await publishGradeReleaseHandler({
+      data: {
+        assignmentId: 1,
+        confirmed: true,
+        incompleteOutcomes: [
+          { studentId: 'student-incomplete', reason: 'Approved medical extension' },
+        ],
+      },
+    });
+
+    expect(result).toEqual(
+      expect.objectContaining({ success: true, publishedCount: 1, incompleteCount: 1 }),
+    );
+    expect(mock.tx.values).toHaveBeenCalledWith(
+      expect.arrayContaining([
+        expect.objectContaining({ studentId: 'student-complete', status: 'complete' }),
+        expect.objectContaining({ studentId: 'student-incomplete', status: 'incomplete' }),
+      ]),
+    );
+    expect(academicRecords.persistAcademicRecordsForReleaseInTransaction).toHaveBeenCalledWith(
+      mock.tx,
+      {
+        assignmentId: 1,
+        releaseVersion: 1,
+        actorId: 'instructor-1',
+        incompleteReasons: { 'student-incomplete': 'Approved medical extension' },
+      },
     );
   });
 
@@ -180,12 +213,12 @@ describe('grade-release and academic-record integration', () => {
     expect(academicRecords.persistAcademicRecordsForReleaseInTransaction).toHaveBeenNthCalledWith(
       1,
       mock.tx,
-      { assignmentId: 1, releaseVersion: 1 },
+      { assignmentId: 1, releaseVersion: 1, actorId: 'instructor-1' },
     );
     expect(academicRecords.persistAcademicRecordsForReleaseInTransaction).toHaveBeenNthCalledWith(
       2,
       mock.tx,
-      { assignmentId: 1, releaseVersion: 2 },
+      { assignmentId: 1, releaseVersion: 2, actorId: 'instructor-1' },
     );
   });
 

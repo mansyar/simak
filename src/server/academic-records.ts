@@ -21,7 +21,7 @@ export type AcademicRecordView = {
   termStartDate: string;
   sourceAssignmentId: number;
   sourceSnapshotId: number | null;
-  sourceReleaseVersion: number | null;
+  sourceReleaseVersion: number;
   policyVersion: number;
   recordVersion: number;
   numericScore: number | null;
@@ -72,6 +72,20 @@ export type GetStudentAcademicRecordsInput = z.infer<typeof GetStudentAcademicRe
 export type GetInstructorAcademicRecordsInput = z.infer<typeof GetInstructorAcademicRecordsSchema>;
 export type GetAdminAcademicRecordsInput = z.infer<typeof GetAdminAcademicRecordsSchema>;
 
+export const DesignateTranscriptSourceSchema = z.object({
+  sectionId: IdSchema,
+  assignmentId: IdSchema,
+});
+
+export const AppendAcademicRecordPolicySchema = z.object({
+  effectiveTermId: IdSchema,
+  gradePoints: z.record(z.string(), z.number()),
+  roundingScale: z.number().int().min(0).max(4),
+});
+
+export type DesignateTranscriptSourceInput = z.infer<typeof DesignateTranscriptSourceSchema>;
+export type AppendAcademicRecordPolicyInput = z.infer<typeof AppendAcademicRecordPolicySchema>;
+
 export const getStudentAcademicRecords = typedServerFn({ method: 'GET' })
   .middleware(serverFnMiddlewares(RATE_LIMITS.standardRead))
   .inputValidator(GetStudentAcademicRecordsSchema)
@@ -95,4 +109,20 @@ export const getAdminAcademicRecords = typedServerFn({ method: 'GET' })
   .handler(async ({ data }) => {
     const { getAdminAcademicRecordsHandler } = await import('./academic-records-extras.server');
     return getAdminAcademicRecordsHandler({ data });
+  });
+
+export const designateTranscriptSource = typedServerFn({ method: 'POST' })
+  .middleware(serverFnMiddlewares(RATE_LIMITS.destructive))
+  .inputValidator(DesignateTranscriptSourceSchema)
+  .handler(async ({ data }) => {
+    const { designateTranscriptSourceHandler } = await import('./academic-records-admin.server');
+    return designateTranscriptSourceHandler({ data });
+  });
+
+export const appendAcademicRecordPolicy = typedServerFn({ method: 'POST' })
+  .middleware(serverFnMiddlewares(RATE_LIMITS.destructive))
+  .inputValidator(AppendAcademicRecordPolicySchema)
+  .handler(async ({ data }) => {
+    const { appendAcademicRecordPolicyHandler } = await import('./academic-records-admin.server');
+    return appendAcademicRecordPolicyHandler({ data });
   });

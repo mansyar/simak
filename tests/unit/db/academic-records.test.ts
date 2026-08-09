@@ -40,6 +40,20 @@ function findAcademicRecordsMigration(): string | null {
   return null;
 }
 
+function findAcademicRecordsReviewMigration(): string | null {
+  const files = readdirSync(migrationsDir).filter((file) => file.endsWith('.sql'));
+
+  for (const file of files) {
+    const path = resolve(migrationsDir, file);
+    const sql = readFileSync(path, 'utf8');
+    if (/academic_records_complete_source_required/i.test(sql)) {
+      return path;
+    }
+  }
+
+  return null;
+}
+
 describe('academic records schema', () => {
   it('exports policy, record, and relation definitions', async () => {
     const mod = await import('@/db/schema/index');
@@ -55,11 +69,11 @@ describe('academic records schema', () => {
     }
   });
 
-  it('stores positive reusable-course credits', async () => {
+  it('allows legacy null course credits while retaining a positive-value check', async () => {
     const { courses } = await import('@/db/schema/academic-context');
 
     expect(courses).toHaveProperty('credits');
-    expect(courses.credits.notNull).toBe(true);
+    expect(courses.credits.notNull).toBe(false);
     expect(
       tableConfig(courses).checks.some((check) => check.name === 'courses_credits_positive'),
     ).toBe(true);
@@ -121,6 +135,8 @@ describe('academic records schema', () => {
       'status',
       'credits',
       'gradePoints',
+      'outcomeReason',
+      'outcomeActorId',
       'publishedAt',
       'createdAt',
     ]) {
@@ -130,8 +146,10 @@ describe('academic records schema', () => {
     expect(academicRecords.recordVersion.notNull).toBe(true);
     expect(academicRecords.policyVersion.notNull).toBe(true);
     expect(academicRecords.sourceAssignmentId.notNull).toBe(true);
+    expect(academicRecords.sourceReleaseVersion.notNull).toBe(true);
     expect(academicRecords.status.notNull).toBe(true);
     expect(academicRecords.credits.notNull).toBe(true);
+    expect(academicRecords.publishedAt.notNull).toBe(true);
     expect(academicRecords).not.toHaveProperty('updatedAt');
     expect(uniqueColumns(academicRecords, 'academic_records_student_section_version_unq')).toEqual([
       'student_id',
@@ -171,19 +189,21 @@ describe('academic records schema', () => {
         'academic_record_policies',
       ]),
     );
-    expect(config.foreignKeys.length).toBeGreaterThanOrEqual(7);
+    expect(config.foreignKeys.length).toBeGreaterThanOrEqual(8);
   });
 });
 
 describe('academic records migration contract', () => {
-  it('creates credits, transcript source designation, policies, records, and constraints', () => {
+  it('keeps the base academic-record migration compatible with existing courses', () => {
     const migrationPath = findAcademicRecordsMigration();
     expect(migrationPath).not.toBeNull();
 
     const sql = readFileSync(migrationPath!, 'utf8');
     expect(sql).toMatch(/CREATE TYPE\s+"public"\."academic_record_status"/i);
-    expect(sql).toMatch(/TRACK-060 prelaunch migration requires an empty courses table/i);
-    expect(sql).toMatch(/ALTER TABLE\s+"courses"\s+ADD COLUMN\s+"credits"/i);
+    expect(sql).not.toMatch(/TRACK-060 prelaunch migration requires an empty courses table/i);
+    expect(sql).toMatch(/ALTER TABLE\s+"courses"\s+ADD COLUMN\s+"credits"\s+numeric\(5, 2\)/i);
+    expect(sql).not.toMatch(/ADD COLUMN\s+"credits"\s+numeric\(5, 2\)\s+NOT NULL/i);
+    expect(sql).toMatch(/"credits" IS NULL OR "courses"\."credits" > 0/i);
     expect(sql).toMatch(/ALTER TABLE\s+"assignments"\s+ADD COLUMN\s+"is_transcript_source"/i);
     expect(sql).toMatch(/CREATE TABLE\s+"academic_record_policies"/i);
     expect(sql).toMatch(/CREATE TABLE\s+"academic_records"/i);
@@ -191,8 +211,24 @@ describe('academic records migration contract', () => {
     expect(sql).toContain('assignments_section_transcript_source_idx');
   });
 
-  it('has a companion rollback for every schema object introduced by the track', () => {
-    const migrationPath = findAcademicRecordsMigration();
+  it('adds the review integrity migration for existing databases', () => {
+    const migrationPath = findAcademicRecordsReviewMigration();
+    expect(migrationPath).not.toBeNull();
+
+    const sql = readFileSync(migrationPath!, 'utf8');
+    expect(sql).not.toMatch(/ALTER TABLE\s+"courses"\s+ALTER COLUMN\s+"credits"/i);
+    expect(sql).toMatch(/academic_records_complete_source_required/i);
+    expect(sql).toMatch(/academic_records_non_complete_outcome_required/i);
+    expect(sql).toMatch(/grade_release_snapshots_published_outcome_check/i);
+    expect(sql).toMatch(/CREATE TRIGGER\s+"academic_records_immutable_trigger"/i);
+    expect(sql).toMatch(/CREATE TRIGGER\s+"academic_record_policies_immutable_trigger"/i);
+    expect(sql).toMatch(/CREATE TRIGGER\s+"grade_release_snapshots_immutable_trigger"/i);
+    expect(sql).toMatch(/CREATE TRIGGER\s+"academic_records_provenance_trigger"/i);
+    expect(sql).toMatch(/CREATE TRIGGER\s+"assignments_transcript_source_immutable_trigger"/i);
+  });
+
+  it('has a companion rollback for the review integrity migration', () => {
+    const migrationPath = findAcademicRecordsReviewMigration();
     expect(migrationPath).not.toBeNull();
 
     const migrationBase = basename(migrationPath!).replace(/\.sql$/, '');
@@ -200,10 +236,7 @@ describe('academic records migration contract', () => {
     expect(existsSync(rollbackPath)).toBe(true);
 
     const sql = readFileSync(rollbackPath, 'utf8');
-    expect(sql).toMatch(/DROP TABLE IF EXISTS "academic_records"/i);
-    expect(sql).toMatch(/DROP TABLE IF EXISTS "academic_record_policies"/i);
-    expect(sql).toMatch(/DROP COLUMN IF EXISTS "is_transcript_source"/i);
-    expect(sql).toMatch(/DROP COLUMN IF EXISTS "credits"/i);
-    expect(sql).toMatch(/DROP TYPE IF EXISTS "academic_record_status"/i);
+    expect(sql).toMatch(/^-- ROLLBACK NOT POSSIBLE: data loss irreversible/i);
+    expect(sql).not.toMatch(/\b(?:ALTER|DROP|DELETE|UPDATE)\b(?! NOT POSSIBLE)/i);
   });
 });

@@ -74,8 +74,9 @@ const academicRecord = {
   createdAt: new Date('2026-02-01T10:00:00Z'),
 };
 
-function createMockDb(selectResults: unknown[]) {
+function createMockDb(selectResults: unknown[], aggregateResults: unknown[] = []) {
   let selectIndex = 0;
+  let aggregateIndex = 0;
   const db: Record<string, ReturnType<typeof vi.fn>> = {
     select: vi.fn(() => {
       const result = selectResults[selectIndex++];
@@ -84,6 +85,7 @@ function createMockDb(selectResults: unknown[]) {
         innerJoin: vi.fn().mockReturnThis(),
         leftJoin: vi.fn().mockReturnThis(),
         where: vi.fn().mockReturnThis(),
+        groupBy: vi.fn().mockReturnThis(),
         orderBy: vi.fn().mockReturnThis(),
         limit: vi.fn().mockReturnThis(),
         offset: vi.fn().mockReturnThis(),
@@ -92,6 +94,7 @@ function createMockDb(selectResults: unknown[]) {
       };
       return query;
     }),
+    execute: vi.fn(() => Promise.resolve(aggregateResults[aggregateIndex++] ?? [])),
   };
 
   return db;
@@ -118,7 +121,16 @@ describe('academic-record server functions', () => {
 
   it('returns only the current student records with term and cumulative GPA', async () => {
     vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(studentSession as never);
-    const db = createMockDb([[academicRecord], [{ count: '1' }], [academicRecord]]);
+    const aggregate = {
+      gpa: '4.00',
+      totalCredits: '3.00',
+      totalQualityPoints: '12.00',
+      eligibleRecordIds: [100],
+    };
+    const db = createMockDb(
+      [[academicRecord], [{ count: '1' }], [{ id: 3, code: '2026-A', name: 'Term' }]],
+      [[aggregate], [aggregate]],
+    );
     vi.mocked(dbMod.getDb).mockReturnValue(db as never);
 
     const result = await getStudentAcademicRecordsHandler({
@@ -153,7 +165,7 @@ describe('academic-record server functions', () => {
       [{ sectionId: 7 }],
       [academicRecord],
       [{ count: '1' }],
-      [academicRecord],
+      [{ id: 3, code: '2026-A', name: 'Term' }],
     ]);
     vi.mocked(dbMod.getDb).mockReturnValue(db as never);
 
@@ -169,7 +181,11 @@ describe('academic-record server functions', () => {
 
   it('allows admins to inspect policy and source metadata for authorized records', async () => {
     vi.mocked(auth.getSessionFromHeaders).mockResolvedValue(adminSession as never);
-    const db = createMockDb([[academicRecord], [{ count: '1' }], [academicRecord]]);
+    const db = createMockDb([
+      [academicRecord],
+      [{ count: '1' }],
+      [{ id: 3, code: '2026-A', name: 'Term' }],
+    ]);
     vi.mocked(dbMod.getDb).mockReturnValue(db as never);
 
     const result = await getAdminAcademicRecordsHandler({

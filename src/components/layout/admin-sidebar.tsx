@@ -32,6 +32,7 @@ export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
     { to: '/admin/dashboard', label: 'adminSidebar.dashboard', icon: LayoutDashboard },
     { to: '/admin/users', label: 'adminSidebar.users', icon: Users },
     { to: '/admin/templates', label: 'adminSidebar.templates', icon: FileType },
+    { to: '/admin/academic-records', label: 'adminSidebar.academicRecords', icon: GraduationCap },
     { to: '/admin/audit-log', label: 'adminSidebar.auditLog', icon: ScrollText },
     { to: '/admin/email-queue', label: 'adminSidebar.emailQueue', icon: Mail },
     { to: '/admin/analytics', label: 'adminSidebar.analytics', icon: BarChart3 },

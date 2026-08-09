@@ -85,6 +85,14 @@ describe('StudentSidebar', () => {
     expect(assignmentsLink.textContent).toContain('studentSidebar.assignments');
   });
 
+  it('should render the academic records link', () => {
+    mockLocation.mockReturnValue({ pathname: '/student/dashboard' });
+    render(<StudentSidebar isOpen={true} onClose={vi.fn()} />);
+
+    const academicRecordsLink = screen.getByTestId('sidebar-link-/student/academic-records');
+    expect(academicRecordsLink.textContent).toContain('studentSidebar.academicRecords');
+  });
+
   it('should highlight the currently active route with background accent', () => {
     mockLocation.mockReturnValue({ pathname: '/student/dashboard' });
     render(<StudentSidebar isOpen={true} onClose={vi.fn()} />);

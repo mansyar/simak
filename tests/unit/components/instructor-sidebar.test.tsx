@@ -87,6 +87,14 @@ describe('InstructorSidebar', () => {
     expect(assignmentsLink.textContent).toBe('instructorSidebar.assignments');
   });
 
+  it('should render the academic records link', () => {
+    mockLocation.mockReturnValue({ pathname: '/instructor/dashboard' });
+    render(<InstructorSidebar isOpen={true} onClose={vi.fn()} />);
+
+    const academicRecordsLink = screen.getByTestId('sidebar-link-/instructor/academic-records');
+    expect(academicRecordsLink.textContent).toBe('instructorSidebar.academicRecords');
+  });
+
   it('should render reviews link', () => {
     mockLocation.mockReturnValue({ pathname: '/instructor/dashboard' });
     render(<InstructorSidebar isOpen={true} onClose={vi.fn()} />);

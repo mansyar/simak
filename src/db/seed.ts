@@ -1,4 +1,4 @@
-import { and, eq } from 'drizzle-orm';
+import { and, desc, eq } from 'drizzle-orm';
 import { getDb } from './index';
 import {
   users,
@@ -12,9 +12,11 @@ import {
   courses,
   courseSections,
   sectionEnrollments,
+  academicRecordPolicies,
 } from './schema/index';
 import { hashPassword } from 'better-auth/crypto';
 import crypto from 'node:crypto';
+import { DEFAULT_ACADEMIC_RECORD_POLICY } from '@/lib/academic-record-policy';
 
 /**
  * Validate seed environment variables.
@@ -158,6 +160,26 @@ export async function seedTestTemplatesAndAssignments(): Promise<void> {
           status: 'active',
         })
         .returning();
+
+  const [existingPolicy] = await db
+    .select({ id: academicRecordPolicies.id })
+    .from(academicRecordPolicies)
+    .where(eq(academicRecordPolicies.effectiveTermId, term.id))
+    .limit(1);
+  if (!existingPolicy) {
+    const [latestPolicy] = await db
+      .select({ version: academicRecordPolicies.version })
+      .from(academicRecordPolicies)
+      .orderBy(desc(academicRecordPolicies.version))
+      .limit(1);
+    await db.insert(academicRecordPolicies).values({
+      version: (latestPolicy?.version ?? 0) + 1,
+      effectiveTermId: term.id,
+      gradePoints: DEFAULT_ACADEMIC_RECORD_POLICY.gradePoints,
+      roundingScale: DEFAULT_ACADEMIC_RECORD_POLICY.roundingScale,
+      isActive: true,
+    });
+  }
 
   const [existingCourse] = await db.select().from(courses).where(eq(courses.code, 'DEV-THESIS'));
   const [course] = existingCourse

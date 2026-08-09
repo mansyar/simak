@@ -1,6 +1,7 @@
 // Grade release lifecycle handlers (server-only, never client-bundled).
 import { and, eq } from 'drizzle-orm';
 import { getDb } from '@/db/index';
+import { sectionEnrollments } from '@/db/schema/academic-context';
 import { assignments, assignmentStudents } from '@/db/schema/assignments';
 import { assignmentGradeConfig, finalGrades, gradeReleaseSnapshots } from '@/db/schema/gradebook';
 import { users } from '@/db/schema/users';
@@ -12,7 +13,10 @@ import { logger } from '@/lib/logger';
 import {
   persistAcademicRecordsForReleaseInTransaction,
   persistWithdrawnAcademicRecordsForReleaseInTransaction,
+  AcademicRecordDomainError,
 } from './academic-records.server';
+import type { PublishGradeReleaseSchema } from './gradebook';
+import type { z } from 'zod';
 
 type Db = ReturnType<typeof getDb>;
 type Tx = Parameters<Parameters<Db['transaction']>[0]>[0];
@@ -58,6 +62,15 @@ async function getOwnedAssignment(
       isTranscriptSource: assignments.isTranscriptSource,
     })
     .from(assignments)
+    .innerJoin(
+      sectionEnrollments,
+      and(
+        eq(sectionEnrollments.sectionId, assignments.sectionId),
+        eq(sectionEnrollments.userId, instructorId),
+        eq(sectionEnrollments.role, 'instructor'),
+        eq(sectionEnrollments.isActive, true),
+      ),
+    )
     .where(and(eq(assignments.id, assignmentId), eq(assignments.instructorId, instructorId)));
 
   const rows = lock
@@ -126,7 +139,7 @@ function classifyGrades(rows: ReleaseGradeRow[]) {
         letterGrade: row.letterGrade,
         status: 'complete',
       });
-    } else if (row.status === 'incomplete' || row.status === 'in_progress') {
+    } else if (row.status === 'incomplete') {
       incomplete.push(row);
     } else {
       missing.push(row);
@@ -204,11 +217,11 @@ export async function getGradeReleasePreflightHandler({
   }
 }
 
-/** Publish complete enrolled grades as an immutable, versioned snapshot set. */
+/** Publish complete grades plus explicitly authorized incomplete outcomes. */
 export async function publishGradeReleaseHandler({
   data,
 }: {
-  data: { assignmentId: number; confirmed: boolean };
+  data: z.input<typeof PublishGradeReleaseSchema>;
 }) {
   const session = await getSessionFromHeaders();
   if (!isInstructor(session)) return serverError(ErrorCode.UNAUTHORIZED, 'Unauthorized');
@@ -229,18 +242,39 @@ export async function publishGradeReleaseHandler({
       }
 
       const categories = classifyGrades(await getEnrolledGrades(tx, data.assignmentId));
+      const incompleteOutcomes = data.incompleteOutcomes ?? [];
+      const incompleteByStudent = new Map(
+        categories.incomplete.map((grade) => [grade.studentId, grade]),
+      );
+      const invalidOutcome = incompleteOutcomes.find(
+        (outcome) => !incompleteByStudent.has(outcome.studentId),
+      );
+      if (invalidOutcome) {
+        return serverError(
+          ErrorCode.VALIDATION,
+          'Incomplete outcomes must reference students with incomplete grades',
+        );
+      }
       const releaseVersion = (config.activeReleaseVersion ?? 0) + 1;
       const publishedAt = new Date();
 
-      if (categories.eligible.length > 0) {
+      const authorizedIncomplete = incompleteOutcomes.map((outcome) => ({
+        grade: incompleteByStudent.get(outcome.studentId)!,
+        reason: outcome.reason.trim(),
+      }));
+      const publishableGrades = [
+        ...categories.eligible,
+        ...authorizedIncomplete.map(({ grade }) => grade),
+      ];
+      if (publishableGrades.length > 0) {
         await tx.insert(gradeReleaseSnapshots).values(
-          categories.eligible.map((grade) => ({
+          publishableGrades.map((grade) => ({
             assignmentId: data.assignmentId,
             studentId: grade.studentId,
             releaseVersion,
-            numericScore: String(grade.numericScore),
-            letterGrade: grade.letterGrade,
-            status: 'complete' as const,
+            numericScore: grade.status === 'complete' ? String(grade.numericScore) : null,
+            letterGrade: grade.status === 'complete' ? grade.letterGrade : null,
+            status: grade.status === 'complete' ? ('complete' as const) : ('incomplete' as const),
             contributingCheckpoints: grade.contributingCheckpoints ?? [],
             publishedAt,
           })),
@@ -257,10 +291,18 @@ export async function publishGradeReleaseHandler({
         })
         .where(eq(assignmentGradeConfig.assignmentId, data.assignmentId));
 
-      if (assignment.isTranscriptSource && categories.eligible.length > 0) {
+      if (assignment.isTranscriptSource && publishableGrades.length > 0) {
         await persistAcademicRecordsForReleaseInTransaction(tx, {
           assignmentId: data.assignmentId,
           releaseVersion,
+          actorId: session.user.id,
+          ...(authorizedIncomplete.length > 0
+            ? {
+                incompleteReasons: Object.fromEntries(
+                  authorizedIncomplete.map(({ grade, reason }) => [grade.studentId, reason]),
+                ),
+              }
+            : {}),
         });
       }
 
@@ -268,7 +310,7 @@ export async function publishGradeReleaseHandler({
         success: true,
         releaseVersion,
         publishedCount: categories.eligible.length,
-        incompleteCount: categories.incomplete.length,
+        incompleteCount: authorizedIncomplete.length,
         missingCount: categories.missing.length,
       };
     });
@@ -290,6 +332,9 @@ export async function publishGradeReleaseHandler({
 
     return result;
   } catch (error) {
+    if (error instanceof AcademicRecordDomainError) {
+      return serverError(error.code, error.message);
+    }
     return serverError(ErrorCode.INTERNAL, 'Internal Server Error', {
       cause: error instanceof Error ? error.message : String(error),
       handler: 'publishGradeReleaseHandler',
@@ -357,6 +402,9 @@ export async function withdrawGradeReleaseHandler({
 
     return { success: true };
   } catch (error) {
+    if (error instanceof AcademicRecordDomainError) {
+      return serverError(error.code, error.message);
+    }
     return serverError(ErrorCode.INTERNAL, 'Internal Server Error', {
       cause: error instanceof Error ? error.message : String(error),
       handler: 'withdrawGradeReleaseHandler',
