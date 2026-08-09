@@ -120,3 +120,27 @@
   - [x] Confirm no approved tech-stack deviation requires a `tech-stack.md` update.
   - [x] Record migration, authorization, and transcript-source operational notes.
 - [x] Task: Phase Verification & Checkpoint [c539316] (Refer to `conductor/workflow.md`)
+
+## Phase 6: Review Fixes
+
+- [x] Task: Harden migration and academic-record provenance [6fae35a]
+  - [x] Preserve nullable credits for legacy courses during migration.
+  - [x] Enforce cross-table snapshot, release, assignment, section, course, and term provenance.
+  - [x] Prevent transcript-source mutation after official records depend on it.
+  - [x] Mark the unsafe data-restoring rollback as irreversible.
+- [x] Task: Correct authorization, outcomes, ordering, and query scalability [6fae35a]
+  - [x] Require active section authorization for instructor publication and withdrawal.
+  - [x] Require explicit reasoned incomplete outcomes instead of deriving them implicitly.
+  - [x] Use deterministic release-version, publication-time, and record-ID ordering.
+  - [x] Replace unbounded transcript materialization with database aggregation.
+  - [x] Serialize source and policy allocation and return appropriate domain errors.
+- [x] Task: Correct transcript UI and acceptance coverage [6fae35a]
+  - [x] Replace native selects with the approved accessible Select primitive.
+  - [x] Add accurate empty states, bilingual announcements, and focus management.
+  - [x] Expand component and E2E coverage for publication, localization, responsive layout, dark mode, keyboard use, accessibility, and navigation.
+- [x] Task: Review-fix verification [6fae35a]
+  - [x] Focused schema, migration, server, and component tests passed.
+  - [x] `pnpm typecheck`, `pnpm lint`, and `pnpm check:i18n` passed.
+  - [x] Full unit run passed 469 files and 4,616 tests; two unrelated route-import tests timed out under the full parallel run and passed when rerun directly.
+  - [x] Fresh migration chain and academic-record integrity integration tests passed against a disposable PostgreSQL database.
+  - [x] Full integration and Playwright runs remain environment-blocked by shared-database schema teardown and a stale localhost server, respectively.
