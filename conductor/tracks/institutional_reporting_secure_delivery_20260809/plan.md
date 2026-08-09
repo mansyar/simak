@@ -55,12 +55,12 @@
   - [x] Implement upload and short-lived download URL helpers using existing storage conventions
   - [x] Ensure object keys contain no unnecessary personal information
   - [x] Run focused tests
-- [~] Task: Implement on-demand generation orchestration
-  - [ ] Write failing tests for request, processing, completion, failure, safe errors, duplicate execution, and manual retry
-  - [ ] Implement durable job creation and generation orchestration
-  - [ ] Add server-side authorization checks at catalog, generation, status, retry, and download boundaries
-  - [ ] Add audit events and privacy-safe structured logs
-  - [ ] Run focused unit and integration tests
+- [x] Task: Implement on-demand generation orchestration [commit: f21fe13]
+  - [x] Write failing tests for request, processing, completion, failure, safe errors, duplicate execution, and manual retry
+  - [x] Implement durable job creation and generation orchestration
+  - [x] Add server-side authorization checks at catalog, generation, status, retry, and download boundaries
+  - [x] Add audit events and privacy-safe structured logs
+  - [x] Run focused unit and integration tests
 - [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
 
 ## Phase 5 — Accessible Role-Scoped User Experience
