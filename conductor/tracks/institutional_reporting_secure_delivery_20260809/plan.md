@@ -55,7 +55,7 @@
   - [x] Implement upload and short-lived download URL helpers using existing storage conventions
   - [x] Ensure object keys contain no unnecessary personal information
   - [x] Run focused tests
-- [ ] Task: Implement on-demand generation orchestration
+- [~] Task: Implement on-demand generation orchestration
   - [ ] Write failing tests for request, processing, completion, failure, safe errors, duplicate execution, and manual retry
   - [ ] Implement durable job creation and generation orchestration
   - [ ] Add server-side authorization checks at catalog, generation, status, retry, and download boundaries
