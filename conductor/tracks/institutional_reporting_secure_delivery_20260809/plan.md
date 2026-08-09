@@ -50,7 +50,7 @@
   - [x] Implement a server-only rendering adapter and the three fixed templates
   - [x] Verify user-controlled content is escaped and no server-only renderer code reaches client bundles
   - [x] Run focused tests and a production build compatibility check
-- [ ] Task: Implement private R2 report storage
+- [~] Task: Implement private R2 report storage
   - [ ] Write failing tests for opaque object keys, metadata persistence, authorized downloads, expiry, missing objects, and R2 failures
   - [ ] Implement upload and short-lived download URL helpers using existing storage conventions
   - [ ] Ensure object keys contain no unnecessary personal information
