@@ -1892,7 +1892,8 @@
       "loading": "Loading students...",
       "loadError": "Unable to load students.",
       "empty": "No students available.",
-      "noResults": "No students match your search."
+      "noResults": "No students match your search.",
+      "loadMore": "Load more students"
     },
     "locale": {
       "label": "Report language",

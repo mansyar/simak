@@ -19,11 +19,17 @@ async function scanReportingSurface(
   page: import('@playwright/test').Page,
   path: string,
   expectedCard: string,
+  interact?: (page: import('@playwright/test').Page) => Promise<void>,
 ) {
   await page.goto(path);
   await page.waitForLoadState('networkidle');
   await expect(page.getByRole('heading', { name: 'Reports', exact: true })).toBeVisible();
   await expect(page.getByText(expectedCard)).toBeVisible();
+
+  if (interact) {
+    await interact(page);
+    await page.waitForLoadState('networkidle');
+  }
 
   const results = await new AxeBuilder({ page }).analyze();
   expect(filterCriticalAndSerious(results.violations)).toEqual([]);
@@ -43,7 +49,21 @@ test.describe('Axe Accessibility Scans — Reporting Surfaces', () => {
       test.use({ storageState: getAuthFilePath(role) });
 
       test(`${role} reports has no critical/serious/moderate a11y violations`, async ({ page }) => {
-        await scanReportingSurface(page, path, card);
+        await scanReportingSurface(
+          page,
+          path,
+          card,
+          role === 'admin'
+            ? async (scannedPage) => {
+                // Exercise the populated transcript picker (combobox/listbox)
+                // so its interactive state is covered by the axe scan.
+                await scannedPage.getByLabel('Search students').click();
+                await expect(scannedPage.getByRole('option').first()).toBeVisible();
+                await scannedPage.keyboard.press('ArrowDown');
+                await scannedPage.keyboard.press('Enter');
+              }
+            : undefined,
+        );
       });
     });
   }

@@ -113,7 +113,7 @@ test.describe('Reporting E2E', () => {
       await expect(page.getByText('Report generated successfully.')).toBeVisible();
     });
 
-    test('downloads via a short-lived server URL without leaking the artifact key', async ({
+    test('navigates to a short-lived download URL without leaking the artifact key', async ({
       page,
     }) => {
       const sql = await openDb();
@@ -134,16 +134,14 @@ test.describe('Reporting E2E', () => {
       const item = page.locator('li', { hasText: REPORT_TITLES.institutional }).first();
       await expect(item.getByText('Completed')).toBeVisible();
 
-      const popupPromise = page.waitForEvent('popup');
+      // The download is served same-tab via a temporary anchor, not a delayed popup.
       await item.getByRole('button', { name: 'Download' }).click();
-      const popup = await popupPromise;
-      await popup.waitForURL('**/mock-report-download**');
+      await page.waitForURL('**/mock-report-download**');
 
-      const downloadUrl = popup.url();
+      const downloadUrl = page.url();
       expect(downloadUrl).toContain('/mock-report-download');
       expect(downloadUrl).toContain('expires=');
       expect(downloadUrl).not.toContain(SECRET_ARTIFACT_KEY);
-      await popup.close();
     });
   });
 

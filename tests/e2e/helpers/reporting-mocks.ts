@@ -108,10 +108,11 @@ export async function mockReportingServerFns(
 }
 
 /**
- * Fulfill requests to the mock download URL so the popup opened by the UI
- * loads deterministically. Registered on the context so popups inherit it.
- * Served as HTML (not PDF) so the popup performs a normal navigation; the
- * tests only assert the server-issued URL, never artifact bytes.
+ * Fulfill requests to the mock download URL so the same-tab anchor
+ * navigation opened by the UI completes deterministically. Registered on
+ * the context so any navigations inherit it. Served as HTML (not PDF) so
+ * the same-tab navigation performs a normal page load; the tests only
+ * assert the server-issued URL, never artifact bytes.
  */
 export function installMockDownloadRoute(page: Page): void {
   void page.context().route('**/mock-report-download**', async (route) => {

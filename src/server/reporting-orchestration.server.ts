@@ -205,18 +205,20 @@ export async function processReportJob(
       code: 'generation_failed',
       message: 'Report generation failed',
     });
-    await dependencies.audit({
-      actorId: job.requesterId,
-      action: 'report_generation_failed',
-      entityType: 'report_job',
-      entityId: String(job.id),
-      details: { reportType: job.reportType, attempts: job.attempts },
-    });
-    dependencies.log.error({
-      event: 'report_generation_failed',
-      reportJobId: job.id,
-      reportType: job.reportType,
-    });
+    if (failed) {
+      await dependencies.audit({
+        actorId: job.requesterId,
+        action: 'report_generation_failed',
+        entityType: 'report_job',
+        entityId: String(job.id),
+        details: { reportType: job.reportType, attempts: failed.attempts },
+      });
+      dependencies.log.error({
+        event: 'report_generation_failed',
+        reportJobId: job.id,
+        reportType: job.reportType,
+      });
+    }
     return failed;
   }
 }

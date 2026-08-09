@@ -3,6 +3,12 @@ import { getDb, type Db } from '@/db/index';
 import { reportJobs } from '@/db/schema/report-jobs';
 import { calculateReportExpiry } from '@/lib/reporting-policy';
 
+export const REPORT_STALE_PROCESSING_TIMEOUT_MS = 10 * 60 * 1000;
+export const REPORT_STALE_FAILURE_CODE = 'generation_timeout';
+export const REPORT_STALE_FAILURE_MESSAGE = 'Report generation timed out';
+
+const SHA256_HEX_PATTERN = /^[0-9a-f]{64}$/;
+
 type ReportJob = typeof reportJobs.$inferSelect;
 
 interface TransitionOptions {
@@ -78,6 +84,25 @@ export async function selectStaleExpiredJobs(
     .limit(limit);
 }
 
+export async function selectStaleProcessingJobs(
+  limit: number,
+  options: TransitionOptions = {},
+): Promise<ReportJob[]> {
+  validateBatchLimit(limit);
+  const { db, now } = context(options);
+  return db
+    .select()
+    .from(reportJobs)
+    .where(
+      and(
+        eq(reportJobs.state, 'processing'),
+        lte(reportJobs.startedAt, new Date(now.getTime() - REPORT_STALE_PROCESSING_TIMEOUT_MS)),
+      ),
+    )
+    .orderBy(asc(reportJobs.startedAt))
+    .limit(limit);
+}
+
 export async function startReportJob(
   jobId: number,
   options: TransitionOptions = {},
@@ -97,6 +122,32 @@ export async function startReportJob(
   return first(rows);
 }
 
+export async function failStaleProcessingJob(
+  jobId: number,
+  options: TransitionOptions = {},
+): Promise<ReportJob | null> {
+  validateJobId(jobId);
+  const { db, now } = context(options);
+  const rows = await db
+    .update(reportJobs)
+    .set({
+      state: 'failed',
+      failureCode: REPORT_STALE_FAILURE_CODE,
+      failureMessage: REPORT_STALE_FAILURE_MESSAGE,
+      failedAt: now,
+      updatedAt: now,
+    })
+    .where(
+      and(
+        eq(reportJobs.id, jobId),
+        eq(reportJobs.state, 'processing'),
+        lte(reportJobs.startedAt, new Date(now.getTime() - REPORT_STALE_PROCESSING_TIMEOUT_MS)),
+      ),
+    )
+    .returning();
+  return first(rows);
+}
+
 export async function completeReportJob(
   jobId: number,
   artifact: ReportArtifact,
@@ -107,7 +158,7 @@ export async function completeReportJob(
     !artifact.artifactKey.trim() ||
     !Number.isInteger(artifact.artifactSizeBytes) ||
     artifact.artifactSizeBytes <= 0 ||
-    !artifact.artifactSha256.trim()
+    !SHA256_HEX_PATTERN.test(artifact.artifactSha256)
   ) {
     throw new Error('Invalid report artifact metadata');
   }

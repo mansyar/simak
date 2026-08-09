@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom/vitest';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { render, screen, within } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import type { ReactElement } from 'react';
@@ -91,7 +91,9 @@ describe('reporting accessibility', () => {
     expect(comboboxes.length).toBeGreaterThan(0);
     for (const combobox of comboboxes) {
       expect(
-        combobox.getAttribute('aria-label') || combobox.getAttribute('aria-labelledby'),
+        combobox.getAttribute('aria-label') ||
+          combobox.getAttribute('aria-labelledby') ||
+          document.querySelector(`label[for="${combobox.id}"]`),
       ).toBeTruthy();
     }
   });
@@ -162,13 +164,59 @@ describe('reporting accessibility', () => {
     expect(analyticsCard).toHaveAttribute('aria-busy', 'true');
   });
 
-  it('exposes student options with listbox semantics', async () => {
+  it('exposes student options with listbox semantics rather than buttons', async () => {
+    const user = userEvent.setup();
     renderWithQuery(<ReportCatalogControls role="admin" />);
     await screen.findByText('reports.types.institutional_academic_summary.name');
 
+    await user.click(screen.getByLabelText('reports.student.searchLabel'));
+
+    const search = screen.getByRole('combobox', { name: 'reports.student.searchLabel' });
+    expect(search).toHaveAttribute('aria-expanded', 'true');
+    expect(search).toHaveAttribute('aria-controls');
     const listbox = await screen.findByRole('listbox');
+    expect(within(listbox).queryAllByRole('button')).toHaveLength(0);
     const option = await within(listbox).findByRole('option', { name: /Alice/ });
     expect(option).toHaveAttribute('aria-selected', 'false');
+  });
+
+  it('supports keyboard selection in the transcript picker', async () => {
+    const user = userEvent.setup();
+    renderWithQuery(<ReportCatalogControls role="admin" />);
+    await screen.findByText('reports.types.institutional_academic_summary.name');
+
+    const search = screen.getByRole('combobox', { name: 'reports.student.searchLabel' });
+    await user.click(search);
+    const options = await screen.findAllByRole('option');
+
+    await user.keyboard('{ArrowDown}');
+    expect(document.getElementById(search.getAttribute('aria-activedescendant')!)).toBe(options[0]);
+
+    await user.keyboard('{Enter}');
+
+    const transcriptCard = screen.getByRole('region', {
+      name: 'reports.types.official_transcript.name',
+    });
+    await user.click(within(transcriptCard).getByRole('button', { name: 'reports.generate' }));
+
+    await waitFor(() => {
+      expect(requestReport).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({ studentId: 'student-1' }),
+        }),
+      );
+    });
+  });
+
+  it('keeps filter label ids unique across multiple report cards', async () => {
+    renderWithQuery(<ReportCatalogControls role="admin" />);
+    await screen.findByText('reports.types.institutional_academic_summary.name');
+
+    const ids = Array.from(document.querySelectorAll<HTMLElement>('[id$="-label"]')).map(
+      (element) => element.id,
+    );
+    expect(ids.length).toBeGreaterThan(0);
+    expect(new Set(ids).size).toBe(ids.length);
   });
 
   it('scopes the history list as a labeled list with live status feedback', async () => {

@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { MutationFeedback } from '@/components/ui/mutation-feedback';
 import { formatDate } from '@/lib/format-date';
 import { getErrorTranslationKey, isServerError } from '@/lib/errors';
-import { isReportDownloadable } from '@/lib/reporting-history';
+import { isReportDownloadable, isReportExpired } from '@/lib/reporting-history';
 import type { ReportHistoryJob } from '@/lib/reporting-history';
 import type { TranslationKey } from '@/i18n/index';
 import { downloadReport, retryReport } from '@/server/reporting';
@@ -23,6 +23,15 @@ const REPORT_STATE_KEYS: Record<ReportHistoryJob['state'], TranslationKey> = {
   expired: 'reports.history.state.expired',
 };
 
+function openDownloadUrl(downloadUrl: string) {
+  const link = document.createElement('a');
+  link.href = downloadUrl;
+  link.rel = 'noopener noreferrer';
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+}
+
 export function ReportHistoryItem({ job, onJobChanged }: ReportHistoryItemProps) {
   const { t, locale } = useI18n();
   const [error, setError] = useState<string | null>(null);
@@ -36,7 +45,8 @@ export function ReportHistoryItem({ job, onJobChanged }: ReportHistoryItemProps)
       return result.downloadUrl;
     },
     onSuccess: (downloadUrl) => {
-      window.open(downloadUrl, '_blank', 'noopener,noreferrer');
+      setError(null);
+      openDownloadUrl(downloadUrl);
     },
     onError: (mutationError) => {
       setError(mutationError instanceof Error ? mutationError.message : t('error.internal'));
@@ -60,6 +70,8 @@ export function ReportHistoryItem({ job, onJobChanged }: ReportHistoryItemProps)
     },
   });
 
+  const derivedExpired = isReportExpired(job);
+  const displayState: ReportHistoryJob['state'] = derivedExpired ? 'expired' : job.state;
   const downloadable = isReportDownloadable(job);
   const busy = downloadMutation.isPending || retryMutation.isPending;
 
@@ -77,7 +89,7 @@ export function ReportHistoryItem({ job, onJobChanged }: ReportHistoryItemProps)
         </p>
         <p className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
           <span className="rounded-full border px-2 py-0.5 font-medium text-foreground">
-            {t(REPORT_STATE_KEYS[job.state])}
+            {t(REPORT_STATE_KEYS[displayState])}
           </span>
           {job.state === 'completed' && job.completedAt && (
             <span>
@@ -94,7 +106,7 @@ export function ReportHistoryItem({ job, onJobChanged }: ReportHistoryItemProps)
             </span>
           )}
         </p>
-        {job.state === 'expired' && (
+        {derivedExpired && (
           <p className="text-xs text-muted-foreground">{t('reports.history.expiredHint')}</p>
         )}
         {error && <MutationFeedback error={error} />}

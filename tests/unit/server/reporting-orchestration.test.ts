@@ -136,6 +136,12 @@ describe('report generation orchestration', () => {
       code: 'generation_failed',
       message: 'Report generation failed',
     });
+    expect(deps.audit).toHaveBeenCalledWith(
+      expect.objectContaining({
+        action: 'report_generation_failed',
+        details: { reportType: 'analytics_summary', attempts: 0 },
+      }),
+    );
     expect(deps.log.error).toHaveBeenCalledWith({
       event: 'report_generation_failed',
       reportJobId: 41,
@@ -143,6 +149,36 @@ describe('report generation orchestration', () => {
     });
     expect(JSON.stringify(vi.mocked(deps.log.error).mock.calls)).not.toContain(
       'student@example.com',
+    );
+  });
+
+  it('uses the attempt count returned by the guarded fail transition for the audit', async () => {
+    const deps = dependencies({
+      renderPdf: vi.fn().mockRejectedValue(new Error('render blew up')),
+      failJob: vi.fn().mockResolvedValue({ ...pendingJob, state: 'failed', attempts: 3 }),
+    });
+
+    await expect(processReportJob(41, 'admin-1', deps)).resolves.toMatchObject({ state: 'failed' });
+    expect(deps.audit).toHaveBeenCalledWith(
+      expect.objectContaining({
+        action: 'report_generation_failed',
+        details: { reportType: 'analytics_summary', attempts: 3 },
+      }),
+    );
+  });
+
+  it('skips the failure audit when another execution already resolved the job', async () => {
+    const deps = dependencies({
+      renderPdf: vi.fn().mockRejectedValue(new Error('render blew up')),
+      failJob: vi.fn().mockResolvedValue(null),
+    });
+
+    await expect(processReportJob(41, 'admin-1', deps)).resolves.toBeNull();
+    expect(deps.audit).not.toHaveBeenCalledWith(
+      expect.objectContaining({ action: 'report_generation_failed' }),
+    );
+    expect(deps.log.error).not.toHaveBeenCalledWith(
+      expect.objectContaining({ event: 'report_generation_failed' }),
     );
   });
 

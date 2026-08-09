@@ -1,13 +1,28 @@
 /** @vitest-environment node */
 import { randomUUID } from 'node:crypto';
-import { beforeAll, afterAll, describe, expect, it } from 'vitest';
+import { beforeAll, afterAll, describe, expect, it, vi } from 'vitest';
 import { eq, like } from 'drizzle-orm';
+
+vi.mock('@/config/env', () => ({
+  getEnv: () => ({
+    LOG_LEVEL: 'silent',
+    DATABASE_URL:
+      process.env.MIGRATE_DATABASE_URL ??
+      process.env.DATABASE_URL ??
+      'postgresql://simak:simak_password@localhost:5433/simak_test',
+  }),
+}));
+
 import { getDb } from '@/db/index';
 import { reportJobs, users } from '@/db/schema/index';
 import {
   completeReportJob,
   expireReportJob,
   startReportJob,
+} from '@/lib/report-job-transitions.server';
+import {
+  REPORT_STALE_FAILURE_CODE,
+  REPORT_STALE_FAILURE_MESSAGE,
 } from '@/lib/report-job-transitions.server';
 import {
   runReportExpiryCleanup,
@@ -51,6 +66,14 @@ function realDependencies(deleted: string[]): ExpiryCleanupDependencies {
     selectStaleExpired: async (limit) => {
       const { selectStaleExpiredJobs } = await import('@/lib/report-job-transitions.server');
       return selectStaleExpiredJobs(limit);
+    },
+    selectStaleProcessing: async (limit) => {
+      const { selectStaleProcessingJobs } = await import('@/lib/report-job-transitions.server');
+      return selectStaleProcessingJobs(limit);
+    },
+    failStaleJob: async (jobId) => {
+      const { failStaleProcessingJob } = await import('@/lib/report-job-transitions.server');
+      return failStaleProcessingJob(jobId);
     },
     expireJob: expireReportJob,
     deleteArtifact: async (artifactKey) => {
@@ -158,6 +181,41 @@ describe('report expiry cleanup (PostgreSQL)', () => {
 
     const [row] = await db.select().from(reportJobs).where(eq(reportJobs.id, due.id));
     expect(row!.artifactKey).toBeNull();
+  });
+
+  it('fails a processing job stuck past the stale timeout, leaving the retry action usable', async () => {
+    const [job] = await db
+      .insert(reportJobs)
+      .values({
+        reportType: 'analytics_summary',
+        requesterId,
+        parameters: { termId: null, courseId: null, sectionId: null, cohort: null },
+        locale: 'en',
+      })
+      .returning();
+    await startReportJob(job!.id);
+    await db
+      .update(reportJobs)
+      .set({ startedAt: new Date(Date.now() - 11 * 60 * 1000) })
+      .where(eq(reportJobs.id, job!.id));
+
+    const summary = await runReportExpiryCleanup(10, 'admin-1', realDependencies([]));
+    expect(summary).toMatchObject({ staleFailed: 1, expired: 0, finalized: 0 });
+
+    const [row] = await db.select().from(reportJobs).where(eq(reportJobs.id, job!.id));
+    expect(row!.state).toBe('failed');
+    expect(row!.failureCode).toBe(REPORT_STALE_FAILURE_CODE);
+    expect(row!.failureMessage).toBe(REPORT_STALE_FAILURE_MESSAGE);
+    expect(row!.failedAt).not.toBeNull();
+    expect(row!.attempts).toBe(1);
+    expect(row!.startedAt).not.toBeNull();
+
+    const { retryReportJob } = await import('@/lib/report-job-transitions.server');
+    const retried = await retryReportJob(job!.id);
+    expect(retried).toMatchObject({ state: 'pending', attempts: 1 });
+    const claimed = await startReportJob(job!.id);
+    expect(claimed).not.toBeNull();
+    expect(claimed!.state).toBe('processing');
   });
 
   it('leaves not-yet-due completed jobs untouched', async () => {

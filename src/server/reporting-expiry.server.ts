@@ -2,10 +2,13 @@ import { safeAuditLog } from '@/lib/audit';
 import { ErrorCode, serverError } from '@/lib/errors';
 import { logger } from '@/lib/logger';
 import {
+  REPORT_STALE_FAILURE_CODE,
   expireReportJob,
+  failStaleProcessingJob,
   finalizeExpiredReportJob,
   selectDueCompletedJobs,
   selectStaleExpiredJobs,
+  selectStaleProcessingJobs,
 } from '@/lib/report-job-transitions.server';
 import { type Session, getSessionFromHeaders } from './auth';
 import { deleteReportArtifact } from './report-storage.server';
@@ -20,6 +23,8 @@ export interface ExpiryCleanupDependencies {
   getSession: () => Promise<Session | null>;
   selectDueCompleted: (limit: number) => Promise<ReportJob[]>;
   selectStaleExpired: (limit: number) => Promise<ReportJob[]>;
+  selectStaleProcessing: (limit: number) => Promise<ReportJob[]>;
+  failStaleJob: (jobId: number) => Promise<ReportJob | null>;
   expireJob: (jobId: number) => Promise<ReportJob | null>;
   deleteArtifact: (artifactKey: string) => Promise<'deleted' | 'not_found'>;
   finalizeJob: (jobId: number) => Promise<ReportJob | null>;
@@ -30,6 +35,7 @@ export interface ExpiryCleanupDependencies {
 export interface ExpiryCleanupSummary {
   dueCompleted: number;
   staleExpired: number;
+  staleFailed: number;
   expired: number;
   finalized: number;
   failedDeletions: number;
@@ -39,6 +45,8 @@ const defaultExpiryCleanupDependencies: ExpiryCleanupDependencies = {
   getSession: getSessionFromHeaders,
   selectDueCompleted: (limit: number) => selectDueCompletedJobs(limit),
   selectStaleExpired: (limit: number) => selectStaleExpiredJobs(limit),
+  selectStaleProcessing: (limit: number) => selectStaleProcessingJobs(limit),
+  failStaleJob: failStaleProcessingJob,
   expireJob: expireReportJob,
   deleteArtifact: deleteReportArtifact,
   finalizeJob: finalizeExpiredReportJob,
@@ -83,10 +91,25 @@ export async function runReportExpiryCleanup(
   const summary: ExpiryCleanupSummary = {
     dueCompleted: 0,
     staleExpired: 0,
+    staleFailed: 0,
     expired: 0,
     finalized: 0,
     failedDeletions: 0,
   };
+
+  const staleProcessing = await dependencies.selectStaleProcessing(batchSize);
+  for (const job of staleProcessing) {
+    const failed = await dependencies.failStaleJob(job.id);
+    if (!failed) continue;
+    summary.staleFailed += 1;
+    await dependencies.audit({
+      actorId,
+      action: 'report_stale_failed',
+      entityType: 'report_job',
+      entityId: String(job.id),
+      details: { reportType: job.reportType, failureCode: REPORT_STALE_FAILURE_CODE },
+    });
+  }
 
   const stale = await dependencies.selectStaleExpired(batchSize);
   summary.staleExpired = stale.length;

@@ -91,8 +91,8 @@ describe('ReportCard', () => {
     vi.mocked(listUsers).mockResolvedValue({ users: [alice], total: 1 });
     renderCard('official_transcript', 'admin');
 
-    await screen.findByRole('option', { name: /Alice/ });
-    await user.click(screen.getByRole('option', { name: /Alice/ }));
+    await user.click(screen.getByLabelText('reports.student.searchLabel'));
+    await user.click(await screen.findByRole('option', { name: /Alice/ }));
     await chooseOption('reports.filters.term', 'Fall 2026');
     await chooseOption('reports.filters.course', 'IF101 - Algorithms');
     await chooseOption('reports.filters.section', 'IF101 - A - Morning');
@@ -116,7 +116,6 @@ describe('ReportCard', () => {
     const user = userEvent.setup();
     vi.mocked(listUsers).mockResolvedValue({ users: [alice], total: 1 });
     renderCard('official_transcript', 'admin');
-    await screen.findByRole('option', { name: /Alice/ });
 
     await user.click(screen.getByRole('button', { name: 'reports.generate' }));
 

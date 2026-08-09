@@ -195,4 +195,141 @@ describe('server-only report PDF renderer', () => {
       text: expect.stringContaining(expected),
     });
   });
+
+  it.each([
+    ['en', 'No academic records'],
+    ['id', 'Tidak ada rekaman akademik'],
+  ] as const)(
+    'renders an explicit no-records notice for an empty transcript in %s',
+    async (locale, notice) => {
+      const pdf = await renderReportPdf({
+        type: 'official_transcript',
+        locale,
+        generatedAt,
+        institution,
+        filters,
+        data: {
+          filters,
+          student: { id: 'student-1', name: 'Siti Nur Aisyah' },
+          termGpa: null,
+          cumulativeGpa: null,
+          records: [],
+        },
+      });
+      const result = await inspectPdf(pdf);
+
+      expect(result.text).toContain(notice);
+      expect(result.pages[0]).not.toMatch(/IF\d{3}/);
+    },
+  );
+
+  it('wraps long official course names without ellipsizing them', async () => {
+    const longName = `MataKuliah${'X'.repeat(300)}`;
+    const pdf = await renderReportPdf({
+      type: 'official_transcript',
+      locale: 'en',
+      generatedAt,
+      institution,
+      filters,
+      data: {
+        filters,
+        student: { id: 'student-1', name: 'Siti Nur Aisyah' },
+        termGpa: null,
+        cumulativeGpa: null,
+        records: [
+          {
+            recordId: 1,
+            courseCode: 'IF001',
+            courseName: longName,
+            sectionCode: 'A',
+            termCode: '2026-1',
+            termName: 'Semester Ganjil',
+            status: 'complete' as const,
+            numericScore: 90,
+            letterGrade: 'A',
+            credits: 3,
+            gradePoints: 4,
+            publishedAt: new Date('2026-06-01T00:00:00.000Z'),
+          },
+          {
+            recordId: 2,
+            courseCode: 'IF002',
+            courseName: 'Algoritma',
+            sectionCode: 'A',
+            termCode: '2026-1',
+            termName: 'Semester Ganjil',
+            status: 'complete' as const,
+            numericScore: 85,
+            letterGrade: 'B+',
+            credits: 3,
+            gradePoints: 3.5,
+            publishedAt: new Date('2026-06-01T00:00:00.000Z'),
+          },
+        ],
+      },
+    });
+    const result = await inspectPdf(pdf);
+
+    expect(result.text.replaceAll(' ', '')).toContain(longName);
+    expect(result.text).not.toContain('…');
+  });
+
+  it('keeps a measured tall row within the content bounds instead of overflowing', async () => {
+    const tallName = `Mata Kuliah ${'Komputasi '.repeat(40)}Lanjutan`;
+    const records = Array.from({ length: 20 }, (_, index) => ({
+      recordId: index + 1,
+      courseCode: `IF${String(index + 1).padStart(3, '0')}`,
+      courseName: 'Algoritma',
+      sectionCode: 'A',
+      termCode: '2026-1',
+      termName: 'Semester Ganjil',
+      status: 'complete' as const,
+      numericScore: 90,
+      letterGrade: 'A',
+      credits: 3,
+      gradePoints: 4,
+      publishedAt: new Date('2026-06-01T00:00:00.000Z'),
+    }));
+    records.push({
+      recordId: 21,
+      courseCode: 'TALL',
+      courseName: tallName,
+      sectionCode: 'A',
+      termCode: '2026-1',
+      termName: 'Semester Ganjil',
+      status: 'complete' as const,
+      numericScore: 90,
+      letterGrade: 'A',
+      credits: 3,
+      gradePoints: 4,
+      publishedAt: new Date('2026-06-01T00:00:00.000Z'),
+    });
+    const pdf = await renderReportPdf({
+      type: 'official_transcript',
+      locale: 'en',
+      generatedAt,
+      institution,
+      filters,
+      data: {
+        filters,
+        student: { id: 'student-1', name: 'Siti Nur Aisyah' },
+        termGpa: null,
+        cumulativeGpa: null,
+        records,
+      },
+    });
+    const full = await getDocument({ data: new Uint8Array(pdf) }).promise;
+    const result = await inspectPdf(pdf);
+
+    expect(result.text).toContain('TALL');
+    expect(result.text.replaceAll(' ', '')).toContain(tallName.replaceAll(' ', ''));
+    for (let pageNumber = 1; pageNumber <= full.numPages; pageNumber += 1) {
+      const page = await full.getPage(pageNumber);
+      const content = await page.getTextContent();
+      for (const item of content.items) {
+        if (!('transform' in item)) continue;
+        expect(item.transform[5] + item.height).toBeGreaterThanOrEqual(58);
+      }
+    }
+  });
 });

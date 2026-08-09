@@ -1,13 +1,17 @@
 /** @vitest-environment node */
 import { describe, expect, it, vi } from 'vitest';
 import {
+  REPORT_STALE_FAILURE_CODE,
+  REPORT_STALE_FAILURE_MESSAGE,
   completeReportJob,
   expireReportJob,
   failReportJob,
+  failStaleProcessingJob,
   finalizeExpiredReportJob,
   retryReportJob,
   selectDueCompletedJobs,
   selectStaleExpiredJobs,
+  selectStaleProcessingJobs,
   startReportJob,
 } from '@/lib/report-job-transitions.server';
 
@@ -53,7 +57,11 @@ describe('report job transitions', () => {
     await expect(
       completeReportJob(
         7,
-        { artifactKey: 'reports/opaque.pdf', artifactSizeBytes: 128, artifactSha256: 'abc' },
+        {
+          artifactKey: 'reports/opaque.pdf',
+          artifactSizeBytes: 128,
+          artifactSha256: 'a'.repeat(64),
+        },
         { db, now },
       ),
     ).resolves.toEqual(row);
@@ -64,6 +72,21 @@ describe('report job transitions', () => {
         expiresAt: new Date('2026-09-08T12:00:00.000Z'),
       }),
     );
+  });
+
+  it('rejects artifact hashes that are not 64 lowercase hexadecimal characters', async () => {
+    const { db, update } = mockDb([]);
+    const valid = { artifactKey: 'reports/opaque.pdf', artifactSizeBytes: 128 };
+    await expect(
+      completeReportJob(7, { ...valid, artifactSha256: 'abc' }, { db, now }),
+    ).rejects.toThrow('Invalid report artifact metadata');
+    await expect(
+      completeReportJob(7, { ...valid, artifactSha256: 'A'.repeat(64) }, { db, now }),
+    ).rejects.toThrow('Invalid report artifact metadata');
+    await expect(
+      completeReportJob(7, { ...valid, artifactSha256: 'a'.repeat(63) }, { db, now }),
+    ).rejects.toThrow('Invalid report artifact metadata');
+    expect(update).not.toHaveBeenCalled();
   });
 
   it('records a safe failure only from processing', async () => {
@@ -130,6 +153,38 @@ describe('report job transitions', () => {
     expect(limit).toHaveBeenCalledWith(10);
   });
 
+  it('selects only processing jobs started before the stale timeout', async () => {
+    const { db, where, limit } = mockSelect([{ id: 7, state: 'processing', startedAt: null }]);
+    await expect(selectStaleProcessingJobs(5, { db, now })).resolves.toEqual([
+      { id: 7, state: 'processing', startedAt: null },
+    ]);
+    expect(where).toHaveBeenCalledTimes(1);
+    expect(limit).toHaveBeenCalledWith(5);
+  });
+
+  it('fails a stale processing job with a safe timeout code without resetting attempts', async () => {
+    const row = { id: 7, state: 'failed', attempts: 3 };
+    const { db, set } = mockDb([row]);
+
+    await expect(failStaleProcessingJob(7, { db, now })).resolves.toEqual(row);
+    expect(set).toHaveBeenCalledWith(
+      expect.objectContaining({
+        state: 'failed',
+        failureCode: REPORT_STALE_FAILURE_CODE,
+        failureMessage: REPORT_STALE_FAILURE_MESSAGE,
+        failedAt: now,
+        updatedAt: now,
+      }),
+    );
+    expect(set.mock.calls[0][0]).not.toHaveProperty('attempts');
+    expect(set.mock.calls[0][0]).not.toHaveProperty('startedAt');
+  });
+
+  it('returns null when a fresh processing job wins the stale-fail transition', async () => {
+    const { db } = mockDb([]);
+    await expect(failStaleProcessingJob(7, { db, now })).resolves.toBeNull();
+  });
+
   it('rejects invalid transition input before touching the database', async () => {
     const { db, update } = mockDb([]);
     await expect(
@@ -140,6 +195,7 @@ describe('report job transitions', () => {
       ),
     ).rejects.toThrow('Invalid report artifact metadata');
     await expect(finalizeExpiredReportJob(0, { db })).rejects.toThrow('Invalid report job ID');
+    await expect(failStaleProcessingJob(-1, { db })).rejects.toThrow('Invalid report job ID');
     await expect(selectDueCompletedJobs(0, { db })).rejects.toThrow('Invalid batch limit');
     await expect(selectStaleExpiredJobs(-1, { db })).rejects.toThrow('Invalid batch limit');
     expect(update).not.toHaveBeenCalled();

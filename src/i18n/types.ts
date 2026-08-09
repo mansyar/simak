@@ -1898,6 +1898,7 @@ export type Translation = {
       loadError: string
       empty: string
       noResults: string
+      loadMore: string
     }
     locale: {
       label: string

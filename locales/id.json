@@ -1892,7 +1892,8 @@
       "loading": "Memuat mahasiswa...",
       "loadError": "Gagal memuat daftar mahasiswa.",
       "empty": "Tidak ada mahasiswa tersedia.",
-      "noResults": "Tidak ada mahasiswa yang cocok dengan pencarian Anda."
+      "noResults": "Tidak ada mahasiswa yang cocok dengan pencarian Anda.",
+      "loadMore": "Muat lebih banyak mahasiswa"
     },
     "locale": {
       "label": "Bahasa laporan",

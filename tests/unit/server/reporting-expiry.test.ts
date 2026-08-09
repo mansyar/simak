@@ -5,6 +5,7 @@ import {
   runReportExpiryCleanupHandler,
   type ExpiryCleanupDependencies,
 } from '@/server/reporting-expiry.server';
+import { REPORT_STALE_FAILURE_CODE } from '@/lib/report-job-transitions.server';
 
 const completedJob = {
   id: 1,
@@ -39,6 +40,8 @@ function dependencies(overrides: Partial<ExpiryCleanupDependencies> = {}) {
     getSession: vi.fn().mockResolvedValue({ user: { id: 'admin-1', role: 'admin' } }),
     selectDueCompleted: vi.fn().mockResolvedValue([]),
     selectStaleExpired: vi.fn().mockResolvedValue([]),
+    selectStaleProcessing: vi.fn().mockResolvedValue([]),
+    failStaleJob: vi.fn().mockResolvedValue(null),
     expireJob: vi.fn().mockImplementation(async (jobId: number) => ({
       ...completedJob,
       id: jobId,
@@ -62,6 +65,7 @@ describe('report expiry cleanup', () => {
     await expect(runReportExpiryCleanup(50, 'admin-1', deps)).resolves.toEqual({
       dueCompleted: 1,
       staleExpired: 0,
+      staleFailed: 0,
       expired: 1,
       finalized: 1,
       failedDeletions: 0,
@@ -95,6 +99,7 @@ describe('report expiry cleanup', () => {
     await expect(runReportExpiryCleanup(50, 'admin-1', deps)).resolves.toEqual({
       dueCompleted: 1,
       staleExpired: 0,
+      staleFailed: 0,
       expired: 0,
       finalized: 0,
       failedDeletions: 0,
@@ -115,6 +120,7 @@ describe('report expiry cleanup', () => {
     await expect(runReportExpiryCleanup(50, 'admin-1', deps)).resolves.toEqual({
       dueCompleted: 1,
       staleExpired: 0,
+      staleFailed: 0,
       expired: 1,
       finalized: 1,
       failedDeletions: 0,
@@ -137,6 +143,7 @@ describe('report expiry cleanup', () => {
     expect(summary).toEqual({
       dueCompleted: 2,
       staleExpired: 0,
+      staleFailed: 0,
       expired: 2,
       finalized: 1,
       failedDeletions: 1,
@@ -169,6 +176,60 @@ describe('report expiry cleanup', () => {
     expect(vi.mocked(deps.deleteArtifact).mock.invocationCallOrder[0]).toBeLessThan(expireOrder);
   });
 
+  it('fails stale processing jobs before snapshotting due jobs', async () => {
+    const processingJob = { ...completedJob, id: 4, state: 'processing' as const };
+    const deps = dependencies({
+      selectStaleProcessing: vi.fn().mockResolvedValue([processingJob]),
+      failStaleJob: vi.fn().mockResolvedValue({ ...processingJob, state: 'failed' }),
+    });
+
+    await expect(runReportExpiryCleanup(50, 'admin-1', deps)).resolves.toEqual({
+      dueCompleted: 0,
+      staleExpired: 0,
+      staleFailed: 1,
+      expired: 0,
+      finalized: 0,
+      failedDeletions: 0,
+    });
+    expect(deps.failStaleJob).toHaveBeenCalledWith(4);
+    expect(vi.mocked(deps.selectStaleProcessing).mock.invocationCallOrder[0]).toBeLessThan(
+      vi.mocked(deps.selectDueCompleted).mock.invocationCallOrder[0],
+    );
+    expect(deps.audit).toHaveBeenCalledWith(
+      expect.objectContaining({
+        action: 'report_stale_failed',
+        entityId: '4',
+        details: expect.objectContaining({ failureCode: REPORT_STALE_FAILURE_CODE }),
+      }),
+    );
+    expect(deps.audit).toHaveBeenCalledWith(
+      expect.objectContaining({
+        action: 'report_expiry_cleanup',
+        details: expect.objectContaining({ staleFailed: 1 }),
+      }),
+    );
+  });
+
+  it('counts a shared stale-fail once when a concurrent run wins', async () => {
+    const processingJob = { ...completedJob, id: 5, state: 'processing' as const };
+    const failed = new Set<number>();
+    const deps = dependencies({
+      selectStaleProcessing: vi.fn().mockResolvedValue([processingJob]),
+      failStaleJob: vi.fn().mockImplementation(async (jobId: number) => {
+        if (failed.has(jobId)) return null;
+        failed.add(jobId);
+        return { ...processingJob, id: jobId, state: 'failed' };
+      }),
+    });
+
+    const [first, second] = await Promise.all([
+      runReportExpiryCleanup(50, 'admin-1', deps),
+      runReportExpiryCleanup(50, 'admin-1', deps),
+    ]);
+
+    expect(first.staleFailed + second.staleFailed).toBe(1);
+  });
+
   it('does not retry a failed deletion within the same run', async () => {
     const deps = dependencies({
       selectDueCompleted: vi.fn().mockResolvedValue([completedJob]),
@@ -178,6 +239,7 @@ describe('report expiry cleanup', () => {
     await expect(runReportExpiryCleanup(50, 'admin-1', deps)).resolves.toEqual({
       dueCompleted: 1,
       staleExpired: 0,
+      staleFailed: 0,
       expired: 1,
       finalized: 0,
       failedDeletions: 1,
@@ -212,6 +274,7 @@ describe('report expiry cleanup', () => {
     await expect(runReportExpiryCleanup(50, 'admin-1', deps)).resolves.toEqual({
       dueCompleted: 0,
       staleExpired: 1,
+      staleFailed: 0,
       expired: 0,
       finalized: 1,
       failedDeletions: 0,
@@ -229,6 +292,7 @@ describe('report expiry cleanup', () => {
     await expect(runReportExpiryCleanup(50, 'admin-1', deps)).resolves.toEqual({
       dueCompleted: 0,
       staleExpired: 1,
+      staleFailed: 0,
       expired: 0,
       finalized: 0,
       failedDeletions: 0,
@@ -253,11 +317,12 @@ describe('report expiry cleanup', () => {
     );
   });
 
-  it('passes the bounded batch size to both selectors', async () => {
+  it('passes the bounded batch size to all selectors', async () => {
     const deps = dependencies();
     await runReportExpiryCleanup(7, 'admin-1', deps);
     expect(deps.selectDueCompleted).toHaveBeenCalledWith(7);
     expect(deps.selectStaleExpired).toHaveBeenCalledWith(7);
+    expect(deps.selectStaleProcessing).toHaveBeenCalledWith(7);
   });
 
   it('rejects unauthenticated operational access before touching the database', async () => {
@@ -287,6 +352,7 @@ describe('report expiry cleanup', () => {
       summary: {
         dueCompleted: 0,
         staleExpired: 0,
+        staleFailed: 0,
         expired: 0,
         finalized: 0,
         failedDeletions: 0,

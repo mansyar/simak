@@ -103,7 +103,13 @@ describe('private report storage', () => {
     );
 
     expect(mocks.headInputs).toEqual([{ Bucket: 'private-bucket', Key: 'reports/opaque.pdf' }]);
-    expect(mocks.getInputs).toEqual([{ Bucket: 'private-bucket', Key: 'reports/opaque.pdf' }]);
+    expect(mocks.getInputs).toEqual([
+      {
+        Bucket: 'private-bucket',
+        Key: 'reports/opaque.pdf',
+        ResponseContentDisposition: 'attachment',
+      },
+    ]);
     expect(mocks.getSignedUrl).toHaveBeenCalledWith({ send: mocks.send }, expect.anything(), {
       expiresIn: 300,
     });

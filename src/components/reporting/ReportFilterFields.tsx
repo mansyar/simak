@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useId, useMemo } from 'react';
 import { useI18n } from '@/routes/__root';
 import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select';
 import type { TranslationKey } from '@/i18n/index';
@@ -63,6 +63,7 @@ function FilterField({
 
 export function ReportFilterFields({ options, filters, onChange }: ReportFilterFieldsProps) {
   const { t } = useI18n();
+  const baseId = useId();
 
   const courseOptions = useMemo(
     () => deriveCourseOptions(options, filters.termId),
@@ -117,7 +118,7 @@ export function ReportFilterFields({ options, filters, onChange }: ReportFilterF
       <legend className="text-sm font-semibold">{t('reports.filters.label')}</legend>
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         <FilterField
-          id="term"
+          id={`${baseId}-term`}
           labelKey="reports.filters.term"
           value={filters.termId === null ? 'all' : String(filters.termId)}
           onValueChange={handleTermChange}
@@ -132,7 +133,7 @@ export function ReportFilterFields({ options, filters, onChange }: ReportFilterF
         </FilterField>
 
         <FilterField
-          id="course"
+          id={`${baseId}-course`}
           labelKey="reports.filters.course"
           value={filters.courseId === null ? 'all' : String(filters.courseId)}
           onValueChange={handleCourseChange}
@@ -152,7 +153,7 @@ export function ReportFilterFields({ options, filters, onChange }: ReportFilterF
         </FilterField>
 
         <FilterField
-          id="section"
+          id={`${baseId}-section`}
           labelKey="reports.filters.section"
           value={filters.sectionId === null ? 'all' : String(filters.sectionId)}
           onValueChange={handleSectionChange}
@@ -172,7 +173,7 @@ export function ReportFilterFields({ options, filters, onChange }: ReportFilterF
         </FilterField>
 
         <FilterField
-          id="cohort"
+          id={`${baseId}-cohort`}
           labelKey="reports.filters.cohort"
           value={filters.cohort === null ? 'all' : filters.cohort}
           onValueChange={handleCohortChange}

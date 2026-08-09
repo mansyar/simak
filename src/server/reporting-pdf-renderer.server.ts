@@ -76,6 +76,7 @@ const COPY = {
     code: 'Code',
     courseName: 'Course name',
     grade: 'Grade',
+    noRecords: 'No academic records',
   },
   id: {
     titles: {
@@ -107,11 +108,12 @@ const COPY = {
     code: 'Kode',
     courseName: 'Nama mata kuliah',
     grade: 'Nilai',
+    noRecords: 'Tidak ada rekaman akademik',
   },
 } as const;
 
 type Copy = (typeof COPY)[ReportLocale];
-type Cell = { text: string; width: number; align?: 'left' | 'right' };
+type Cell = { text: string; width: number; align?: 'left' | 'right'; ellipsis?: boolean };
 
 function text(doc: PDFKit.PDFDocument, value: string, options: PDFKit.Mixins.TextOptions = {}) {
   const content = doc.markStructureContent('P');
@@ -156,13 +158,18 @@ function ensureSpace(doc: PDFKit.PDFDocument, height: number, tableHeader?: () =
   tableHeader?.();
 }
 
-function tableRow(doc: PDFKit.PDFDocument, cells: Cell[], bold = false) {
+function tableRowHeight(doc: PDFKit.PDFDocument, cells: Cell[], bold = false) {
   const padding = 4;
-  const lineHeight = 11;
+  doc.font(bold ? 'Bold' : 'Regular').fontSize(8);
   const heights = cells.map((cell) =>
     doc.heightOfString(cell.text, { width: cell.width - padding * 2, lineGap: 1 }),
   );
-  const height = Math.max(20, ...heights.map((value) => value + padding * 2));
+  return Math.max(20, ...heights.map((value) => value + padding * 2));
+}
+
+function tableRow(doc: PDFKit.PDFDocument, cells: Cell[], bold = false) {
+  const padding = 4;
+  const height = tableRowHeight(doc, cells, bold);
   const startX = MARGIN;
   const startY = doc.y;
   let x = startX;
@@ -177,13 +184,17 @@ function tableRow(doc: PDFKit.PDFDocument, cells: Cell[], bold = false) {
       height: height - padding * 2,
       lineGap: 1,
       align: cell.align,
-      ellipsis: true,
+      ellipsis: cell.ellipsis ?? true,
     });
     x += cell.width;
   }
   doc.y = startY + height;
   doc.x = startX;
-  return Math.max(height, lineHeight);
+  return Math.max(height, 11);
+}
+
+function ensureSpaceForRow(doc: PDFKit.PDFDocument, cells: Cell[], tableHeader?: () => void) {
+  ensureSpace(doc, tableRowHeight(doc, cells), tableHeader);
 }
 
 function renderInstitutional(
@@ -209,7 +220,14 @@ function renderInstitutional(
     [copy.averageScore, request.data.totals.averageScore],
   ] as const;
   for (const [label, value] of metrics) {
-    ensureSpace(doc, 22, metricHeader);
+    ensureSpaceForRow(
+      doc,
+      [
+        { text: label, width: 330 },
+        { text: formatNumber(value), width: 181, align: 'right' },
+      ],
+      metricHeader,
+    );
     tableRow(doc, [
       { text: label, width: 330 },
       { text: formatNumber(value), width: 181, align: 'right' },
@@ -230,7 +248,14 @@ function renderInstitutional(
   for (const outcome of [...request.data.outcomes].sort((a, b) =>
     a.status.localeCompare(b.status),
   )) {
-    ensureSpace(doc, 22, outcomeHeader);
+    ensureSpaceForRow(
+      doc,
+      [
+        { text: outcome.status, width: 330 },
+        { text: String(outcome.count), width: 181, align: 'right' },
+      ],
+      outcomeHeader,
+    );
     tableRow(doc, [
       { text: outcome.status, width: 330 },
       { text: String(outcome.count), width: 181, align: 'right' },
@@ -262,7 +287,21 @@ function renderAnalytics(
     (a, b) => a.sectionCode.localeCompare(b.sectionCode) || a.sectionId - b.sectionId,
   );
   for (const section of sections) {
-    ensureSpace(doc, 32, header);
+    ensureSpaceForRow(
+      doc,
+      [
+        { text: section.sectionCode, width: widths[0] },
+        { text: String(section.students), width: widths[1], align: 'right' },
+        { text: String(section.activeAssignments), width: widths[2], align: 'right' },
+        {
+          text: `${section.passedCheckpoints}/${section.totalCheckpoints}`,
+          width: widths[3],
+          align: 'right',
+        },
+        { text: `${section.completionRate}%`, width: widths[4], align: 'right' },
+      ],
+      header,
+    );
     tableRow(doc, [
       { text: section.sectionCode, width: widths[0] },
       { text: String(section.students), width: widths[1], align: 'right' },
@@ -308,16 +347,23 @@ function renderTranscript(
       a.courseCode.localeCompare(b.courseCode) ||
       b.recordId - a.recordId,
   );
+  if (records.length === 0) {
+    doc.font('Regular').fontSize(8).fillColor('#5B6472');
+    text(doc, copy.noRecords);
+    doc.moveDown(0.7);
+    return;
+  }
   for (const record of records) {
-    ensureSpace(doc, 32, header);
-    tableRow(doc, [
+    const cells: Cell[] = [
       { text: record.courseCode, width: widths[0] },
-      { text: record.courseName, width: widths[1] },
+      { text: record.courseName, width: widths[1], ellipsis: false },
       { text: record.termCode, width: widths[2] },
       { text: record.letterGrade ?? '-', width: widths[3] },
       { text: formatNumber(record.credits), width: widths[4], align: 'right' },
       { text: formatNumber(record.numericScore), width: widths[5], align: 'right' },
-    ]);
+    ];
+    ensureSpaceForRow(doc, cells, header);
+    tableRow(doc, cells);
   }
 }
 
@@ -342,6 +388,7 @@ export function renderReportPdf(request: ReportPdfRequest): Promise<Buffer> {
   const doc = new PDFDocument({
     size: 'A4',
     margins: { top: MARGIN, right: MARGIN, bottom: 58, left: MARGIN },
+    font: null as unknown as string,
     bufferPages: true,
     tagged: true,
     displayTitle: true,

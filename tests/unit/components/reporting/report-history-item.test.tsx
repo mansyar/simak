@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom/vitest';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import type { ReactElement } from 'react';
@@ -71,20 +71,46 @@ describe('ReportHistoryItem', () => {
     expect(screen.queryByText(/failureCode|failureMessage|generation_failed/)).toBeNull();
   });
 
-  it('offers a secure download for a completed, unexpired job', async () => {
+  it('starts the download through a same-tab anchor link', async () => {
     const user = userEvent.setup();
-    const openSpy = vi.fn();
-    vi.stubGlobal('open', openSpy);
+    let anchorHref: string | null = null;
+    const clickSpy = vi
+      .spyOn(HTMLAnchorElement.prototype, 'click')
+      .mockImplementation(function (this: HTMLAnchorElement) {
+        anchorHref = this.href;
+      });
     renderItem(job());
 
     await user.click(screen.getByRole('button', { name: 'reports.history.download' }));
 
     expect(downloadReport).toHaveBeenCalledWith({ data: { jobId: 7 } });
-    expect(openSpy).toHaveBeenCalledWith(
-      'https://cdn.example/report.pdf',
-      '_blank',
-      'noopener,noreferrer',
-    );
+    expect(clickSpy).toHaveBeenCalledTimes(1);
+    expect(anchorHref).toBe('https://cdn.example/report.pdf');
+    clickSpy.mockRestore();
+  });
+
+  it('clears a stale download error after a successful download', async () => {
+    const user = userEvent.setup();
+    vi.mocked(downloadReport).mockResolvedValueOnce({
+      error: { code: 'NOT_FOUND', message: 'gone' },
+    });
+    renderItem(job());
+
+    await user.click(screen.getByRole('button', { name: 'reports.history.download' }));
+    expect(await screen.findByRole('alert')).toBeDefined();
+
+    await user.click(screen.getByRole('button', { name: 'reports.history.download' }));
+    await waitFor(() => expect(downloadReport).toHaveBeenCalledTimes(2));
+    expect(screen.queryByRole('alert')).toBeNull();
+  });
+
+  it('derives an expired display from a past expiry even while the job state is still completed', () => {
+    renderItem(job({ expiresAt: new Date(Date.now() - 60_000) }));
+
+    expect(screen.getByText('reports.history.state.expired')).toBeDefined();
+    expect(screen.queryByText('reports.history.state.completed')).toBeNull();
+    expect(screen.getByText('reports.history.expiredHint')).toBeDefined();
+    expect(screen.queryByRole('button', { name: 'reports.history.download' })).toBeNull();
   });
 
   it('announces a download failure via an assertive live region', async () => {

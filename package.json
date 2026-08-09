@@ -6,7 +6,9 @@
   "packageManager": "pnpm@10.34.5",
   "scripts": {
     "dev": "pnpm generate:i18n && vite dev",
-    "build": "pnpm generate:i18n && vite build && pnpm build:migrate && pnpm build:seed",
+    "build": "pnpm generate:i18n && vite build && pnpm build:fonts && pnpm build:report-smoke && pnpm build:migrate && pnpm build:seed",
+    "build:fonts": "node scripts/copy-report-fonts.mjs",
+    "build:report-smoke": "esbuild src/server/reporting-pdf-renderer.server.ts --bundle --format=esm --platform=node --banner:js=\"import { createRequire as createNodeRequire } from 'node:module'; const require = createNodeRequire(import.meta.url);\" --outfile=.output/server/_ssr/reporting-font-smoke.mjs",
     "build:migrate": "esbuild src/db/migrate.ts --bundle --format=esm --platform=node --define:import.meta.env.SSR=true --outfile=.output/server/migrate.mjs --external:child_process",
     "build:seed": "esbuild src/db/seed.ts --bundle --format=esm --platform=node --define:import.meta.env.PROD=true --define:import.meta.env.SSR=true --banner:js=\"import { createRequire as createNodeRequire } from 'node:module'; const require = createNodeRequire(import.meta.url);\" --outfile=.output/server/seed.mjs",
     "start": "vinxi start",

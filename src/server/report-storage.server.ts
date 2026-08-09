@@ -85,9 +85,17 @@ export async function createReportDownloadUrl(artifactKey: string): Promise<stri
   }
 
   try {
-    return await getSignedUrl(client, new GetObjectCommand({ Bucket: bucket, Key: artifactKey }), {
-      expiresIn: REPORT_DOWNLOAD_EXPIRY_SECONDS,
-    });
+    return await getSignedUrl(
+      client,
+      new GetObjectCommand({
+        Bucket: bucket,
+        Key: artifactKey,
+        ResponseContentDisposition: 'attachment',
+      }),
+      {
+        expiresIn: REPORT_DOWNLOAD_EXPIRY_SECONDS,
+      },
+    );
   } catch {
     throw new ReportStorageError('provider_failure');
   }
