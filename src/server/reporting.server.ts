@@ -54,6 +54,8 @@ export function buildReportFilterOptions(rows: FilterRow[]) {
         code: row.sectionCode,
         name: row.sectionName,
         cohort: row.cohort,
+        termId: row.termId,
+        courseId: row.courseId,
       })),
     ),
     cohorts: [

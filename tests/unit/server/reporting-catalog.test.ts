@@ -36,7 +36,7 @@ describe('reporting catalog', () => {
     expect(buildReportFilterOptions([row, row])).toEqual({
       terms: [{ id: 1, code: '2026-FALL', name: 'Fall 2026' }],
       courses: [{ id: 2, code: 'IF101', name: 'Algorithms' }],
-      sections: [{ id: 3, code: 'A', name: 'Morning', cohort: '2026' }],
+      sections: [{ id: 3, code: 'A', name: 'Morning', cohort: '2026', termId: 1, courseId: 2 }],
       cohorts: ['2026'],
     });
   });

@@ -1844,6 +1844,76 @@ export type Translation = {
       gradeDistribution: string
     }
   }
+  reports: {
+    eyebrow: string
+    title: string
+    subtitle: {
+      superadmin: string
+      admin: string
+      instructor: string
+      student: string
+    }
+    loading: string
+    loadError: string
+    empty: string
+    emptyDescription: string
+    catalogLabel: string
+    types: {
+      institutional_academic_summary: {
+        name: string
+        description: string
+      }
+      official_transcript: {
+        name: string
+        description: string
+        descriptionAdmin: string
+      }
+      analytics_summary: {
+        name: string
+        description: string
+      }
+    }
+    filters: {
+      label: string
+      term: string
+      course: string
+      section: string
+      cohort: string
+      allTerms: string
+      allCourses: string
+      allSections: string
+      allCohorts: string
+      noCourses: string
+      noSections: string
+      noCohorts: string
+    }
+    student: {
+      label: string
+      searchLabel: string
+      searchPlaceholder: string
+      loading: string
+      loadError: string
+      empty: string
+      noResults: string
+    }
+    locale: {
+      label: string
+      english: string
+      indonesian: string
+    }
+    generate: string
+    generating: string
+    validation: {
+      studentRequired: string
+    }
+    job: {
+      pending: string
+      processing: string
+      completed: string
+      failed: string
+      expired: string
+    }
+  }
 }
 
 export type TranslationFunctions = Record<string, (key: string) => string>

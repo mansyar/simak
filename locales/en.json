@@ -1838,5 +1838,75 @@
     "analytics": {
       "gradeDistribution": "Grade Distribution"
     }
+  },
+  "reports": {
+    "eyebrow": "REPORTING",
+    "title": "Reports",
+    "subtitle": {
+      "superadmin": "Generate institutional summaries, official transcripts, and analytics reports from released academic data.",
+      "admin": "Generate institutional summaries, official transcripts, and analytics reports from released academic data.",
+      "instructor": "Generate analytics reports for your assigned courses and sections.",
+      "student": "Generate your official academic transcript."
+    },
+    "loading": "Loading available reports...",
+    "loadError": "Unable to load reports. Please try again.",
+    "empty": "No reports available",
+    "emptyDescription": "There are no reports you can generate right now.",
+    "catalogLabel": "Available reports",
+    "types": {
+      "institutional_academic_summary": {
+        "name": "Institutional Academic Summary",
+        "description": "An overview by term, course, section, and cohort built from released academic records."
+      },
+      "official_transcript": {
+        "name": "Official Transcript",
+        "description": "Your official academic transcript from released academic records.",
+        "descriptionAdmin": "Generate a student's official academic transcript from released academic records."
+      },
+      "analytics_summary": {
+        "name": "Analytics Summary",
+        "description": "A summary of completion and submission analytics for the selected context."
+      }
+    },
+    "filters": {
+      "label": "Report filters",
+      "term": "Academic term",
+      "course": "Course",
+      "section": "Course section",
+      "cohort": "Cohort",
+      "allTerms": "All terms",
+      "allCourses": "All courses",
+      "allSections": "All sections",
+      "allCohorts": "All cohorts",
+      "noCourses": "No courses available for this term.",
+      "noSections": "No sections available for this selection.",
+      "noCohorts": "No cohorts available for this selection."
+    },
+    "student": {
+      "label": "Student",
+      "searchLabel": "Search students",
+      "searchPlaceholder": "Search students by name or email...",
+      "loading": "Loading students...",
+      "loadError": "Unable to load students.",
+      "empty": "No students available.",
+      "noResults": "No students match your search."
+    },
+    "locale": {
+      "label": "Report language",
+      "english": "English",
+      "indonesian": "Indonesian"
+    },
+    "generate": "Generate report",
+    "generating": "Generating report...",
+    "validation": {
+      "studentRequired": "Select a student to generate this transcript."
+    },
+    "job": {
+      "pending": "Report requested. It will be available for download once generated.",
+      "processing": "Report is being generated. It will be available for download shortly.",
+      "completed": "Report generated successfully.",
+      "failed": "Report generation failed. Please try again.",
+      "expired": "This report has expired."
+    }
   }
 }
