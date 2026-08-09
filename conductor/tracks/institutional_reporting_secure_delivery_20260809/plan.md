@@ -24,7 +24,7 @@
   - [x] Refactor and run focused tests
 - [x] Task: Phase Verification & Checkpoint (Refer to workflow.md) (d20c6ce)
 
-## Phase 3 — Report Data and Authorization
+## Phase 3 — Report Data and Authorization [checkpoint: 7ceeba1]
 
 - [x] Task: Implement the role-scoped report catalog and filters [commit: 2fac961]
   - [x] Add failing tests, schema, migration, and academic-context input support for optional explicit section cohort metadata
@@ -40,7 +40,7 @@
   - [x] Implement the minimum role-scoped loaders by reusing established analytics and academic-record calculations
   - [x] Verify unauthorized and nonexistent entities are indistinguishable where required
   - [x] Run focused tests
-- [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
+- [x] Task: Phase Verification & Checkpoint (Refer to workflow.md) (7ceeba1)
 
 ## Phase 4 — PDF Generation and Private Artifacts
 
