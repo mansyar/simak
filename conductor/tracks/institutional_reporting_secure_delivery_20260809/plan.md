@@ -42,7 +42,7 @@
   - [x] Run focused tests
 - [x] Task: Phase Verification & Checkpoint (Refer to workflow.md) (7ceeba1)
 
-## Phase 4 — PDF Generation and Private Artifacts
+## Phase 4 — PDF Generation and Private Artifacts [checkpoint: f21fe13]
 
 - [x] Task: Implement the server-only PDF renderer [commit: 84380de]
   - [x] Write failing renderer tests for all three templates, both locales, escaping, filter summaries, timestamps, pagination, and multi-page tables
@@ -61,7 +61,7 @@
   - [x] Add server-side authorization checks at catalog, generation, status, retry, and download boundaries
   - [x] Add audit events and privacy-safe structured logs
   - [x] Run focused unit and integration tests
-- [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
+- [x] Task: Phase Verification & Checkpoint (Refer to workflow.md) (f21fe13)
 
 ## Phase 5 — Accessible Role-Scoped User Experience
 
