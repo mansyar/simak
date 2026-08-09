@@ -50,6 +50,8 @@ The application must:
 - Reject references to unauthorized or nonexistent academic entities.
 - Record normalized parameters with each report job for auditability.
 
+Course sections carry optional, explicit cohort metadata. Cohort filtering uses this field only; it must not infer cohort identity from section codes or names. This small academic-context extension was approved during Phase 3 after confirming that the existing schema had no authoritative cohort representation.
+
 ### 4. On-demand generation
 
 - Users manually request report generation.

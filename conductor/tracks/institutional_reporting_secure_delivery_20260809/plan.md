@@ -27,6 +27,7 @@
 ## Phase 3 — Report Data and Authorization
 
 - [~] Task: Implement the role-scoped report catalog and filters
+  - [ ] Add failing tests, schema, migration, and academic-context input support for optional explicit section cohort metadata
   - [ ] Write failing tests for Admin, SuperAdmin, Instructor, and Student catalog visibility
   - [ ] Write failing authorization tests for term, course, section, and cohort filters
   - [ ] Implement client-safe stubs and server-only handlers using `typedServerFn`
