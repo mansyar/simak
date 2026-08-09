@@ -98,13 +98,13 @@
   - [x] Write Playwright tests for Student self-transcript generation
   - [x] Add accessibility scans for the reporting surfaces
   - [x] Run the relevant browser matrix
-- [~] Task: Complete track-wide quality verification
-  - [ ] Run formatting and lint checks
-  - [ ] Run type checking
-  - [ ] Run i18n parity and unused-key checks
-  - [ ] Run unit tests and coverage
-  - [ ] Run report integration tests explicitly
-  - [ ] Run the production build and verify renderer/runtime compatibility
-  - [ ] Confirm all modified source and test files remain within the 500-line limit
-  - [ ] Document any approved deviations
+- [x] Task: Complete track-wide quality verification [commit: 9bba921]
+  - [x] Run formatting and lint checks
+  - [x] Run type checking
+  - [x] Run i18n parity and unused-key checks
+  - [x] Run unit tests and coverage
+  - [x] Run report integration tests explicitly
+  - [x] Run the production build and verify renderer/runtime compatibility
+  - [x] Confirm all modified source and test files remain within the 500-line limit
+  - [x] Document any approved deviations
 - [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
