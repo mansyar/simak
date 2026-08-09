@@ -33,7 +33,7 @@
   - [x] Implement client-safe stubs and server-only handlers using `typedServerFn`
   - [x] Reuse existing academic-context authorization and query patterns
   - [x] Run focused unit and integration tests
-- [ ] Task: Implement allowlisted report data loaders
+- [~] Task: Implement allowlisted report data loaders
   - [ ] Write failing tests for institutional academic summaries
   - [ ] Write failing tests for instructor-scoped analytics summaries
   - [ ] Write failing tests proving transcripts use released immutable academic records rather than mutable grades
