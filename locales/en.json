@@ -523,6 +523,8 @@
       "endsOn": "Ends on",
       "courseCode": "Course code",
       "courseName": "Course name",
+      "courseCredits": "Course credits",
+      "creditsUnit": "credits",
       "sectionTerm": "Term ID",
       "sectionCourse": "Course ID",
       "sectionCode": "Section code",
@@ -702,6 +704,42 @@
     "branding": "SIMAK",
     "sectionMain": "MAIN",
     "sectionPreferences": "PREFERENCES"
+  },
+  "academicRecords": {
+    "eyebrow": "ACADEMIC RECORDS",
+    "title": "Academic records",
+    "subtitle": {
+      "student": "A release-based view of your completed academic work and GPA.",
+      "instructor": "Review released academic records for your authorized sections.",
+      "admin": "Inspect released records, source releases, and policy versions."
+    },
+    "termGpa": "Term GPA",
+    "cumulativeGpa": "Cumulative GPA",
+    "gpaUnavailable": "GPA is unavailable until an eligible released result exists.",
+    "credits": "Credits",
+    "qualityPoints": "Quality points",
+    "termFilter": "Academic term",
+    "allTerms": "All terms",
+    "section": "Section",
+    "score": "Score",
+    "letterGrade": "Letter grade",
+    "gradePoints": "Grade points",
+    "recordList": "Academic record list",
+    "pagination": "Academic record pages",
+    "previous": "Previous",
+    "next": "Next",
+    "empty": "No academic records available",
+    "loadError": "Unable to load academic records. Please try again.",
+    "gpaExcluded": "This outcome is shown on the transcript but excluded from GPA.",
+    "sourceAssignment": "Source assignment",
+    "sourceRelease": "Source release",
+    "policyVersion": "Policy version",
+    "recordVersion": "Record version",
+    "status": {
+      "complete": "Complete",
+      "incomplete": "Incomplete",
+      "withdrawn": "Withdrawn"
+    }
   },
   "studentRubrics": {
     "title": "Rubric Results",

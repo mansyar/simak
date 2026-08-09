@@ -1,6 +1,7 @@
 /** @vitest-environment node */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { recomputeStudentGrade } from '@/server/reviews-extras.server';
+import { academicRecords } from '@/db/schema/academic-records';
 import { finalGrades } from '@/db/schema/gradebook';
 
 vi.mock('@/server/auth', () => ({ getSessionFromHeaders: vi.fn() }));
@@ -68,6 +69,7 @@ describe('recomputeStudentGrade', () => {
     await recomputeStudentGrade(mockDb as any, 1, 'student-1');
 
     expect(mockDb.insert).toHaveBeenCalledWith(finalGrades);
+    expect(mockDb.insert).not.toHaveBeenCalledWith(academicRecords);
     expect(mockDb.values).toHaveBeenCalledWith(
       expect.objectContaining({
         assignmentId: 1,

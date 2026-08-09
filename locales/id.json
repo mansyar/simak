@@ -523,6 +523,8 @@
       "endsOn": "Berakhir pada",
       "courseCode": "Kode mata kuliah",
       "courseName": "Nama mata kuliah",
+      "courseCredits": "SKS mata kuliah",
+      "creditsUnit": "SKS",
       "sectionTerm": "ID semester",
       "sectionCourse": "ID mata kuliah",
       "sectionCode": "Kode kelas",
@@ -702,6 +704,42 @@
     "branding": "SIMAK",
     "sectionMain": "UTAMA",
     "sectionPreferences": "PENGATURAN"
+  },
+  "academicRecords": {
+    "eyebrow": "REKAM AKADEMIK",
+    "title": "Rekam akademik",
+    "subtitle": {
+      "student": "Ringkasan tugas akademik yang telah dirilis dan IPK Anda.",
+      "instructor": "Tinjau rekam akademik dari kelas yang dapat Anda akses.",
+      "admin": "Periksa rekam yang dirilis, sumber rilis, dan versi kebijakan."
+    },
+    "termGpa": "IP semester",
+    "cumulativeGpa": "IPK kumulatif",
+    "gpaUnavailable": "IPK belum tersedia sampai ada hasil rilis yang memenuhi syarat.",
+    "credits": "Kredit",
+    "qualityPoints": "Poin mutu",
+    "termFilter": "Periode akademik",
+    "allTerms": "Semua periode",
+    "section": "Kelas",
+    "score": "Nilai",
+    "letterGrade": "Nilai huruf",
+    "gradePoints": "Poin nilai",
+    "recordList": "Daftar rekam akademik",
+    "pagination": "Halaman rekam akademik",
+    "previous": "Sebelumnya",
+    "next": "Berikutnya",
+    "empty": "Belum ada rekam akademik",
+    "loadError": "Rekam akademik tidak dapat dimuat. Silakan coba lagi.",
+    "gpaExcluded": "Hasil ini ditampilkan di transkrip tetapi tidak dihitung dalam IPK.",
+    "sourceAssignment": "Tugas sumber",
+    "sourceRelease": "Rilis sumber",
+    "policyVersion": "Versi kebijakan",
+    "recordVersion": "Versi rekam",
+    "status": {
+      "complete": "Selesai",
+      "incomplete": "Belum lengkap",
+      "withdrawn": "Mengundurkan diri"
+    }
   },
   "studentRubrics": {
     "title": "Hasil Rubrik",

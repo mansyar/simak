@@ -46,6 +46,12 @@ export const CreateCourseSchema = z.object({
   code: z.string().trim().min(1).max(50),
   name: z.string().trim().min(1).max(160),
   description: z.string().trim().max(2000).nullable().optional(),
+  credits: z.coerce
+    .number()
+    .finite()
+    .positive()
+    .max(999.99)
+    .refine((value) => Number.isInteger(value * 100), 'Credits must use at most two decimals'),
 });
 
 export const UpdateCourseSchema = CreateCourseSchema.and(CourseIdSchema);

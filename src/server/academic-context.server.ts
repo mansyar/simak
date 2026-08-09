@@ -41,6 +41,7 @@ const courseProjection = {
   code: courses.code,
   name: courses.name,
   description: courses.description,
+  credits: courses.credits,
   createdAt: courses.createdAt,
   updatedAt: courses.updatedAt,
 };
@@ -260,7 +261,7 @@ export async function getCourseHandler(args: { data: CourseId }) {
 export async function createCourseHandler(args: { data: CreateCourseInput }) {
   const auth = await requireAdmin();
   if (isServerError(auth)) return auth;
-  const { code, name, description } = args.data;
+  const { code, name, description, credits } = args.data;
   try {
     const [existing] = await getDb()
       .select({ id: courses.id })
@@ -270,7 +271,7 @@ export async function createCourseHandler(args: { data: CreateCourseInput }) {
     if (existing) return serverError(ErrorCode.CONFLICT, 'Course code already exists');
     const [course] = await getDb()
       .insert(courses)
-      .values({ code, name, description })
+      .values({ code, name, description, credits: credits.toFixed(2) })
       .returning(courseProjection);
     if (!course) return internalError('Course insert returned no row', 'createCourseHandler');
     await safeAuditLog('createCourseHandler', {
@@ -289,7 +290,7 @@ export async function createCourseHandler(args: { data: CreateCourseInput }) {
 export async function updateCourseHandler(args: { data: CreateCourseInput & CourseId }) {
   const auth = await requireAdmin();
   if (isServerError(auth)) return auth;
-  const { id, code, name, description } = args.data;
+  const { id, code, name, description, credits } = args.data;
   try {
     const [existing] = await getDb()
       .select({ id: courses.id, archivedAt: courses.archivedAt })
@@ -300,7 +301,7 @@ export async function updateCourseHandler(args: { data: CreateCourseInput & Cour
     if (existing.archivedAt) return serverError(ErrorCode.CONFLICT, 'Archived course is immutable');
     const [course] = await getDb()
       .update(courses)
-      .set({ code, name, description, updatedAt: new Date() })
+      .set({ code, name, description, credits: credits.toFixed(2), updatedAt: new Date() })
       .where(eq(courses.id, id))
       .returning(courseProjection);
     if (!course) return internalError('Course update returned no row', 'updateCourseHandler');

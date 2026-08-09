@@ -141,8 +141,8 @@ describe('search query plans', () => {
           ON CONFLICT ("code") DO UPDATE SET "name" = EXCLUDED."name"
           RETURNING "id"
         ), course AS (
-          INSERT INTO "courses" ("code", "name")
-          VALUES ('QUERY_PLAN_COURSE', 'Query Plan Course')
+          INSERT INTO "courses" ("code", "name", "credits")
+          VALUES ('QUERY_PLAN_COURSE', 'Query Plan Course', 3.00)
           ON CONFLICT ("code") DO UPDATE SET "name" = EXCLUDED."name"
           RETURNING "id"
         ), section AS (

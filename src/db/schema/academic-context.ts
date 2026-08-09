@@ -5,6 +5,7 @@ import {
   date,
   index,
   integer,
+  numeric,
   pgEnum,
   pgTable,
   serial,
@@ -56,11 +57,15 @@ export const courses = pgTable(
     code: text('code').notNull(),
     name: text('name').notNull(),
     description: text('description'),
+    credits: numeric('credits', { precision: 5, scale: 2 }).notNull(),
     createdAt: timestamp('created_at').defaultNow().notNull(),
     updatedAt: timestamp('updated_at').defaultNow().notNull(),
     archivedAt: timestamp('archived_at'),
   },
-  (table) => [unique('courses_code_unq').on(table.code)],
+  (table) => [
+    unique('courses_code_unq').on(table.code),
+    check('courses_credits_positive', sql`${table.credits} > 0`),
+  ],
 );
 
 export const courseSections = pgTable(

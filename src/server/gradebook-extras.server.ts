@@ -9,6 +9,10 @@ import { isServerError, serverError, ErrorCode } from '@/lib/errors';
 import { logAuditEvent } from '@/lib/audit';
 import { isInstructor } from '@/lib/session-guards';
 import { logger } from '@/lib/logger';
+import {
+  persistAcademicRecordsForReleaseInTransaction,
+  persistWithdrawnAcademicRecordsForReleaseInTransaction,
+} from './academic-records.server';
 
 type Db = ReturnType<typeof getDb>;
 type Tx = Parameters<Parameters<Db['transaction']>[0]>[0];
@@ -47,7 +51,12 @@ async function getOwnedAssignment(
   lock = false,
 ) {
   const query = db
-    .select({ id: assignments.id, instructorId: assignments.instructorId })
+    .select({
+      id: assignments.id,
+      instructorId: assignments.instructorId,
+      sectionId: assignments.sectionId,
+      isTranscriptSource: assignments.isTranscriptSource,
+    })
     .from(assignments)
     .where(and(eq(assignments.id, assignmentId), eq(assignments.instructorId, instructorId)));
 
@@ -248,6 +257,13 @@ export async function publishGradeReleaseHandler({
         })
         .where(eq(assignmentGradeConfig.assignmentId, data.assignmentId));
 
+      if (assignment.isTranscriptSource && categories.eligible.length > 0) {
+        await persistAcademicRecordsForReleaseInTransaction(tx, {
+          assignmentId: data.assignmentId,
+          releaseVersion,
+        });
+      }
+
       return {
         success: true,
         releaseVersion,
@@ -303,6 +319,15 @@ export async function withdrawGradeReleaseHandler({
       if (!config) return serverError(ErrorCode.NOT_FOUND, 'Grade release configuration not found');
       if (config.releaseStatus !== 'published' || config.activeReleaseVersion === null) {
         return serverError(ErrorCode.CONFLICT, 'Grade release is not currently published');
+      }
+
+      if (assignment.isTranscriptSource) {
+        await persistWithdrawnAcademicRecordsForReleaseInTransaction(tx, {
+          assignmentId: data.assignmentId,
+          releaseVersion: config.activeReleaseVersion,
+          reason: data.reason.trim(),
+          actorId: session.user.id,
+        });
       }
 
       await tx

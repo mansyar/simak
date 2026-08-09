@@ -164,7 +164,7 @@ export async function seedTestTemplatesAndAssignments(): Promise<void> {
     ? [existingCourse]
     : await db
         .insert(courses)
-        .values({ code: 'DEV-THESIS', name: 'Development Thesis' })
+        .values({ code: 'DEV-THESIS', name: 'Development Thesis', credits: '3.00' })
         .returning();
 
   const [existingSection] = await db

@@ -1,0 +1,11 @@
+{
+  "track_id": "academic-records-transcript-gpa_20260808",
+  "roadmap_id": "TRACK-060",
+  "type": "feature",
+  "status": "completed",
+  "title": "Academic Records — Transcript & GPA",
+  "created_at": "2026-08-08",
+  "updated_at": "2026-08-09",
+  "dependencies": ["TRACK-057", "TRACK-025", "TRACK-051"],
+  "description": "Add immutable, release-derived academic records, configurable grading policy, term and cumulative GPA, and role-scoped transcript views."
+}

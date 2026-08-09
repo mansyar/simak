@@ -10,4 +10,4 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ## Active Tracks
 
-_No active tracks._
+- [x] **Track: Academic Records — Transcript & GPA** *Link: [Track index](./tracks/academic-records-transcript-gpa_20260808/index.md)*

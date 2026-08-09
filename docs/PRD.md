@@ -39,6 +39,7 @@ _(Note: Features marked with `[v2]` are deferred to a post-MVP phase.)_
 - Students can submit work for each checkpoint.
 - Instructors can review, approve, or request revisions on submissions.
 - Instructors can explicitly publish complete final grades and withdraw a release with an accountable reason when corrections are needed.
+- Students and authorized academic staff can view official release-derived academic records, term GPA, and cumulative GPA without exposing draft or provisional grades.
 - Instructors can maintain private reusable plain-text feedback snippets and explicitly append them to editable review comments without changing review decisions or submission state.
 - In-app notifications keep both parties informed of submissions, reviews, revision requests, missed deadlines, and appointment lifecycle changes. Email notifications cover 18 event types: submission received, review completed, revision requested, consultation verified/rejected, extension approved/rejected, extension requested, deadline reminder, student at risk, discussion reply, and appointment booked, cancelled, rescheduled, completed, no-show, 24-hour reminder, and 1-hour reminder. Auth-related emails (invitations, password reset, 2FA enable/disable) continue as before. Proactive deadline and appointment reminders are dispatched by independent hourly scans alongside the email queue processor. Notification **preferences** (per-user, per-type, per-channel opt-out) are configurable in the Settings Hub with independent Email and In-app toggles. All preferences default to enabled (opt-out). Security-critical emails (password reset, invitations, 2FA) are exempt from preference gating.
 - Checkpoints must be completed in sequential order.
@@ -59,9 +60,9 @@ _(Note: Features marked with `[v2]` are deferred to a post-MVP phase.)_
 | Role           | Description                                                                                                                              |
 | -------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
 | **SuperAdmin** | Seeds the system. Can create Admin users only. Not involved in day-to-day operations.                                                    |
-| **Admin**      | Manages users (Instructor, Student) and assignment templates. Sends invitation emails. Retains authorized read-only gradebook/export access and can review release audit events, but does not publish or withdraw grades. |
-| **Instructor** | Creates assignments, reviews submissions, manages deadlines, publishes or withdraws grades for owned assignments, maintains private feedback snippets, and manages private at-risk interventions for assigned students. Can assign multiple assignments per student. |
-| **Student**    | Views assignments, uploads checkpoint submissions, tracks progress, and sees final grades only from active published snapshots. Can collaborate on group assignments `[v2]`. |
+| **Admin**      | Manages users (Instructor, Student) and assignment templates. Sends invitation emails. Retains authorized read-only gradebook/export and academic-record access, including policy/source provenance, and can review release audit events, but does not publish or withdraw grades. |
+| **Instructor** | Creates assignments, reviews submissions, manages deadlines, publishes or withdraws grades for owned assignments, maintains private feedback snippets, and manages private at-risk interventions for assigned students. Can assign multiple assignments per student and view academic records only within authorized sections. |
+| **Student**    | Views assignments, uploads checkpoint submissions, tracks progress, and sees final grades only from active published snapshots. Can view their own official transcript and GPA. Can collaborate on group assignments `[v2]`. |
 
 ---
 
@@ -96,7 +97,8 @@ _(Note: Features marked with `[v2]` are deferred to a post-MVP phase.)_
 8. Asks questions about a checkpoint via the discussion panel (async Q&A with the instructor).
 9. Downloads previously submitted files from any checkpoint.
 10. Sees a final grade only when the instructor has published an eligible snapshot; draft, incomplete, missing, and post-withdrawal states show an unavailable/not-yet-released message.
-11. Manages profile, preferences, and notification settings.
+11. Opens `/student/academic-records` to view immutable transcript history, term GPA, cumulative GPA, course credits, statuses, and release details. Incomplete and withdrawn outcomes remain visible but are excluded from GPA.
+12. Manages profile, preferences, and notification settings.
 
 ### Instructor
 
@@ -110,6 +112,7 @@ _(Note: Features marked with `[v2]` are deferred to a post-MVP phase.)_
 8. Records and manages private at-risk interventions from the dashboard, assignment context, or `/instructor/interventions`. Intervention records are scoped to the current assignment owner and are not visible to students or admins.
 9. Opens the assignment gradebook to review working grades and exports, then runs a preflight to see complete, incomplete, and missing-grade students before publishing.
 10. Withdraws a published release with a required reason when corrections are needed; republishing creates a new immutable release version.
+11. Opens `/instructor/academic-records` to inspect release-derived records for students in authorized sections, including source and policy context.
 
 ### Admin
 
@@ -119,6 +122,7 @@ _(Note: Features marked with `[v2]` are deferred to a post-MVP phase.)_
 4. Manages assignment templates — creates templates with ordered checkpoints and types.
 5. Views system-wide analytics and audit logs.
 6. Monitors and manages the email delivery queue via `/admin/email-queue` — views paginated, filterable, searchable list of queued emails with summary stats (pending/sent/failed counts). Can manually retry failed emails (resets to `pending` for reprocessing by the background processor). The table includes a `resendMessageId` column (correlated with Resend's delivery dashboard) displayed as a monospace truncated cell. The background processor sends emails in concurrent batches of 5 via `Promise.allSettled` (reducing cycle latency), and automatically prunes `sent` rows older than 90 days and `failed` rows older than 180 days (never touches `pending`/`processing` rows). The page also includes a "Trigger R2 Cleanup" button that manually initiates orphaned R2 object cleanup (bypassing the 6-hour throttle) — deletes R2 objects whose upload intents expired without being consumed, returning a summary of deleted/failed counts.
+7. Opens `/admin/academic-records` to inspect authorized student records, source release metadata, policy versions, repeat attempts, and persisted academic statuses.
 
 ### SuperAdmin
 
@@ -269,6 +273,15 @@ _(Note: Features marked with `[v2]` are deferred to a post-MVP phase.)_
 - **CSV/Excel export:** Admin-only gradebook CSV export (student names, per-checkpoint scores, final score, letter grade, status) with CSV formula-injection mitigation. Client-side Excel export via SheetJS with `sanitizeCell`.
 - **Grade recomputation trigger:** `submitReviewHandler` post-commit advisory section calls `recomputeStudentGrade` when `decision === 'pass'` (revise doesn't change pass state). Wrapped in try/catch — grade computation failure never surfaces an error for a successful review.
 
+### Academic Records — Transcript & GPA (TRACK-060)
+
+- **Official source boundary:** A course section has at most one explicitly designated transcript-source assignment. A record is created only from an eligible published `grade_release_snapshot` or an explicitly authorized incomplete/withdrawn outcome; draft grades, mutable working grades, provisional `final_grades`, missing sources, and ambiguous source assignments never become official records.
+- **Immutable provenance:** Migration `0028_flowery_cyclops.sql` adds positive course credits, versioned term-effective academic-record policies, and immutable `academic_records`. Each record stores its student, course/section/term, source assignment and release version, policy version, record version, credits, released result, status, and publication timestamp. Releasing a later version inserts a new row and preserves prior history; grade recomputation never mutates it. The migration preflight refuses to fabricate credits for existing course rows.
+- **Policy contract:** The initial mapping is `A = 4.0`, `B = 3.0`, `C = 2.0`, `D = 1.0`, and `F = 0.0`. Additional grades require explicit point values. Policies are append-only and effective by academic term; existing records retain the policy version used at creation. GPA uses positive course credits and half-up rounding, defaulting to two decimal places.
+- **GPA rules:** Term GPA is the weighted mean of eligible complete records in the selected term. Cumulative GPA selects the latest eligible attempt per course using deterministic term/publication ordering. All attempts remain visible; incomplete and withdrawn records remain visible but are excluded from GPA. `unavailable` is a response state for missing, unpublished, ambiguous, or unconfigured data and is not persisted as an academic result.
+- **Role-scoped views:** Students use `/student/academic-records` for their own transcript and summaries; instructors use `/instructor/academic-records` for authorized sections; admins and superadmins use `/admin/academic-records` for authorized records and provenance. Authorization is enforced server-side through session, role, academic-context, and section-enrollment checks.
+- **Scope boundary:** The feature includes bilingual responsive UI, accessible loading/empty/error/unavailable states, transactional release/withdrawal persistence, and unit/integration/E2E coverage. PDF transcript generation, scheduled delivery, degree audits, appeals, and external SIS/LMS integrations remain out of scope and are deferred to later tracks.
+
 ### At-Risk Student Identification & Early Warning
 
 - **Risk scoring engine:** A pure function (`computeStudentRisk` in `src/lib/risk-scoring.ts`) evaluates 5 risk signals per student-checkpoint pair and returns an overall risk level (high/medium/low) with a list of contributing factors. Risk scores are ephemeral — computed on-demand from existing data (checkpoint states, due dates, consultation counts, review decisions, submission timestamps) and never persisted to the database.
@@ -377,10 +390,10 @@ Core entities:
 - **User** — with role (SuperAdmin, Admin, Instructor, Student) and optional `settings` jsonb column for storing profile, theme, accessibility preferences (e.g., reduced motion), notification preferences (per-type, per-channel opt-out), and an optional validated IANA timezone for student deadline presentation.
 - **AssignmentTemplate** — defines type + ordered checkpoint names.
 - **AcademicTerm** — reusable academic period with a unique code, valid date range, and explicit draft/active/closed/archived lifecycle.
-- **Course** — reusable course identity with a unique code and display name.
+- **Course** — reusable course identity with a unique code, display name, and positive catalog credit value used by academic records.
 - **CourseSection** — term-specific course offering with a unique term/course/code identity and active/inactive/archived lifecycle.
 - **SectionEnrollment** — role-aware instructor/student membership in a course section, with active/inactive history-safe state.
-- **Assignment** — ties a reusable template to exactly one course section, an explicit individual/group mode (individual is the supported default), one or more explicitly selected students, a draft/active/archived lifecycle, final deadline, title, and description.
+- **Assignment** — ties a reusable template to exactly one course section, an explicit individual/group mode (individual is the supported default), an optional transcript-source designation (at most one per section), one or more explicitly selected students, a draft/active/archived lifecycle, final deadline, title, and description.
 - **Assignment context policy** — instructors may operate only in active sections where they have an active instructor enrollment; students see only active assignments in sections where they have active student enrollment. Assignment lifecycle is separate from `deletedAt`, which remains the destructive soft-delete boundary.
 - **Academic foundation migration policy** — the prelaunch migration refuses to run when existing assignment rows would require fabricated term/course/section facts. Development and E2E environments reset and recreate deterministic academic fixtures; any future production import requires an explicit legacy mapping before it can proceed.
 - **AssignmentGroupMember** `[v2]` — maps students to group assignments.
@@ -403,3 +416,5 @@ Core entities:
 - **AssignmentGradeConfig** — per-assignment grade configuration (1:1 with assignments, cascade-deleted). Stores grading scheme (`equal_weight`/`custom_weight`), custom per-checkpoint weights (jsonb, nullable), letter grade bounds (jsonb, default A≥90/B≥80/C≥70/D≥60), release status (`draft`/`published`), active release version, and publication timestamp. Auto-created on assignment creation. The TRACK-057 prelaunch migration does not backfill unknown legacy assignments; it stops when assignment rows exist without authoritative academic context.
 - **FinalGrade** — cached computed grade per student per assignment (upserted on recomputation). Stores numeric score (numeric(5,2), nullable), letter grade (text, nullable), status (`complete`/`incomplete`/`in_progress`), and contributing checkpoints breakdown (jsonb). Unique constraint on `(assignmentId, studentId)`. Neither gradebook table uses soft-delete — config is cascade-deleted via FK, final_grades is a cache (upserted, never individually deleted).
 - **GradeReleaseSnapshot** — immutable per-student release value captured at publication time. Stores assignment/student, release version, numeric score, letter grade, status, checkpoint breakdown, and publication timestamp. Unique per `(assignmentId, releaseVersion, studentId)` with assignment/version and student lookup indexes; prior versions remain retained for auditability but are not shown in student-facing history.
+- **AcademicRecordPolicy** — append-only, versioned grading policy effective from an academic term. Stores the JSONB grade-to-point mapping, validated rounding scale, active state, and creation timestamp. A record retains the policy version selected at creation.
+- **AcademicRecord** — immutable official transcript result tied to a student, course/section/term, designated source assignment, optional release snapshot/version, policy version, record version, credits, released score/letter, status (`complete`/`incomplete`/`withdrawn`), grade points, and publication timestamp. Historical versions remain retained; active reads select the newest source version. Incomplete and withdrawn rows are visible but excluded from GPA.

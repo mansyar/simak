@@ -17,6 +17,7 @@ export * from './extensions';
 export * from './email-queue';
 export * from './deadline-reminders';
 export * from './gradebook';
+export * from './academic-records';
 export * from './discussions';
 export * from './interventions';
 export * from './feedback-snippets';
@@ -39,6 +40,7 @@ import { extensionRequests } from './extensions';
 import { emailQueue } from './email-queue';
 import { deadlineReminders } from './deadline-reminders';
 import { assignmentGradeConfig, finalGrades, gradeReleaseSnapshots } from './gradebook';
+import { academicRecordPolicies, academicRecords } from './academic-records';
 import { checkpointDiscussions } from './discussions';
 import { interventions } from './interventions';
 import { feedbackSnippets } from './feedback-snippets';
@@ -87,14 +89,18 @@ export const usersRelations = relations(users, ({ many }) => ({
   feedbackSnippets: many(feedbackSnippets),
   calendarFeedTokens: many(calendarFeedTokens),
   sectionEnrollments: many(sectionEnrollments),
+  academicRecords: many(academicRecords),
 }));
 
 export const academicTermsRelations = relations(academicTerms, ({ many }) => ({
   courseSections: many(courseSections),
+  academicRecordPolicies: many(academicRecordPolicies),
+  academicRecords: many(academicRecords),
 }));
 
 export const coursesRelations = relations(courses, ({ many }) => ({
   courseSections: many(courseSections),
+  academicRecords: many(academicRecords),
 }));
 
 export const courseSectionsRelations = relations(courseSections, ({ one, many }) => ({
@@ -108,6 +114,7 @@ export const courseSectionsRelations = relations(courseSections, ({ one, many })
   }),
   enrollments: many(sectionEnrollments),
   assignments: many(assignments),
+  academicRecords: many(academicRecords),
 }));
 
 export const sectionEnrollmentsRelations = relations(sectionEnrollments, ({ one }) => ({
@@ -173,6 +180,7 @@ export const assignmentsRelations = relations(assignments, ({ many, one }) => ({
   assignmentGradeConfig: one(assignmentGradeConfig),
   finalGrades: many(finalGrades),
   gradeReleaseSnapshots: many(gradeReleaseSnapshots),
+  academicRecords: many(academicRecords),
   interventions: many(interventions),
 }));
 
@@ -383,6 +391,48 @@ export const gradeReleaseSnapshotsRelations = relations(gradeReleaseSnapshots, (
   student: one(users, {
     fields: [gradeReleaseSnapshots.studentId],
     references: [users.id],
+  }),
+}));
+
+export const academicRecordPoliciesRelations = relations(
+  academicRecordPolicies,
+  ({ one, many }) => ({
+    effectiveTerm: one(academicTerms, {
+      fields: [academicRecordPolicies.effectiveTermId],
+      references: [academicTerms.id],
+    }),
+    academicRecords: many(academicRecords),
+  }),
+);
+
+export const academicRecordsRelations = relations(academicRecords, ({ one }) => ({
+  student: one(users, {
+    fields: [academicRecords.studentId],
+    references: [users.id],
+  }),
+  course: one(courses, {
+    fields: [academicRecords.courseId],
+    references: [courses.id],
+  }),
+  courseSection: one(courseSections, {
+    fields: [academicRecords.courseSectionId],
+    references: [courseSections.id],
+  }),
+  term: one(academicTerms, {
+    fields: [academicRecords.termId],
+    references: [academicTerms.id],
+  }),
+  sourceAssignment: one(assignments, {
+    fields: [academicRecords.sourceAssignmentId],
+    references: [assignments.id],
+  }),
+  sourceSnapshot: one(gradeReleaseSnapshots, {
+    fields: [academicRecords.sourceSnapshotId],
+    references: [gradeReleaseSnapshots.id],
+  }),
+  policy: one(academicRecordPolicies, {
+    fields: [academicRecords.policyVersion],
+    references: [academicRecordPolicies.version],
   }),
 }));
 
