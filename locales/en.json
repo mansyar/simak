@@ -108,6 +108,7 @@
     "auditLog": "Audit Log",
     "emailQueue": "Email Queue",
     "analytics": "Analytics",
+    "reports": "Reports",
     "branding": "SIMAK",
     "sectionMain": "MAIN",
     "sectionPreferences": "PREFERENCES"
@@ -120,6 +121,7 @@
     "interventions": "Interventions",
     "feedbackSnippets": "Feedback snippets",
     "analytics": "Analytics",
+    "reports": "Reports",
     "branding": "SIMAK",
     "sectionMain": "MAIN",
     "sectionPreferences": "PREFERENCES"
@@ -704,6 +706,7 @@
     "dashboard": "Dashboard",
     "assignments": "Assignments",
     "academicRecords": "Academic records",
+    "reports": "Reports",
     "settings": "Settings",
     "branding": "SIMAK",
     "sectionMain": "MAIN",

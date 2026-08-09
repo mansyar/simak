@@ -25,14 +25,17 @@ import { Route as UnauthenticatedAuthResetPasswordRouteImport } from './routes/_
 import { Route as UnauthenticatedAuthLoginRouteImport } from './routes/_unauthenticated/auth/login'
 import { Route as UnauthenticatedAuthForgotPasswordRouteImport } from './routes/_unauthenticated/auth/forgot-password'
 import { Route as AuthenticatedStudentSettingsRouteImport } from './routes/_authenticated/student/settings'
+import { Route as AuthenticatedStudentReportsRouteImport } from './routes/_authenticated/student/reports'
 import { Route as AuthenticatedStudentDashboardRouteImport } from './routes/_authenticated/student/dashboard'
 import { Route as AuthenticatedStudentAcademicRecordsRouteImport } from './routes/_authenticated/student/academic-records'
 import { Route as AuthenticatedInstructorSettingsRouteImport } from './routes/_authenticated/instructor/settings'
+import { Route as AuthenticatedInstructorReportsRouteImport } from './routes/_authenticated/instructor/reports'
 import { Route as AuthenticatedInstructorFeedbackSnippetsRouteImport } from './routes/_authenticated/instructor/feedback-snippets'
 import { Route as AuthenticatedInstructorDashboardRouteImport } from './routes/_authenticated/instructor/dashboard'
 import { Route as AuthenticatedInstructorAnalyticsRouteImport } from './routes/_authenticated/instructor/analytics'
 import { Route as AuthenticatedInstructorAcademicRecordsRouteImport } from './routes/_authenticated/instructor/academic-records'
 import { Route as AuthenticatedAdminSettingsRouteImport } from './routes/_authenticated/admin/settings'
+import { Route as AuthenticatedAdminReportsRouteImport } from './routes/_authenticated/admin/reports'
 import { Route as AuthenticatedAdminEmailQueueRouteImport } from './routes/_authenticated/admin/email-queue'
 import { Route as AuthenticatedAdminDashboardRouteImport } from './routes/_authenticated/admin/dashboard'
 import { Route as AuthenticatedAdminAuditLogRouteImport } from './routes/_authenticated/admin/audit-log'
@@ -140,6 +143,12 @@ const AuthenticatedStudentSettingsRoute =
     path: '/settings',
     getParentRoute: () => AuthenticatedStudentRoute,
   } as any)
+const AuthenticatedStudentReportsRoute =
+  AuthenticatedStudentReportsRouteImport.update({
+    id: '/reports',
+    path: '/reports',
+    getParentRoute: () => AuthenticatedStudentRoute,
+  } as any)
 const AuthenticatedStudentDashboardRoute =
   AuthenticatedStudentDashboardRouteImport.update({
     id: '/dashboard',
@@ -156,6 +165,12 @@ const AuthenticatedInstructorSettingsRoute =
   AuthenticatedInstructorSettingsRouteImport.update({
     id: '/settings',
     path: '/settings',
+    getParentRoute: () => AuthenticatedInstructorRoute,
+  } as any)
+const AuthenticatedInstructorReportsRoute =
+  AuthenticatedInstructorReportsRouteImport.update({
+    id: '/reports',
+    path: '/reports',
     getParentRoute: () => AuthenticatedInstructorRoute,
   } as any)
 const AuthenticatedInstructorFeedbackSnippetsRoute =
@@ -186,6 +201,12 @@ const AuthenticatedAdminSettingsRoute =
   AuthenticatedAdminSettingsRouteImport.update({
     id: '/settings',
     path: '/settings',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminReportsRoute =
+  AuthenticatedAdminReportsRouteImport.update({
+    id: '/reports',
+    path: '/reports',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
 const AuthenticatedAdminEmailQueueRoute =
@@ -327,14 +348,17 @@ export interface FileRoutesByFullPath {
   '/admin/audit-log': typeof AuthenticatedAdminAuditLogRoute
   '/admin/dashboard': typeof AuthenticatedAdminDashboardRoute
   '/admin/email-queue': typeof AuthenticatedAdminEmailQueueRoute
+  '/admin/reports': typeof AuthenticatedAdminReportsRoute
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/instructor/academic-records': typeof AuthenticatedInstructorAcademicRecordsRoute
   '/instructor/analytics': typeof AuthenticatedInstructorAnalyticsRoute
   '/instructor/dashboard': typeof AuthenticatedInstructorDashboardRoute
   '/instructor/feedback-snippets': typeof AuthenticatedInstructorFeedbackSnippetsRoute
+  '/instructor/reports': typeof AuthenticatedInstructorReportsRoute
   '/instructor/settings': typeof AuthenticatedInstructorSettingsRoute
   '/student/academic-records': typeof AuthenticatedStudentAcademicRecordsRoute
   '/student/dashboard': typeof AuthenticatedStudentDashboardRoute
+  '/student/reports': typeof AuthenticatedStudentReportsRoute
   '/student/settings': typeof AuthenticatedStudentSettingsRoute
   '/auth/forgot-password': typeof UnauthenticatedAuthForgotPasswordRoute
   '/auth/login': typeof UnauthenticatedAuthLoginRoute
@@ -372,14 +396,17 @@ export interface FileRoutesByTo {
   '/admin/audit-log': typeof AuthenticatedAdminAuditLogRoute
   '/admin/dashboard': typeof AuthenticatedAdminDashboardRoute
   '/admin/email-queue': typeof AuthenticatedAdminEmailQueueRoute
+  '/admin/reports': typeof AuthenticatedAdminReportsRoute
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/instructor/academic-records': typeof AuthenticatedInstructorAcademicRecordsRoute
   '/instructor/analytics': typeof AuthenticatedInstructorAnalyticsRoute
   '/instructor/dashboard': typeof AuthenticatedInstructorDashboardRoute
   '/instructor/feedback-snippets': typeof AuthenticatedInstructorFeedbackSnippetsRoute
+  '/instructor/reports': typeof AuthenticatedInstructorReportsRoute
   '/instructor/settings': typeof AuthenticatedInstructorSettingsRoute
   '/student/academic-records': typeof AuthenticatedStudentAcademicRecordsRoute
   '/student/dashboard': typeof AuthenticatedStudentDashboardRoute
+  '/student/reports': typeof AuthenticatedStudentReportsRoute
   '/student/settings': typeof AuthenticatedStudentSettingsRoute
   '/auth/forgot-password': typeof UnauthenticatedAuthForgotPasswordRoute
   '/auth/login': typeof UnauthenticatedAuthLoginRoute
@@ -420,14 +447,17 @@ export interface FileRoutesById {
   '/_authenticated/admin/audit-log': typeof AuthenticatedAdminAuditLogRoute
   '/_authenticated/admin/dashboard': typeof AuthenticatedAdminDashboardRoute
   '/_authenticated/admin/email-queue': typeof AuthenticatedAdminEmailQueueRoute
+  '/_authenticated/admin/reports': typeof AuthenticatedAdminReportsRoute
   '/_authenticated/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/_authenticated/instructor/academic-records': typeof AuthenticatedInstructorAcademicRecordsRoute
   '/_authenticated/instructor/analytics': typeof AuthenticatedInstructorAnalyticsRoute
   '/_authenticated/instructor/dashboard': typeof AuthenticatedInstructorDashboardRoute
   '/_authenticated/instructor/feedback-snippets': typeof AuthenticatedInstructorFeedbackSnippetsRoute
+  '/_authenticated/instructor/reports': typeof AuthenticatedInstructorReportsRoute
   '/_authenticated/instructor/settings': typeof AuthenticatedInstructorSettingsRoute
   '/_authenticated/student/academic-records': typeof AuthenticatedStudentAcademicRecordsRoute
   '/_authenticated/student/dashboard': typeof AuthenticatedStudentDashboardRoute
+  '/_authenticated/student/reports': typeof AuthenticatedStudentReportsRoute
   '/_authenticated/student/settings': typeof AuthenticatedStudentSettingsRoute
   '/_unauthenticated/auth/forgot-password': typeof UnauthenticatedAuthForgotPasswordRoute
   '/_unauthenticated/auth/login': typeof UnauthenticatedAuthLoginRoute
@@ -467,14 +497,17 @@ export interface FileRouteTypes {
     | '/admin/audit-log'
     | '/admin/dashboard'
     | '/admin/email-queue'
+    | '/admin/reports'
     | '/admin/settings'
     | '/instructor/academic-records'
     | '/instructor/analytics'
     | '/instructor/dashboard'
     | '/instructor/feedback-snippets'
+    | '/instructor/reports'
     | '/instructor/settings'
     | '/student/academic-records'
     | '/student/dashboard'
+    | '/student/reports'
     | '/student/settings'
     | '/auth/forgot-password'
     | '/auth/login'
@@ -512,14 +545,17 @@ export interface FileRouteTypes {
     | '/admin/audit-log'
     | '/admin/dashboard'
     | '/admin/email-queue'
+    | '/admin/reports'
     | '/admin/settings'
     | '/instructor/academic-records'
     | '/instructor/analytics'
     | '/instructor/dashboard'
     | '/instructor/feedback-snippets'
+    | '/instructor/reports'
     | '/instructor/settings'
     | '/student/academic-records'
     | '/student/dashboard'
+    | '/student/reports'
     | '/student/settings'
     | '/auth/forgot-password'
     | '/auth/login'
@@ -559,14 +595,17 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/audit-log'
     | '/_authenticated/admin/dashboard'
     | '/_authenticated/admin/email-queue'
+    | '/_authenticated/admin/reports'
     | '/_authenticated/admin/settings'
     | '/_authenticated/instructor/academic-records'
     | '/_authenticated/instructor/analytics'
     | '/_authenticated/instructor/dashboard'
     | '/_authenticated/instructor/feedback-snippets'
+    | '/_authenticated/instructor/reports'
     | '/_authenticated/instructor/settings'
     | '/_authenticated/student/academic-records'
     | '/_authenticated/student/dashboard'
+    | '/_authenticated/student/reports'
     | '/_authenticated/student/settings'
     | '/_unauthenticated/auth/forgot-password'
     | '/_unauthenticated/auth/login'
@@ -716,6 +755,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedStudentSettingsRouteImport
       parentRoute: typeof AuthenticatedStudentRoute
     }
+    '/_authenticated/student/reports': {
+      id: '/_authenticated/student/reports'
+      path: '/reports'
+      fullPath: '/student/reports'
+      preLoaderRoute: typeof AuthenticatedStudentReportsRouteImport
+      parentRoute: typeof AuthenticatedStudentRoute
+    }
     '/_authenticated/student/dashboard': {
       id: '/_authenticated/student/dashboard'
       path: '/dashboard'
@@ -735,6 +781,13 @@ declare module '@tanstack/react-router' {
       path: '/settings'
       fullPath: '/instructor/settings'
       preLoaderRoute: typeof AuthenticatedInstructorSettingsRouteImport
+      parentRoute: typeof AuthenticatedInstructorRoute
+    }
+    '/_authenticated/instructor/reports': {
+      id: '/_authenticated/instructor/reports'
+      path: '/reports'
+      fullPath: '/instructor/reports'
+      preLoaderRoute: typeof AuthenticatedInstructorReportsRouteImport
       parentRoute: typeof AuthenticatedInstructorRoute
     }
     '/_authenticated/instructor/feedback-snippets': {
@@ -770,6 +823,13 @@ declare module '@tanstack/react-router' {
       path: '/settings'
       fullPath: '/admin/settings'
       preLoaderRoute: typeof AuthenticatedAdminSettingsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/reports': {
+      id: '/_authenticated/admin/reports'
+      path: '/reports'
+      fullPath: '/admin/reports'
+      preLoaderRoute: typeof AuthenticatedAdminReportsRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
     '/_authenticated/admin/email-queue': {
@@ -929,6 +989,7 @@ interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminAuditLogRoute: typeof AuthenticatedAdminAuditLogRoute
   AuthenticatedAdminDashboardRoute: typeof AuthenticatedAdminDashboardRoute
   AuthenticatedAdminEmailQueueRoute: typeof AuthenticatedAdminEmailQueueRoute
+  AuthenticatedAdminReportsRoute: typeof AuthenticatedAdminReportsRoute
   AuthenticatedAdminSettingsRoute: typeof AuthenticatedAdminSettingsRoute
   AuthenticatedAdminTemplatesTemplateIdRoute: typeof AuthenticatedAdminTemplatesTemplateIdRoute
   AuthenticatedAdminTemplatesImportRoute: typeof AuthenticatedAdminTemplatesImportRoute
@@ -946,6 +1007,7 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminAuditLogRoute: AuthenticatedAdminAuditLogRoute,
   AuthenticatedAdminDashboardRoute: AuthenticatedAdminDashboardRoute,
   AuthenticatedAdminEmailQueueRoute: AuthenticatedAdminEmailQueueRoute,
+  AuthenticatedAdminReportsRoute: AuthenticatedAdminReportsRoute,
   AuthenticatedAdminSettingsRoute: AuthenticatedAdminSettingsRoute,
   AuthenticatedAdminTemplatesTemplateIdRoute:
     AuthenticatedAdminTemplatesTemplateIdRoute,
@@ -979,6 +1041,7 @@ interface AuthenticatedInstructorRouteChildren {
   AuthenticatedInstructorAnalyticsRoute: typeof AuthenticatedInstructorAnalyticsRoute
   AuthenticatedInstructorDashboardRoute: typeof AuthenticatedInstructorDashboardRoute
   AuthenticatedInstructorFeedbackSnippetsRoute: typeof AuthenticatedInstructorFeedbackSnippetsRoute
+  AuthenticatedInstructorReportsRoute: typeof AuthenticatedInstructorReportsRoute
   AuthenticatedInstructorSettingsRoute: typeof AuthenticatedInstructorSettingsRoute
   AuthenticatedInstructorAssignmentsIdRoute: typeof AuthenticatedInstructorAssignmentsIdRouteWithChildren
   AuthenticatedInstructorAssignmentsNewRoute: typeof AuthenticatedInstructorAssignmentsNewRoute
@@ -998,6 +1061,7 @@ const AuthenticatedInstructorRouteChildren: AuthenticatedInstructorRouteChildren
       AuthenticatedInstructorDashboardRoute,
     AuthenticatedInstructorFeedbackSnippetsRoute:
       AuthenticatedInstructorFeedbackSnippetsRoute,
+    AuthenticatedInstructorReportsRoute: AuthenticatedInstructorReportsRoute,
     AuthenticatedInstructorSettingsRoute: AuthenticatedInstructorSettingsRoute,
     AuthenticatedInstructorAssignmentsIdRoute:
       AuthenticatedInstructorAssignmentsIdRouteWithChildren,
@@ -1036,6 +1100,7 @@ const AuthenticatedStudentAssignmentsIdRouteWithChildren =
 interface AuthenticatedStudentRouteChildren {
   AuthenticatedStudentAcademicRecordsRoute: typeof AuthenticatedStudentAcademicRecordsRoute
   AuthenticatedStudentDashboardRoute: typeof AuthenticatedStudentDashboardRoute
+  AuthenticatedStudentReportsRoute: typeof AuthenticatedStudentReportsRoute
   AuthenticatedStudentSettingsRoute: typeof AuthenticatedStudentSettingsRoute
   AuthenticatedStudentAssignmentsIdRoute: typeof AuthenticatedStudentAssignmentsIdRouteWithChildren
   AuthenticatedStudentAssignmentsIndexRoute: typeof AuthenticatedStudentAssignmentsIndexRoute
@@ -1045,6 +1110,7 @@ const AuthenticatedStudentRouteChildren: AuthenticatedStudentRouteChildren = {
   AuthenticatedStudentAcademicRecordsRoute:
     AuthenticatedStudentAcademicRecordsRoute,
   AuthenticatedStudentDashboardRoute: AuthenticatedStudentDashboardRoute,
+  AuthenticatedStudentReportsRoute: AuthenticatedStudentReportsRoute,
   AuthenticatedStudentSettingsRoute: AuthenticatedStudentSettingsRoute,
   AuthenticatedStudentAssignmentsIdRoute:
     AuthenticatedStudentAssignmentsIdRouteWithChildren,

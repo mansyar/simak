@@ -103,6 +103,25 @@ describe('StudentSidebar', () => {
     expect(dashboardLink.className).not.toContain('border-l-[3px]');
   });
 
+  it('should render the reports link', () => {
+    mockLocation.mockReturnValue({ pathname: '/student/dashboard' });
+    render(<StudentSidebar isOpen={true} onClose={vi.fn()} />);
+
+    const reportsLink = screen.getByTestId('sidebar-link-/student/reports');
+    expect(reportsLink).toBeDefined();
+    expect(reportsLink.textContent).toContain('studentSidebar.reports');
+  });
+
+  it('should highlight the reports route', () => {
+    mockLocation.mockReturnValue({ pathname: '/student/reports' });
+    render(<StudentSidebar isOpen={true} onClose={vi.fn()} />);
+
+    const reportsLink = screen.getByTestId('sidebar-link-/student/reports');
+    expect(reportsLink.className).toContain('bg-sidebar-accent');
+    expect(reportsLink.className).toContain('text-sidebar-primary-foreground');
+    expect(reportsLink.getAttribute('aria-current')).toBe('page');
+  });
+
   it('should expose mobile drawer semantics, focus management, and active route state', () => {
     const mockOnClose = vi.fn();
     const trigger = document.createElement('button');

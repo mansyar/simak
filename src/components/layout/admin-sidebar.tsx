@@ -11,6 +11,7 @@ import {
   GraduationCap,
   Mail,
   BarChart3,
+  FileBarChart,
 } from 'lucide-react';
 import { authClient } from '../../lib/auth-client';
 import { useMobileDrawer } from '../../hooks/use-mobile-drawer';
@@ -36,6 +37,7 @@ export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
     { to: '/admin/audit-log', label: 'adminSidebar.auditLog', icon: ScrollText },
     { to: '/admin/email-queue', label: 'adminSidebar.emailQueue', icon: Mail },
     { to: '/admin/analytics', label: 'adminSidebar.analytics', icon: BarChart3 },
+    { to: '/admin/reports', label: 'adminSidebar.reports', icon: FileBarChart },
   ] as const;
 
   const preferenceLinks = [

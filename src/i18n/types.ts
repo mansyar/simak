@@ -113,6 +113,7 @@ export type Translation = {
     auditLog: string
     emailQueue: string
     analytics: string
+    reports: string
     branding: string
     sectionMain: string
     sectionPreferences: string
@@ -125,6 +126,7 @@ export type Translation = {
     interventions: string
     feedbackSnippets: string
     analytics: string
+    reports: string
     branding: string
     sectionMain: string
     sectionPreferences: string
@@ -709,6 +711,7 @@ export type Translation = {
     dashboard: string
     assignments: string
     academicRecords: string
+    reports: string
     settings: string
     branding: string
     sectionMain: string

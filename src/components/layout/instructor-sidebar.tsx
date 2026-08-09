@@ -12,6 +12,7 @@ import {
   LifeBuoy,
   MessageSquare,
   ScrollText,
+  FileBarChart,
 } from 'lucide-react';
 import { authClient } from '../../lib/auth-client';
 import { useMobileDrawer } from '../../hooks/use-mobile-drawer';
@@ -49,6 +50,7 @@ export function InstructorSidebar({ isOpen, onClose }: InstructorSidebarProps) {
       icon: MessageSquare,
     },
     { to: '/instructor/analytics', label: 'instructorSidebar.analytics', icon: BarChart3 },
+    { to: '/instructor/reports', label: 'instructorSidebar.reports', icon: FileBarChart },
   ] as const;
 
   const preferenceLinks = [

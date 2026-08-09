@@ -108,6 +108,7 @@
     "auditLog": "Log Audit",
     "emailQueue": "Antrian Email",
     "analytics": "Analitik",
+    "reports": "Laporan",
     "branding": "SIMAK",
     "sectionMain": "UTAMA",
     "sectionPreferences": "PENGATURAN"
@@ -120,6 +121,7 @@
     "interventions": "Intervensi",
     "feedbackSnippets": "Cuplikan umpan balik",
     "analytics": "Analitik",
+    "reports": "Laporan",
     "branding": "SIMAK",
     "sectionMain": "UTAMA",
     "sectionPreferences": "PENGATURAN"
@@ -704,6 +706,7 @@
     "dashboard": "Dasbor",
     "assignments": "Tugas",
     "academicRecords": "Rekam akademik",
+    "reports": "Laporan",
     "settings": "Pengaturan",
     "branding": "SIMAK",
     "sectionMain": "UTAMA",

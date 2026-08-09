@@ -8,6 +8,7 @@ import {
   X,
   GraduationCap,
   ScrollText,
+  FileBarChart,
 } from 'lucide-react';
 import { authClient } from '../../lib/auth-client';
 import { useMobileDrawer } from '../../hooks/use-mobile-drawer';
@@ -33,6 +34,7 @@ export function StudentSidebar({ isOpen, onClose }: StudentSidebarProps) {
       label: 'studentSidebar.academicRecords',
       icon: ScrollText,
     },
+    { to: '/student/reports', label: 'studentSidebar.reports', icon: FileBarChart },
   ] as const;
 
   const preferenceLinks = [
