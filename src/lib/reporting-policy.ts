@@ -33,6 +33,10 @@ export type NormalizedReportFilters = {
   cohort: string | null;
 };
 
+export type ReportJobParameters = NormalizedReportFilters & {
+  studentId?: string;
+};
+
 const ADMIN_REPORT_TYPES: readonly ReportType[] = REPORT_TYPES;
 const REPORT_TYPES_BY_ROLE: Record<ReportingRole, readonly ReportType[]> = {
   superadmin: ADMIN_REPORT_TYPES,

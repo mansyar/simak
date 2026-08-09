@@ -10,7 +10,7 @@ import {
   text,
   timestamp,
 } from 'drizzle-orm/pg-core';
-import type { NormalizedReportFilters } from '@/lib/reporting-policy';
+import type { ReportJobParameters } from '@/lib/reporting-policy';
 import { users } from './users';
 
 export const reportType = pgEnum('report_type', [
@@ -37,7 +37,7 @@ export const reportJobs = pgTable(
     requesterId: text('requester_id')
       .notNull()
       .references(() => users.id),
-    parameters: jsonb('parameters').$type<NormalizedReportFilters>().notNull(),
+    parameters: jsonb('parameters').$type<ReportJobParameters>().notNull(),
     locale: reportLocale('locale').notNull(),
     state: reportJobState('state').notNull().default('pending'),
     attempts: integer('attempts').notNull().default(0),
