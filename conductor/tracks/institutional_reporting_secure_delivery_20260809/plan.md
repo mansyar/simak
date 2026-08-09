@@ -65,7 +65,7 @@
 
 ## Phase 5 — Accessible Role-Scoped User Experience
 
-- [ ] Task: Build report catalog, filter, and generation controls
+- [~] Task: Build report catalog, filter, and generation controls
   - [ ] Write failing component tests for role-specific catalogs, dependent filters, loading, validation, empty, and error states
   - [ ] Add English and Indonesian translation keys and regenerate i18n types
   - [ ] Implement responsive shadcn/Tailwind report controls using established route and form patterns
