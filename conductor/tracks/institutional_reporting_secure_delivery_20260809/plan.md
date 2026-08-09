@@ -44,12 +44,12 @@
 
 ## Phase 4 — PDF Generation and Private Artifacts
 
-- [~] Task: Implement the server-only PDF renderer
-  - [ ] Write failing renderer tests for all three templates, both locales, escaping, filter summaries, timestamps, pagination, and multi-page tables
-  - [ ] Add the approved renderer and bundled bilingual font assets
-  - [ ] Implement a server-only rendering adapter and the three fixed templates
-  - [ ] Verify user-controlled content is escaped and no server-only renderer code reaches client bundles
-  - [ ] Run focused tests and a production build compatibility check
+- [x] Task: Implement the server-only PDF renderer [commit: 84380de]
+  - [x] Write failing renderer tests for all three templates, both locales, escaping, filter summaries, timestamps, pagination, and multi-page tables
+  - [x] Add the approved renderer and bundled bilingual font assets
+  - [x] Implement a server-only rendering adapter and the three fixed templates
+  - [x] Verify user-controlled content is escaped and no server-only renderer code reaches client bundles
+  - [x] Run focused tests and a production build compatibility check
 - [ ] Task: Implement private R2 report storage
   - [ ] Write failing tests for opaque object keys, metadata persistence, authorized downloads, expiry, missing objects, and R2 failures
   - [ ] Implement upload and short-lived download URL helpers using existing storage conventions
