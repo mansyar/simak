@@ -1,6 +1,6 @@
 # Implementation Plan: TRACK-061 Institutional Reporting & Secure Delivery
 
-## Phase 1 — Architecture and PDF Renderer Decision
+## Phase 1 — Architecture and PDF Renderer Decision [checkpoint: 4ca8f4b]
 
 - [x] Task: Define report contracts and renderer compatibility criteria (4ca8f4b)
   - [x] Write failing contract tests for the three allowlisted report types, role availability, normalized filters, locales, job states, and expiry calculation
@@ -8,7 +8,7 @@
   - [x] Evaluate server-side PDF candidates against Node 20, ESM, Docker/Coolify, bilingual font embedding, multi-page tables, security, maintenance, and bundle constraints
   - [x] Record the renderer decision and rationale in `conductor/tech-stack.md` before adding the dependency
   - [x] Refactor and run focused tests
-- [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
+- [x] Task: Phase Verification & Checkpoint (Refer to workflow.md) (4ca8f4b)
 
 ## Phase 2 — Durable Report Jobs and Database Integrity
 
