@@ -17,7 +17,7 @@
   - [x] Add the Drizzle schema, constraints, indexes, relations, and migration
   - [x] Add cleanup-safe and concurrency-safe state-transition constraints
   - [x] Run schema and migration-focused tests
-- [ ] Task: Implement report-job transition helpers
+- [~] Task: Implement report-job transition helpers
   - [ ] Write failing unit and integration tests for valid transitions, stale updates, retries, completion, failure, and expiry
   - [ ] Implement transactional transition helpers using guarded updates or row locking
   - [ ] Verify rendering and R2 operations occur outside database transactions
