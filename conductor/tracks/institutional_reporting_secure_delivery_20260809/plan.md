@@ -65,12 +65,12 @@
 
 ## Phase 5 — Accessible Role-Scoped User Experience
 
-- [~] Task: Build report catalog, filter, and generation controls
-  - [ ] Write failing component tests for role-specific catalogs, dependent filters, loading, validation, empty, and error states
-  - [ ] Add English and Indonesian translation keys and regenerate i18n types
-  - [ ] Implement responsive shadcn/Tailwind report controls using established route and form patterns
-  - [ ] Verify keyboard access, labels, focus behavior, touch targets, and reduced-motion behavior
-  - [ ] Run focused component and i18n tests
+- [x] Task: Build report catalog, filter, and generation controls [commit: 3a61ae6]
+  - [x] Write failing component tests for role-specific catalogs, dependent filters, loading, validation, empty, and error states
+  - [x] Add English and Indonesian translation keys and regenerate i18n types
+  - [x] Implement responsive shadcn/Tailwind report controls using established route and form patterns
+  - [x] Verify keyboard access, labels, focus behavior, touch targets, and reduced-motion behavior
+  - [x] Run focused component and i18n tests
 - [ ] Task: Build report history and artifact actions
   - [ ] Write failing tests for pending, processing, completed, failed, and expired displays
   - [ ] Write failing tests for authorized download and eligible retry actions
