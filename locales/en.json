@@ -1907,6 +1907,32 @@
       "completed": "Report generated successfully.",
       "failed": "Report generation failed. Please try again.",
       "expired": "This report has expired."
+    },
+    "history": {
+      "title": "Report history",
+      "description": "Download generated reports or retry failed ones.",
+      "loading": "Loading report history...",
+      "loadError": "Unable to load report history.",
+      "empty": "No reports yet",
+      "emptyDescription": "Reports you generate will appear here.",
+      "listLabel": "Generated reports",
+      "state": {
+        "pending": "Pending",
+        "processing": "Processing",
+        "completed": "Completed",
+        "failed": "Failed",
+        "expired": "Expired"
+      },
+      "requestedLabel": "Requested {date}",
+      "generatedLabel": "Generated {date}",
+      "expiresLabel": "Expires {date}",
+      "expiredHint": "This report has expired and can no longer be downloaded.",
+      "download": "Download",
+      "downloading": "Preparing download...",
+      "retry": "Retry",
+      "retrying": "Retrying...",
+      "activeFeedback": "{count} report(s) still being generated.",
+      "upToDateFeedback": "{count} report(s) in your history."
     }
   }
 }

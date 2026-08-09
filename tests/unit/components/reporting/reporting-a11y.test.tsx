@@ -10,8 +10,11 @@ vi.mock('@/routes/__root', () => ({
 }));
 
 vi.mock('@/server/reporting', () => ({
+  downloadReport: vi.fn(),
   getReportCatalog: vi.fn(),
+  getReportHistory: vi.fn(),
   requestReport: vi.fn(),
+  retryReport: vi.fn(),
 }));
 
 vi.mock('@/server/users', () => ({
@@ -19,7 +22,7 @@ vi.mock('@/server/users', () => ({
 }));
 
 import { ReportCatalogControls } from '@/components/reporting/ReportCatalogControls';
-import { getReportCatalog, requestReport } from '@/server/reporting';
+import { getReportCatalog, getReportHistory, requestReport } from '@/server/reporting';
 import { listUsers } from '@/server/users';
 
 const filters = {
@@ -60,6 +63,7 @@ describe('reporting accessibility', () => {
       reports: ['institutional_academic_summary', 'official_transcript', 'analytics_summary'],
       filters,
     });
+    vi.mocked(getReportHistory).mockResolvedValue({ jobs: [] });
     vi.mocked(listUsers).mockResolvedValue({
       users: [alice],
       total: 1,
@@ -165,5 +169,28 @@ describe('reporting accessibility', () => {
     const listbox = await screen.findByRole('listbox');
     const option = await within(listbox).findByRole('option', { name: /Alice/ });
     expect(option).toHaveAttribute('aria-selected', 'false');
+  });
+
+  it('scopes the history list as a labeled list with live status feedback', async () => {
+    vi.mocked(getReportHistory).mockResolvedValue({
+      jobs: [
+        {
+          id: 3,
+          reportType: 'analytics_summary',
+          locale: 'en',
+          state: 'completed',
+          createdAt: new Date('2026-08-10T10:00:00Z'),
+          completedAt: new Date('2026-08-10T10:05:00Z'),
+          failedAt: null,
+          expiresAt: new Date('2026-09-09T10:00:00Z'),
+        },
+      ],
+    });
+    renderWithQuery(<ReportCatalogControls role="admin" />);
+    await screen.findByText('reports.types.institutional_academic_summary.name');
+
+    const list = await screen.findByRole('list', { name: 'reports.history.listLabel' });
+    expect(within(list).getByRole('button', { name: 'reports.history.download' })).toBeDefined();
+    expect(await screen.findByRole('status')).toBeDefined();
   });
 });

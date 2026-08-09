@@ -5,6 +5,7 @@ import { EmptyState } from '@/components/ui/empty-state';
 import { ErrorState } from '@/components/ui/error-state';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ReportCard } from '@/components/reporting/ReportCard';
+import { ReportHistory } from '@/components/reporting/ReportHistory';
 import { getErrorTranslationKey, isServerError } from '@/lib/errors';
 import { reportKeys } from '@/lib/query-keys';
 import type { ReportingRole } from '@/lib/reporting-policy';
@@ -86,6 +87,8 @@ export function ReportCatalogControls({ role }: ReportCatalogControlsProps) {
           ))}
         </section>
       )}
+
+      <ReportHistory role={role} />
     </div>
   );
 }

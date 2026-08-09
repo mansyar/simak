@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import type { ReactElement } from 'react';
 import type { ReportType } from '@/lib/reporting-policy';
@@ -9,8 +10,11 @@ vi.mock('@/routes/__root', () => ({
 }));
 
 vi.mock('@/server/reporting', () => ({
+  downloadReport: vi.fn(),
   getReportCatalog: vi.fn(),
+  getReportHistory: vi.fn(),
   requestReport: vi.fn(),
+  retryReport: vi.fn(),
 }));
 
 vi.mock('@/server/users', () => ({
@@ -18,7 +22,7 @@ vi.mock('@/server/users', () => ({
 }));
 
 import { ReportCatalogControls } from '@/components/reporting/ReportCatalogControls';
-import { getReportCatalog, requestReport } from '@/server/reporting';
+import { getReportCatalog, getReportHistory, requestReport } from '@/server/reporting';
 import { listUsers } from '@/server/users';
 
 const emptyFilters = { terms: [], courses: [], sections: [], cohorts: [] };
@@ -36,6 +40,7 @@ describe('ReportCatalogControls', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.mocked(listUsers).mockResolvedValue({ users: [], total: 0 });
+    vi.mocked(getReportHistory).mockResolvedValue({ jobs: [] });
   });
 
   it('renders the admin catalog with all three report types', async () => {
@@ -103,5 +108,51 @@ describe('ReportCatalogControls', () => {
 
     await screen.findByText('reports.types.analytics_summary.name');
     expect(requestReport).not.toHaveBeenCalled();
+  });
+
+  it('renders the report history section alongside the catalog', async () => {
+    vi.mocked(getReportCatalog).mockResolvedValue(catalog(['analytics_summary']));
+    vi.mocked(getReportHistory).mockResolvedValue({
+      jobs: [
+        {
+          id: 9,
+          reportType: 'analytics_summary',
+          locale: 'en',
+          state: 'completed',
+          createdAt: new Date('2026-08-10T10:00:00Z'),
+          completedAt: new Date('2026-08-10T10:05:00Z'),
+          failedAt: null,
+          expiresAt: new Date('2026-09-09T10:00:00Z'),
+        },
+      ],
+    });
+    renderWithQuery(<ReportCatalogControls role="admin" />);
+
+    expect(await screen.findByText('reports.history.title')).toBeDefined();
+    expect(await screen.findByText('reports.history.state.completed')).toBeDefined();
+    expect(await screen.findByRole('button', { name: 'reports.history.download' })).toBeDefined();
+  });
+
+  it('refetches history when a report is generated from a card', async () => {
+    const user = userEvent.setup();
+    vi.mocked(getReportCatalog).mockResolvedValue(catalog(['analytics_summary']));
+    vi.mocked(requestReport).mockResolvedValue({
+      job: {
+        id: 10,
+        reportType: 'analytics_summary',
+        locale: 'en',
+        state: 'completed',
+        createdAt: new Date('2026-08-10T11:00:00Z'),
+        completedAt: new Date('2026-08-10T11:05:00Z'),
+        failedAt: null,
+        expiresAt: new Date('2026-09-09T11:00:00Z'),
+      },
+    });
+    renderWithQuery(<ReportCatalogControls role="instructor" />);
+
+    await screen.findByText('reports.types.analytics_summary.name');
+    await user.click(screen.getByRole('button', { name: 'reports.generate' }));
+
+    await waitFor(() => expect(getReportHistory).toHaveBeenCalledTimes(2));
   });
 });

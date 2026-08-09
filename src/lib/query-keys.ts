@@ -92,4 +92,5 @@ export const feedbackSnippetKeys = {
 export const reportKeys = {
   all: () => ['reports'] as const,
   catalog: (role: ReportingRole) => ['reports', 'catalog', role] as const,
+  history: (role: ReportingRole) => ['reports', 'history', role] as const,
 };

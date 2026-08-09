@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useI18n } from '@/routes/__root';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -13,6 +13,7 @@ import {
   type CatalogFilterOptions,
   type SelectedReportFilters,
 } from '@/lib/reporting-options';
+import { reportKeys } from '@/lib/query-keys';
 import type {
   ReportJobState,
   ReportLocale,
@@ -96,6 +97,7 @@ function ReportLocaleToggle({
 
 export function ReportCard({ reportType, role, options }: ReportCardProps) {
   const { t } = useI18n();
+  const queryClient = useQueryClient();
   const [filters, setFilters] = useState<SelectedReportFilters>(DEFAULT_FILTERS);
   const [locale, setLocale] = useState<ReportLocale>('en');
   const [studentId, setStudentId] = useState<string | null>(null);
@@ -118,6 +120,7 @@ export function ReportCard({ reportType, role, options }: ReportCardProps) {
     onSuccess: (job) => {
       setValidationError(null);
       if (job.state) setJobState(job.state);
+      queryClient.invalidateQueries({ queryKey: reportKeys.history(role) });
     },
     onError: (error) => {
       setJobState(null);

@@ -1907,6 +1907,32 @@
       "completed": "Laporan berhasil dibuat.",
       "failed": "Gagal membuat laporan. Silakan coba lagi.",
       "expired": "Laporan ini telah kedaluwarsa."
+    },
+    "history": {
+      "title": "Riwayat laporan",
+      "description": "Unduh laporan yang sudah dibuat atau coba lagi laporan yang gagal.",
+      "loading": "Memuat riwayat laporan...",
+      "loadError": "Gagal memuat riwayat laporan.",
+      "empty": "Belum ada laporan",
+      "emptyDescription": "Laporan yang Anda buat akan muncul di sini.",
+      "listLabel": "Laporan yang dibuat",
+      "state": {
+        "pending": "Menunggu",
+        "processing": "Diproses",
+        "completed": "Selesai",
+        "failed": "Gagal",
+        "expired": "Kedaluwarsa"
+      },
+      "requestedLabel": "Diminta {date}",
+      "generatedLabel": "Dibuat {date}",
+      "expiresLabel": "Kedaluwarsa {date}",
+      "expiredHint": "Laporan ini telah kedaluwarsa dan tidak dapat diunduh lagi.",
+      "download": "Unduh",
+      "downloading": "Menyiapkan unduhan...",
+      "retry": "Coba lagi",
+      "retrying": "Mencoba lagi...",
+      "activeFeedback": "{count} laporan masih sedang dibuat.",
+      "upToDateFeedback": "{count} laporan di riwayat Anda."
     }
   }
 }

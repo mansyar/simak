@@ -50,6 +50,7 @@ const DYNAMIC_KEY_PATTERNS = [
   /^reports\.subtitle\.(superadmin|admin|instructor|student)$/,
   /^reports\.types\.(institutional_academic_summary|official_transcript|analytics_summary)\.description(Admin)?$/,
   /^reports\.job\.(pending|processing|completed|failed|expired)$/,
+  /^reports\.history\.state\.(pending|processing|completed|failed|expired)$/,
 ];
 
 function isDynamicKey(key) {

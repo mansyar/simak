@@ -1913,6 +1913,32 @@ export type Translation = {
       failed: string
       expired: string
     }
+    history: {
+      title: string
+      description: string
+      loading: string
+      loadError: string
+      empty: string
+      emptyDescription: string
+      listLabel: string
+      state: {
+        pending: string
+        processing: string
+        completed: string
+        failed: string
+        expired: string
+      }
+      requestedLabel: string
+      generatedLabel: string
+      expiresLabel: string
+      expiredHint: string
+      download: string
+      downloading: string
+      retry: string
+      retrying: string
+      activeFeedback: string
+      upToDateFeedback: string
+    }
   }
 }
 
