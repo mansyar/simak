@@ -84,7 +84,7 @@
   - [x] Run focused route tests
 - [x] Task: Phase Verification & Checkpoint (Refer to workflow.md) (7216caa)
 
-## Phase 6 — Expiry Cleanup and End-to-End Hardening
+## Phase 6 — Expiry Cleanup and End-to-End Hardening [checkpoint: 9bba921]
 
 - [x] Task: Implement idempotent expiry cleanup [commit: 31f68f6]
   - [x] Write failing tests for due selection, inaccessible-before-deletion behavior, R2 deletion, retries, already-missing objects, and idempotency
@@ -107,4 +107,4 @@
   - [x] Run the production build and verify renderer/runtime compatibility
   - [x] Confirm all modified source and test files remain within the 500-line limit
   - [x] Document any approved deviations
-- [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
+- [x] Task: Phase Verification & Checkpoint (Refer to workflow.md) (9bba921)
