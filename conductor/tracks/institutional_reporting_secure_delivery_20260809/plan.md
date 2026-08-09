@@ -63,7 +63,7 @@
   - [x] Run focused unit and integration tests
 - [x] Task: Phase Verification & Checkpoint (Refer to workflow.md) (f21fe13)
 
-## Phase 5 — Accessible Role-Scoped User Experience
+## Phase 5 — Accessible Role-Scoped User Experience [checkpoint: 7216caa]
 
 - [x] Task: Build report catalog, filter, and generation controls [commit: 3a61ae6]
   - [x] Write failing component tests for role-specific catalogs, dependent filters, loading, validation, empty, and error states
@@ -82,7 +82,7 @@
   - [x] Implement role-scoped routes and sidebar entries
   - [x] Verify mobile layout and accessible navigation
   - [x] Run focused route tests
-- [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
+- [x] Task: Phase Verification & Checkpoint (Refer to workflow.md) (7216caa)
 
 ## Phase 6 — Expiry Cleanup and End-to-End Hardening
 
