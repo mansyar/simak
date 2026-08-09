@@ -77,11 +77,11 @@
   - [x] Implement status polling or explicit refresh using established TanStack Query patterns
   - [x] Display expiry and safe failure information without exposing internal errors
   - [x] Run focused component tests
-- [~] Task: Wire role routes and navigation
-  - [ ] Write failing route tests for Admin, Instructor, and Student access boundaries
-  - [ ] Implement role-scoped routes and sidebar entries
-  - [ ] Verify mobile layout and accessible navigation
-  - [ ] Run focused route tests
+- [x] Task: Wire role routes and navigation [commit: 7216caa]
+  - [x] Write failing route tests for Admin, Instructor, and Student access boundaries
+  - [x] Implement role-scoped routes and sidebar entries
+  - [x] Verify mobile layout and accessible navigation
+  - [x] Run focused route tests
 - [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
 
 ## Phase 6 — Expiry Cleanup and End-to-End Hardening
