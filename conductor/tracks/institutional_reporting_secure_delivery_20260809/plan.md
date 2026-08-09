@@ -98,7 +98,7 @@
   - [x] Write Playwright tests for Student self-transcript generation
   - [x] Add accessibility scans for the reporting surfaces
   - [x] Run the relevant browser matrix
-- [ ] Task: Complete track-wide quality verification
+- [~] Task: Complete track-wide quality verification
   - [ ] Run formatting and lint checks
   - [ ] Run type checking
   - [ ] Run i18n parity and unused-key checks
