@@ -661,6 +661,7 @@ Claims use `claimedAt` and nullable `sentAt`: stale claims are reclaimed, locked
 | code        | text, unique, not null | Reusable course identity |
 | name        | text, not null         |       |
 | description | text                   |       |
+| credits     | numeric(5,2), nullable | Positive when configured; null preserves legacy courses but makes transcript persistence unavailable |
 | archivedAt  | timestamp              | Soft archive; rows remain history-safe |
 
 #### course_sections
@@ -1083,7 +1084,7 @@ Policies are versioned rather than edited in place. The server validates positiv
 | --------------------- | ------------------------------------- | ---------------------------------------------------------------------- |
 | id                    | serial (PK)                           |                                                                        |
 | studentId             | text (FK → users), not null           | Student whose official record is represented                           |
-| courseId              | integer (FK → courses), not null      | Reusable course; `courses.credits` is positive and required           |
+| courseId              | integer (FK → courses), not null      | Reusable course; configured `courses.credits` is positive             |
 | courseSectionId       | integer (FK → course_sections), not null | Term-specific section                                               |
 | termId               | integer (FK → academic_terms), not null | Academic term                                                       |
 | sourceAssignmentId    | integer (FK → assignments), not null  | Explicit transcript-source assignment                                  |
@@ -1099,14 +1100,14 @@ Policies are versioned rather than edited in place. The server validates positiv
 | publishedAt           | timestamp, nullable                   | Source publication timestamp                                            |
 | createdAt             | timestamp, not null                   | DEFAULT NOW(); no `updatedAt` by design                                |
 
-Unique constraint on `(studentId, courseSectionId, recordVersion)`. Indexes support student/term, section/student, source release, and policy lookups. A later release inserts a new record version; active reads select the newest version without mutating prior rows. Student reads are self-scoped, instructors require active enrollment in the section, and admins may view provenance metadata.
+Unique constraint on `(studentId, courseSectionId, recordVersion)`. Provenance triggers reject cross-student snapshots, mismatched assignments/releases, and section/course/term inconsistencies. Transcript-source designation and assignment section become immutable once official records depend on them. A later release inserts a new record version; active reads use source release version, publication time, and record ID without mutating prior rows.
 
 #### Academic-record policy and GPA behavior (TRACK-060)
 
 - `src/lib/academic-record-policy.ts` is a pure, database-free policy engine. It validates positive finite course credits and explicit grade-point mappings, supports a rounding scale from 0 through 4, and rounds with decimal half-up semantics rather than JavaScript's binary `toFixed` behavior.
 - Term GPA is the credit-weighted mean of `complete` records in the selected term. Cumulative GPA selects the latest eligible complete attempt per course using deterministic term and publication/version ordering. All historical attempts remain available for transcript display; `incomplete` and `withdrawn` records are excluded from both GPA calculations.
-- Release and withdrawal handlers persist academic records in the same transaction as the authoritative release state. The source assignment, release snapshot/version, policy version, captured credits, status, and publication time are stored as provenance. A later release appends a new record version; no update path exists for an existing record.
-- The client-safe `src/server/academic-records.ts` exposes rate-limited GET stubs for student, instructor, and admin reads. Server-only handlers enforce session/role, student self-scope, instructor active-section scope, admin access, pagination, and term/section/student/status filters before returning transcript rows and GPA summaries.
+- Release and withdrawal handlers persist academic records in the same transaction as the authoritative release state. Instructors must have active section enrollment, and incomplete outcomes require explicit unique `{ studentId, reason }` decisions. Advisory locks serialize transcript-source designation and initial policy-version allocation.
+- The client-safe `src/server/academic-records.ts` exposes rate-limited GET stubs for student, instructor, and admin reads. Server-only handlers enforce role scope and pagination; database aggregates calculate GPA and terms without materializing all institution-wide matching records.
 
 ### Database Indexes
 
@@ -1162,7 +1163,7 @@ Unique constraint on `(studentId, courseSectionId, recordVersion)`. Indexes supp
 | `checkpoint_discussions` | `assignmentId`, `createdAt` | composite b-tree | Instructor overview across all checkpoints (TRACK-026) |
 | `checkpoint_discussions` | `parentMessageId`       | b-tree           | Reply threading lookup (TRACK-026)            |
 
-Migrations `0024_powerful_clint_barton.sql` through `0027_daily_synch.sql` (TRACK-058) add the UTC appointment table and lifecycle enum, durable reminder tier storage, retryable `claimed_at`/nullable `sent_at` reminder claims, and the appointment status/student consistency check. Migration `0028_flowery_cyclops.sql` (TRACK-060) adds positive course credits, the per-section transcript-source designation, versioned academic-record policies, immutable academic records, and their enum/foreign-key/index/check constraints. Its preflight aborts when existing courses would require fabricated credits; apply it only after credits are populated or in a clean prelaunch database. Each migration has a companion rollback; the full sequence was forward-applied and verified against the disposable E2E PostgreSQL database.
+Migrations `0024_powerful_clint_barton.sql` through `0027_daily_synch.sql` (TRACK-058) add the appointment contracts. Migration `0028_flowery_cyclops.sql` (TRACK-060) adds nullable legacy credits, transcript-source designation, policies, and academic records. Migration `0029_left_boomerang.sql` adds provenance and immutability triggers plus outcome constraints; its rollback is explicitly irreversible after valid null legacy credits or non-complete records exist. The forward chain and focused integrity scenarios were verified against a disposable PostgreSQL database.
 
 All indexes use Drizzle's `index()` or `uniqueIndex()` API. Migrations generated with `drizzle-kit generate`. Migration `0008_deep_santa_claus.sql` (TRACK-005) added 7 new indexes and replaced 2 low-cardinality single-column indexes with composites. Migration `0009_familiar_hydra.sql` (TRACK-016) added the `resend_message_id` column to `email_queue`. Migrations `0010`–`0012` (TRACK-020) added rubric tables (`rubric_criteria`, `rubric_levels`, `review_scores`), `grading_type` pgEnum, `checkpoints.templateCheckpointId` FK + backfill, `template_checkpoints.deletedAt`, and the two rubric-related indexes. Migration `0014_sour_nightshade.sql` (TRACK-026) added the `checkpoint_discussions` table with 3 indexes. Migration `0016` (TRACK-039) added the `cleanedUpAt` timestamp column to `upload_intents`. Migration `0019_daffy_bulldozer.sql` (TRACK-051) added release state, immutable snapshots, indexes, and foreign keys; migration `0020_white_spacker_dave.sql` (TRACK-055) added the calendar feed token; migration `0021_round_mysterio.sql` (TRACK-054) added revision action items and its two composite indexes; migration `0022_search_trigram_indexes.sql` (TRACK-056) enables `pg_trgm` and adds ten GIN trigram indexes for contains-search fields, including the `CAST(details AS text)` audit expression; migration `0023_sloppy_anthem.sql` (TRACK-057) adds academic terms/courses/sections/enrollments and assignment context/mode/status, with a preflight that aborts when existing assignment rows would require fabricated context. The `0023` rollback removes those objects in reverse dependency order. Its prelaunch refusal is intentional; development and E2E reset/seed flows recreate deterministic context instead of inventing legacy facts. Companion rollbacks are kept in `drizzle/migrations/rollback/`. Each migration has a companion rollback file at `drizzle/migrations/rollback/<NNNN>_<tag>.rollback.sql`.
 
@@ -1541,6 +1542,7 @@ E2E tests run against a dedicated test database (`simak_test` on a separate `pos
 | `extension.spec.ts`          | 3     | Extension request → approve (checkpoint `dueDate` extended in DB), reject (deadline NOT extended), instructor bulk extension (all unfinished checkpoints extended) |
 | `password-setup.spec.ts`     | 2     | Password setup lifecycle (admin creates user → extract token from DB → setup password → login → redirect to dashboard), token reuse + expired token rejection |
 | `grade-release.spec.ts`      | 2     | Instructor preflight/publication, complete-only student snapshot visibility, student control absence, withdrawal reason validation, retained draft state, and post-withdrawal unavailability |
+| `academic-records.spec.ts`   | 5     | Publish-to-transcript flow, role/provenance boundaries, term filtering, Indonesian and dark-mode rendering, keyboard/focus behavior, 320px layout, and axe coverage |
 
 Run with `pnpm test:e2e` (headless) or `pnpm test:e2e:ui` (interactive UI mode). All tests pass in ~2 minutes.
 
