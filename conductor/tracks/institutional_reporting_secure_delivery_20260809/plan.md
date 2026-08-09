@@ -10,7 +10,7 @@
   - [x] Refactor and run focused tests
 - [x] Task: Phase Verification & Checkpoint (Refer to workflow.md) (4ca8f4b)
 
-## Phase 2 — Durable Report Jobs and Database Integrity
+## Phase 2 — Durable Report Jobs and Database Integrity [checkpoint: d20c6ce]
 
 - [x] Task: Add report-job persistence (dcddaec)
   - [x] Write failing schema tests for report type, requester, normalized parameters, locale, state, artifact metadata, failure metadata, timestamps, and 30-day expiry
@@ -22,7 +22,7 @@
   - [x] Implement transactional transition helpers using guarded updates or row locking
   - [x] Verify rendering and R2 operations occur outside database transactions
   - [x] Refactor and run focused tests
-- [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
+- [x] Task: Phase Verification & Checkpoint (Refer to workflow.md) (d20c6ce)
 
 ## Phase 3 — Report Data and Authorization
 
