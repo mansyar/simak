@@ -86,7 +86,7 @@
 
 ## Phase 6 — Expiry Cleanup and End-to-End Hardening
 
-- [ ] Task: Implement idempotent expiry cleanup
+- [~] Task: Implement idempotent expiry cleanup
   - [ ] Write failing tests for due selection, inaccessible-before-deletion behavior, R2 deletion, retries, already-missing objects, and idempotency
   - [ ] Implement a protected manual/operational cleanup entry point without recurring scheduling infrastructure
   - [ ] Mark reports expired before or independently of physical object deletion
