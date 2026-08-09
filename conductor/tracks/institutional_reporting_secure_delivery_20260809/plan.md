@@ -71,12 +71,12 @@
   - [x] Implement responsive shadcn/Tailwind report controls using established route and form patterns
   - [x] Verify keyboard access, labels, focus behavior, touch targets, and reduced-motion behavior
   - [x] Run focused component and i18n tests
-- [~] Task: Build report history and artifact actions
-  - [ ] Write failing tests for pending, processing, completed, failed, and expired displays
-  - [ ] Write failing tests for authorized download and eligible retry actions
-  - [ ] Implement status polling or explicit refresh using established TanStack Query patterns
-  - [ ] Display expiry and safe failure information without exposing internal errors
-  - [ ] Run focused component tests
+- [x] Task: Build report history and artifact actions [commit: ada2b66]
+  - [x] Write failing tests for pending, processing, completed, failed, and expired displays
+  - [x] Write failing tests for authorized download and eligible retry actions
+  - [x] Implement status polling or explicit refresh using established TanStack Query patterns
+  - [x] Display expiry and safe failure information without exposing internal errors
+  - [x] Run focused component tests
 - [ ] Task: Wire role routes and navigation
   - [ ] Write failing route tests for Admin, Instructor, and Student access boundaries
   - [ ] Implement role-scoped routes and sidebar entries
