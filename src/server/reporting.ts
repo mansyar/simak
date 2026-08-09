@@ -72,6 +72,9 @@ export const ReportJobInputSchema = z.object({ jobId: z.number().int().positive(
 export const ReportHistoryInputSchema = z.object({
   limit: z.number().int().min(1).max(100).default(20),
 });
+export const ReportExpiryCleanupInputSchema = z.object({
+  batchSize: z.number().int().min(1).max(100).default(50),
+});
 
 export const getReportCatalog = typedServerFn({ method: 'GET' })
   .middleware(serverFnMiddlewares(RATE_LIMITS.standardRead))
@@ -143,4 +146,12 @@ export const downloadReport = typedServerFn({ method: 'POST' })
   .handler(async ({ data }) => {
     const { downloadReportHandler } = await import('./reporting-orchestration.server');
     return downloadReportHandler({ data });
+  });
+
+export const runReportExpiryCleanup = typedServerFn({ method: 'POST' })
+  .middleware(serverFnMiddlewares(RATE_LIMITS.destructive))
+  .inputValidator(ReportExpiryCleanupInputSchema)
+  .handler(async ({ data }) => {
+    const { runReportExpiryCleanupHandler } = await import('./reporting-expiry.server');
+    return runReportExpiryCleanupHandler({ data });
   });

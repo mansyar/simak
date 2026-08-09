@@ -110,9 +110,19 @@ export const reportJobs = pgTable(
         AND ${table.completedAt} IS NOT NULL
         AND ${table.failedAt} IS NULL
         AND ${table.expiresAt} IS NOT NULL
-        AND ${table.artifactKey} IS NULL
         AND ${table.failureCode} IS NULL
         AND ${table.failureMessage} IS NULL
+        AND (
+          (
+            ${table.artifactKey} IS NULL
+            AND ${table.artifactSizeBytes} IS NULL
+            AND ${table.artifactSha256} IS NULL
+          ) OR (
+            ${table.artifactKey} IS NOT NULL
+            AND ${table.artifactSizeBytes} > 0
+            AND ${table.artifactSha256} IS NOT NULL
+          )
+        )
       )`,
     ),
   ],

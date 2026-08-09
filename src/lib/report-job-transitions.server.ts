@@ -1,4 +1,4 @@
-import { and, eq, lte, sql } from 'drizzle-orm';
+import { and, asc, eq, isNotNull, lte, sql } from 'drizzle-orm';
 import { getDb, type Db } from '@/db/index';
 import { reportJobs } from '@/db/schema/report-jobs';
 import { calculateReportExpiry } from '@/lib/reporting-policy';
@@ -29,8 +29,53 @@ function validateJobId(jobId: number): void {
   if (!Number.isInteger(jobId) || jobId <= 0) throw new Error('Invalid report job ID');
 }
 
+function validateBatchLimit(limit: number): void {
+  if (!Number.isInteger(limit) || limit <= 0) throw new Error('Invalid batch limit');
+}
+
 function first(rows: ReportJob[]): ReportJob | null {
   return rows[0] ?? null;
+}
+
+export async function selectDueCompletedJobs(
+  limit: number,
+  options: TransitionOptions = {},
+): Promise<ReportJob[]> {
+  validateBatchLimit(limit);
+  const { db, now } = context(options);
+  return db
+    .select()
+    .from(reportJobs)
+    .where(
+      and(
+        eq(reportJobs.state, 'completed'),
+        lte(reportJobs.expiresAt, now),
+        isNotNull(reportJobs.artifactKey),
+      ),
+    )
+    .orderBy(asc(reportJobs.expiresAt))
+    .limit(limit);
+}
+
+export async function selectStaleExpiredJobs(
+  limit: number,
+  options: TransitionOptions = {},
+): Promise<ReportJob[]> {
+  validateBatchLimit(limit);
+  const { db } = context(options);
+  return db
+    .select()
+    .from(reportJobs)
+    .where(
+      and(
+        eq(reportJobs.state, 'expired'),
+        isNotNull(reportJobs.artifactKey),
+        isNotNull(reportJobs.artifactSizeBytes),
+        isNotNull(reportJobs.artifactSha256),
+      ),
+    )
+    .orderBy(asc(reportJobs.updatedAt))
+    .limit(limit);
 }
 
 export async function startReportJob(
@@ -134,12 +179,37 @@ export async function expireReportJob(
   const { db, now } = context(options);
   const rows = await db
     .update(reportJobs)
-    .set({ state: 'expired', artifactKey: null, updatedAt: now })
+    .set({ state: 'expired', updatedAt: now })
     .where(
       and(
         eq(reportJobs.id, jobId),
         eq(reportJobs.state, 'completed'),
         lte(reportJobs.expiresAt, now),
+      ),
+    )
+    .returning();
+  return first(rows);
+}
+
+export async function finalizeExpiredReportJob(
+  jobId: number,
+  options: TransitionOptions = {},
+): Promise<ReportJob | null> {
+  validateJobId(jobId);
+  const { db, now } = context(options);
+  const rows = await db
+    .update(reportJobs)
+    .set({
+      artifactKey: null,
+      artifactSizeBytes: null,
+      artifactSha256: null,
+      updatedAt: now,
+    })
+    .where(
+      and(
+        eq(reportJobs.id, jobId),
+        eq(reportJobs.state, 'expired'),
+        isNotNull(reportJobs.artifactKey),
       ),
     )
     .returning();

@@ -233,6 +233,22 @@ describe('report generation orchestration', () => {
     expect(deps.createDownloadUrl).not.toHaveBeenCalled();
   });
 
+  it('denies download for expired jobs even when the artifact key is retained', async () => {
+    const deps = dependencies({
+      findOwnedJob: vi.fn().mockResolvedValue({
+        ...pendingJob,
+        state: 'expired',
+        artifactKey: 'reports/opaque.pdf',
+        expiresAt: new Date('2026-08-10T10:00:00Z'),
+      }),
+    });
+
+    await expect(downloadReportHandler({ data: { jobId: 41 } }, deps)).resolves.toEqual({
+      error: { code: 'NOT_FOUND', message: 'Report not found' },
+    });
+    expect(deps.createDownloadUrl).not.toHaveBeenCalled();
+  });
+
   it('presigns and audits an authorized completed download', async () => {
     const deps = dependencies({
       findOwnedJob: vi.fn().mockResolvedValue({

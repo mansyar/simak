@@ -5,7 +5,9 @@ import { getDb } from '@/db/index';
 import { reportJobs, users } from '@/db/schema/index';
 import {
   completeReportJob,
+  expireReportJob,
   failReportJob,
+  finalizeExpiredReportJob,
   retryReportJob,
   startReportJob,
 } from '@/lib/report-job-transitions.server';
@@ -58,6 +60,22 @@ describe('report job transitions integration', () => {
     return job!;
   }
 
+  async function createCompletedDueJob() {
+    const job = await createJob();
+    await startReportJob(job.id);
+    await completeReportJob(job.id, {
+      artifactKey: `reports/${crypto.randomUUID()}.pdf`,
+      artifactSizeBytes: 256,
+      artifactSha256: 'a'.repeat(64),
+    });
+    await db
+      .update(reportJobs)
+      .set({ expiresAt: new Date(Date.now() - 60_000) })
+      .where(eq(reportJobs.id, job.id));
+    const [due] = await db.select().from(reportJobs).where(eq(reportJobs.id, job.id));
+    return due!;
+  }
+
   it('allows only one concurrent worker to claim a pending job', async () => {
     const job = await createJob();
     const claims = await Promise.all([startReportJob(job.id), startReportJob(job.id)]);
@@ -95,5 +113,74 @@ describe('report job transitions integration', () => {
       failedAt: null,
       failureCode: null,
     });
+  });
+
+  it('expires a due completed job while retaining the artifact key', async () => {
+    const job = await createCompletedDueJob();
+
+    const expired = await expireReportJob(job.id);
+    expect(expired).toMatchObject({
+      state: 'expired',
+      artifactKey: job.artifactKey,
+      artifactSizeBytes: 256,
+      artifactSha256: 'a'.repeat(64),
+    });
+
+    const [row] = await db.select().from(reportJobs).where(eq(reportJobs.id, job.id));
+    expect(row!.state).toBe('expired');
+    expect(row!.artifactKey).toBe(job.artifactKey);
+  });
+
+  it('refuses to expire a completed job that is not yet due', async () => {
+    const job = await createJob();
+    await startReportJob(job.id);
+    await completeReportJob(job.id, {
+      artifactKey: `reports/${crypto.randomUUID()}.pdf`,
+      artifactSizeBytes: 256,
+      artifactSha256: 'a'.repeat(64),
+    });
+
+    await expect(expireReportJob(job.id)).resolves.toBeNull();
+  });
+
+  it('allows only one concurrent worker to expire a due completed job', async () => {
+    const job = await createCompletedDueJob();
+
+    const expirations = await Promise.all([expireReportJob(job.id), expireReportJob(job.id)]);
+    expect(expirations.filter(Boolean)).toHaveLength(1);
+    expect(expirations.find(Boolean)).toMatchObject({ state: 'expired' });
+  });
+
+  it('clears retained artifact metadata atomically when finalizing an expired job', async () => {
+    const job = await createCompletedDueJob();
+    await expireReportJob(job.id);
+
+    const finalized = await finalizeExpiredReportJob(job.id);
+    expect(finalized).toMatchObject({
+      state: 'expired',
+      artifactKey: null,
+      artifactSizeBytes: null,
+      artifactSha256: null,
+    });
+  });
+
+  it('refuses to finalize jobs that have no retained artifact key', async () => {
+    const job = await createCompletedDueJob();
+    await expireReportJob(job.id);
+    await finalizeExpiredReportJob(job.id);
+
+    await expect(finalizeExpiredReportJob(job.id)).resolves.toBeNull();
+  });
+
+  it('allows only one concurrent worker to finalize an expired job', async () => {
+    const job = await createCompletedDueJob();
+    await expireReportJob(job.id);
+
+    const finalizations = await Promise.all([
+      finalizeExpiredReportJob(job.id),
+      finalizeExpiredReportJob(job.id),
+    ]);
+    expect(finalizations.filter(Boolean)).toHaveLength(1);
+    expect(finalizations.find(Boolean)).toMatchObject({ artifactKey: null });
   });
 });

@@ -12,7 +12,7 @@ vi.mock('@tanstack/react-start', () => ({
   }),
 }));
 
-import { RequestReportInputSchema } from '@/server/reporting';
+import { ReportExpiryCleanupInputSchema, RequestReportInputSchema } from '@/server/reporting';
 
 const filters = { termId: undefined, courseId: null, sectionId: undefined, cohort: null };
 
@@ -45,5 +45,19 @@ describe('report request schema', () => {
       filters: { termId: null, courseId: null, sectionId: null, cohort: null },
       studentId: 'student-1',
     });
+  });
+});
+
+describe('report expiry cleanup schema', () => {
+  it('defaults the batch size when omitted', () => {
+    expect(ReportExpiryCleanupInputSchema.parse({})).toEqual({ batchSize: 50 });
+  });
+
+  it.each([0, -1, 101])('rejects out-of-range batch size %s', (batchSize) => {
+    expect(ReportExpiryCleanupInputSchema.safeParse({ batchSize }).success).toBe(false);
+  });
+
+  it('accepts a bounded batch size', () => {
+    expect(ReportExpiryCleanupInputSchema.parse({ batchSize: 25 })).toEqual({ batchSize: 25 });
   });
 });

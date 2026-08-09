@@ -4,7 +4,10 @@ import {
   completeReportJob,
   expireReportJob,
   failReportJob,
+  finalizeExpiredReportJob,
   retryReportJob,
+  selectDueCompletedJobs,
+  selectStaleExpiredJobs,
   startReportJob,
 } from '@/lib/report-job-transitions.server';
 
@@ -14,6 +17,15 @@ function mockDb(result: unknown[]) {
   const set = vi.fn().mockReturnValue({ where });
   const update = vi.fn().mockReturnValue({ set });
   return { db: { update } as never, update, set, where };
+}
+
+function mockSelect(rows: unknown[]) {
+  const limit = vi.fn().mockResolvedValue(rows);
+  const orderBy = vi.fn().mockReturnValue({ limit });
+  const where = vi.fn().mockReturnValue({ orderBy });
+  const from = vi.fn().mockReturnValue({ where });
+  const select = vi.fn().mockReturnValue({ from });
+  return { db: { select } as never, select, from, where, orderBy, limit };
 }
 
 describe('report job transitions', () => {
@@ -81,12 +93,41 @@ describe('report job transitions', () => {
     );
   });
 
-  it('expires only completed jobs whose expiry is due and clears the object key', async () => {
-    const { db, set } = mockDb([{ id: 7, state: 'expired' }]);
+  it('expires only due completed jobs while retaining the artifact key for deletion', async () => {
+    const { db, set } = mockDb([{ id: 7, state: 'expired', artifactKey: 'reports/opaque.pdf' }]);
     await expireReportJob(7, { db, now });
+    expect(set).toHaveBeenCalledWith(expect.objectContaining({ state: 'expired', updatedAt: now }));
+    expect(set.mock.calls[0][0]).not.toHaveProperty('artifactKey');
+  });
+
+  it('clears retained artifact metadata when finalizing an expired job', async () => {
+    const { db, set } = mockDb([{ id: 7, state: 'expired', artifactKey: null }]);
+    await finalizeExpiredReportJob(7, { db, now });
     expect(set).toHaveBeenCalledWith(
-      expect.objectContaining({ state: 'expired', artifactKey: null, updatedAt: now }),
+      expect.objectContaining({
+        artifactKey: null,
+        artifactSizeBytes: null,
+        artifactSha256: null,
+        updatedAt: now,
+      }),
     );
+  });
+
+  it('selects due completed jobs in ascending expiry order with a bound', async () => {
+    const { db, where, limit } = mockSelect([{ id: 7, state: 'completed' }]);
+    await expect(selectDueCompletedJobs(25, { db, now })).resolves.toEqual([
+      { id: 7, state: 'completed' },
+    ]);
+    expect(where).toHaveBeenCalledTimes(1);
+    expect(limit).toHaveBeenCalledWith(25);
+  });
+
+  it('selects stale expired jobs that still retain an artifact key', async () => {
+    const { db, limit } = mockSelect([{ id: 7, state: 'expired', artifactKey: 'reports/a.pdf' }]);
+    await expect(selectStaleExpiredJobs(10, { db })).resolves.toEqual([
+      { id: 7, state: 'expired', artifactKey: 'reports/a.pdf' },
+    ]);
+    expect(limit).toHaveBeenCalledWith(10);
   });
 
   it('rejects invalid transition input before touching the database', async () => {
@@ -98,6 +139,9 @@ describe('report job transitions', () => {
         { db, now },
       ),
     ).rejects.toThrow('Invalid report artifact metadata');
+    await expect(finalizeExpiredReportJob(0, { db })).rejects.toThrow('Invalid report job ID');
+    await expect(selectDueCompletedJobs(0, { db })).rejects.toThrow('Invalid batch limit');
+    await expect(selectStaleExpiredJobs(-1, { db })).rejects.toThrow('Invalid batch limit');
     expect(update).not.toHaveBeenCalled();
   });
 });
