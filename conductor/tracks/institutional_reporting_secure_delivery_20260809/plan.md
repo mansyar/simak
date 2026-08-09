@@ -92,12 +92,12 @@
   - [x] Mark reports expired before or independently of physical object deletion
   - [x] Add audit events and structured cleanup summaries
   - [x] Run focused unit and integration tests
-- [~] Task: Add critical end-to-end coverage
-  - [ ] Write Playwright tests for Admin summary generation and download
-  - [ ] Write Playwright tests for Instructor scope enforcement
-  - [ ] Write Playwright tests for Student self-transcript generation
-  - [ ] Add accessibility scans for the reporting surfaces
-  - [ ] Run the relevant browser matrix
+- [x] Task: Add critical end-to-end coverage [commit: 9bba921]
+  - [x] Write Playwright tests for Admin summary generation and download
+  - [x] Write Playwright tests for Instructor scope enforcement
+  - [x] Write Playwright tests for Student self-transcript generation
+  - [x] Add accessibility scans for the reporting surfaces
+  - [x] Run the relevant browser matrix
 - [ ] Task: Complete track-wide quality verification
   - [ ] Run formatting and lint checks
   - [ ] Run type checking
