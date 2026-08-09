@@ -92,7 +92,7 @@
   - [x] Mark reports expired before or independently of physical object deletion
   - [x] Add audit events and structured cleanup summaries
   - [x] Run focused unit and integration tests
-- [ ] Task: Add critical end-to-end coverage
+- [~] Task: Add critical end-to-end coverage
   - [ ] Write Playwright tests for Admin summary generation and download
   - [ ] Write Playwright tests for Instructor scope enforcement
   - [ ] Write Playwright tests for Student self-transcript generation
