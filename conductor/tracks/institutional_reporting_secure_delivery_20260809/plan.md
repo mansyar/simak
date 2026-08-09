@@ -33,13 +33,13 @@
   - [x] Implement client-safe stubs and server-only handlers using `typedServerFn`
   - [x] Reuse existing academic-context authorization and query patterns
   - [x] Run focused unit and integration tests
-- [~] Task: Implement allowlisted report data loaders
-  - [ ] Write failing tests for institutional academic summaries
-  - [ ] Write failing tests for instructor-scoped analytics summaries
-  - [ ] Write failing tests proving transcripts use released immutable academic records rather than mutable grades
-  - [ ] Implement the minimum role-scoped loaders by reusing established analytics and academic-record calculations
-  - [ ] Verify unauthorized and nonexistent entities are indistinguishable where required
-  - [ ] Run focused tests
+- [x] Task: Implement allowlisted report data loaders [commit: 7ceeba1]
+  - [x] Write failing tests for institutional academic summaries
+  - [x] Write failing tests for instructor-scoped analytics summaries
+  - [x] Write failing tests proving transcripts use released immutable academic records rather than mutable grades
+  - [x] Implement the minimum role-scoped loaders by reusing established analytics and academic-record calculations
+  - [x] Verify unauthorized and nonexistent entities are indistinguishable where required
+  - [x] Run focused tests
 - [ ] Task: Phase Verification & Checkpoint (Refer to workflow.md)
 
 ## Phase 4 — PDF Generation and Private Artifacts
