@@ -44,7 +44,7 @@
 
 ## Phase 4 — PDF Generation and Private Artifacts
 
-- [ ] Task: Implement the server-only PDF renderer
+- [~] Task: Implement the server-only PDF renderer
   - [ ] Write failing renderer tests for all three templates, both locales, escaping, filter summaries, timestamps, pagination, and multi-page tables
   - [ ] Add the approved renderer and bundled bilingual font assets
   - [ ] Implement a server-only rendering adapter and the three fixed templates
