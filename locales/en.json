@@ -531,6 +531,7 @@
       "sectionCourse": "Course ID",
       "sectionCode": "Section code",
       "sectionName": "Section name",
+      "sectionCohort": "Cohort",
       "enrollmentSection": "Section ID",
       "enrollmentUser": "User ID",
       "enrollmentRole": "Enrollment role",

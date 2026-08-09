@@ -536,6 +536,7 @@ export type Translation = {
       sectionCourse: string
       sectionCode: string
       sectionName: string
+      sectionCohort: string
       enrollmentSection: string
       enrollmentUser: string
       enrollmentRole: string

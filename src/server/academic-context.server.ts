@@ -52,6 +52,7 @@ const sectionProjection = {
   courseId: courseSections.courseId,
   code: courseSections.code,
   name: courseSections.name,
+  cohort: courseSections.cohort,
   status: courseSections.status,
   createdAt: courseSections.createdAt,
   updatedAt: courseSections.updatedAt,
@@ -369,7 +370,7 @@ export async function getCourseSectionHandler(args: { data: CourseSectionId }) {
 export async function createCourseSectionHandler(args: { data: CreateCourseSectionInput }) {
   const auth = await requireAdmin();
   if (isServerError(auth)) return auth;
-  const { termId, courseId, code, name, status } = args.data;
+  const { termId, courseId, code, name, cohort, status } = args.data;
   try {
     const [existing] = await getDb()
       .select({ id: courseSections.id })
@@ -398,7 +399,7 @@ export async function createCourseSectionHandler(args: { data: CreateCourseSecti
       return serverError(ErrorCode.CONFLICT, 'Archived context cannot receive sections');
     const [section] = await getDb()
       .insert(courseSections)
-      .values({ termId, courseId, code, name, status })
+      .values({ termId, courseId, code, name, cohort, status })
       .returning(sectionProjection);
     if (!section)
       return internalError('Course section insert returned no row', 'createCourseSectionHandler');
@@ -422,7 +423,7 @@ export async function createCourseSectionHandler(args: { data: CreateCourseSecti
 export async function updateCourseSectionHandler(args: { data: UpdateCourseSectionInput }) {
   const auth = await requireAdmin();
   if (isServerError(auth)) return auth;
-  const { id, termId, courseId, code, name, status } = args.data;
+  const { id, termId, courseId, code, name, cohort, status } = args.data;
   try {
     const [existing] = await getDb()
       .select({ id: courseSections.id, status: courseSections.status })
@@ -448,6 +449,7 @@ export async function updateCourseSectionHandler(args: { data: UpdateCourseSecti
         courseId,
         code,
         name,
+        cohort,
         status,
         archivedAt: status === 'archived' ? new Date() : null,
         updatedAt: new Date(),

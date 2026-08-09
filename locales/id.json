@@ -531,6 +531,7 @@
       "sectionCourse": "ID mata kuliah",
       "sectionCode": "Kode kelas",
       "sectionName": "Nama kelas",
+      "sectionCohort": "Angkatan",
       "enrollmentSection": "ID kelas",
       "enrollmentUser": "ID pengguna",
       "enrollmentRole": "Peran pendaftaran",
