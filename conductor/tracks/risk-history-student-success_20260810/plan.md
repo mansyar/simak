@@ -68,7 +68,7 @@
   - Verify lifecycle regression coverage, scheduler behavior, audit events, and
     no-automatic-action/no-notification guarantees before checkpointing.
 
-## Phase 3 — Role-scoped history, outcomes, and aggregate APIs
+## Phase 3 — Role-scoped history, outcomes, and aggregate APIs (checkpoint: 561061e1)
 
 - [x] Task: Implement instructor history and intervention outcome queries (d5bc1088)
   - Write failing handler tests for current-owner access, reassignment transfer,
@@ -90,7 +90,7 @@
   - Implement the narrow student response and audit conventions.
   - Confirm privacy tests pass.
 
-- [x] Task: Phase verification and checkpoint (refer to `workflow.md`)
+- [x] Task: Phase verification and checkpoint (561061e1; refer to `workflow.md`)
   - Verify authorization, reassignment, anonymization, and threshold tests with
     the required automated and manual verification protocol.
 
