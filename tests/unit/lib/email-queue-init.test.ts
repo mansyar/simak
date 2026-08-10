@@ -11,6 +11,7 @@ const {
   scannerMock,
   appointmentScannerMock,
   r2CleanupMock,
+  riskHistoryMock,
   reclaimMock,
 } = vi.hoisted(() => ({
   mockChildLogger: { error: vi.fn(), info: vi.fn(), warn: vi.fn() },
@@ -18,6 +19,7 @@ const {
   scannerMock: vi.fn(),
   appointmentScannerMock: vi.fn(),
   r2CleanupMock: vi.fn(),
+  riskHistoryMock: vi.fn(),
   reclaimMock: vi.fn(),
 }));
 
@@ -46,6 +48,10 @@ vi.mock('@/lib/r2-cleanup', () => ({
   processOrphanedR2Objects: r2CleanupMock,
 }));
 
+vi.mock('@/server/risk-history-jobs.server', () => ({
+  processRiskHistoryJobs: riskHistoryMock,
+}));
+
 describe('email-queue-init', () => {
   beforeEach(() => {
     vi.resetModules();
@@ -59,6 +65,12 @@ describe('email-queue-init', () => {
     appointmentScannerMock.mockResolvedValue(undefined);
     r2CleanupMock.mockReset();
     r2CleanupMock.mockResolvedValue({ deleted: 0, failed: 0, batchSize: 0 });
+    riskHistoryMock.mockReset();
+    riskHistoryMock.mockResolvedValue({
+      snapshots: { scanned: 0, created: 0, hasMore: false },
+      retention: { scanned: 0, anonymized: 0, hasMore: false },
+      complete: true,
+    });
     reclaimMock.mockReset();
     reclaimMock.mockResolvedValue({ reclaimed: 0 });
   });
@@ -92,7 +104,6 @@ describe('email-queue-init', () => {
 
     vi.advanceTimersByTime(30_000);
     await vi.advanceTimersByTimeAsync(0);
-
     expect(processMock).toHaveBeenCalledTimes(1);
     resolveTick();
     await stopGracefully();
@@ -148,6 +159,47 @@ describe('email-queue-init', () => {
     await stopGracefully();
   });
 
+  it('runs risk history snapshot and retention processing once per day', async () => {
+    mockProcessor(() => Promise.resolve());
+    const { startEmailQueue, stopGracefully } = await import('@/lib/email-queue-init');
+
+    startEmailQueue();
+    await vi.advanceTimersByTimeAsync(0);
+    expect(riskHistoryMock).toHaveBeenCalledTimes(1);
+
+    vi.advanceTimersByTime(30_000);
+    await vi.advanceTimersByTimeAsync(0);
+    expect(riskHistoryMock).toHaveBeenCalledTimes(1);
+
+    await stopGracefully();
+  });
+
+  it('logs risk history failures and retries on the next tick', async () => {
+    mockProcessor(() => Promise.resolve());
+    riskHistoryMock
+      .mockRejectedValueOnce(new Error('risk history unavailable'))
+      .mockResolvedValueOnce({
+        snapshots: { scanned: 1, created: 1, hasMore: false },
+        retention: { scanned: 0, anonymized: 0, hasMore: false },
+        complete: true,
+      });
+    const { startEmailQueue, stopGracefully } = await import('@/lib/email-queue-init');
+
+    startEmailQueue();
+    await vi.advanceTimersByTimeAsync(0);
+    expect(mockChildLogger.error).toHaveBeenCalledWith({
+      event: 'risk_history.daily_failed',
+      error: 'risk history unavailable',
+      willRetryNextInterval: true,
+    });
+
+    vi.advanceTimersByTime(30_000);
+    await vi.advanceTimersByTimeAsync(0);
+    expect(riskHistoryMock).toHaveBeenCalledTimes(2);
+
+    await stopGracefully();
+  });
+
   it('does not call pruneOldEmails again within 24h of last prune', async () => {
     mockProcessor(() => Promise.resolve());
     pruneMock.mockResolvedValue({ deleted: 0 });
@@ -157,7 +209,6 @@ describe('email-queue-init', () => {
     await vi.advanceTimersByTimeAsync(0);
     expect(pruneMock).toHaveBeenCalledTimes(1);
 
-    // Several ticks within 24h — prune should NOT be called again
     for (let i = 0; i < 5; i++) {
       vi.advanceTimersByTime(30_000);
       await vi.advanceTimersByTimeAsync(0);
