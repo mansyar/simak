@@ -63,6 +63,9 @@ vi.mock('@/lib/errors', () => ({
 vi.mock('@/components/gradebook/StudentFinalGradeCard', () => ({
   StudentFinalGradeCard: () => <div data-testid="final-grade-card" />,
 }));
+vi.mock('@/components/student/assignments/StudentSupportCard', () => ({
+  StudentSupportCard: () => <div data-testid="student-support-card" />,
+}));
 
 vi.mock('@/components/student/assignments/AssignmentDetailHeader', () => ({
   AssignmentDetailHeader: ({ detail }: any) => <h1 data-testid="detail-header">{detail.title}</h1>,

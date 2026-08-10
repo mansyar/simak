@@ -934,6 +934,31 @@ export type Translation = {
       medium: string
       high: string
     }
+    admin: {
+      title: string
+      loading: string
+      error: string
+      empty: string
+      aggregateList: string
+      observationCount: string
+      suppressedTitle: string
+      suppressedDescription: string
+      termFilter: string
+      selectTerm: string
+    }
+    student: {
+      loading: string
+      error: string
+      onTrackTitle: string
+      onTrackDescription: string
+      supportAvailableTitle: string
+      supportAvailableDescription: string
+      nextSteps: string
+      steps: {
+        contactInstructor: string
+        reviewCurrentWork: string
+      }
+    }
   }
   instructorDashboard: {
     title: string

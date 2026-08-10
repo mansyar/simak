@@ -928,6 +928,31 @@
       "low": "Low",
       "medium": "Medium",
       "high": "High"
+    },
+    "admin": {
+      "title": "Privacy-safe risk trends",
+      "loading": "Loading aggregate risk trends",
+      "error": "Aggregate trends could not be loaded",
+      "empty": "No aggregate observations in this period",
+      "aggregateList": "Aggregate risk observations",
+      "observationCount": "Observation count",
+      "suppressedTitle": "Trend details are protected",
+      "suppressedDescription": "Results remain hidden until this academic group contains at least 10 students.",
+      "termFilter": "Academic term",
+      "selectTerm": "Select an academic term"
+    },
+    "student": {
+      "loading": "Loading support status",
+      "error": "Support status could not be loaded",
+      "onTrackTitle": "Keep moving forward",
+      "onTrackDescription": "Continue with your current assignment plan and ask your instructor whenever you need guidance.",
+      "supportAvailableTitle": "Support is available",
+      "supportAvailableDescription": "You are not alone. These next steps can help you continue making progress.",
+      "nextSteps": "Suggested next steps",
+      "steps": {
+        "contactInstructor": "Contact your instructor to discuss the support available.",
+        "reviewCurrentWork": "Review your current work and identify one manageable next step."
+      }
     }
   },
   "instructorDashboard": {

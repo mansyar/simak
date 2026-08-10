@@ -928,6 +928,31 @@
       "low": "Rendah",
       "medium": "Sedang",
       "high": "Tinggi"
+    },
+    "admin": {
+      "title": "Tren risiko yang menjaga privasi",
+      "loading": "Memuat tren risiko agregat",
+      "error": "Tren agregat tidak dapat dimuat",
+      "empty": "Tidak ada observasi agregat pada periode ini",
+      "aggregateList": "Observasi risiko agregat",
+      "observationCount": "Jumlah observasi",
+      "suppressedTitle": "Detail tren dilindungi",
+      "suppressedDescription": "Hasil tetap disembunyikan sampai kelompok akademik ini berisi minimal 10 mahasiswa.",
+      "termFilter": "Semester akademik",
+      "selectTerm": "Pilih semester akademik"
+    },
+    "student": {
+      "loading": "Memuat status dukungan",
+      "error": "Status dukungan tidak dapat dimuat",
+      "onTrackTitle": "Teruslah melangkah maju",
+      "onTrackDescription": "Lanjutkan rencana tugas Anda dan hubungi dosen kapan pun Anda memerlukan arahan.",
+      "supportAvailableTitle": "Dukungan tersedia",
+      "supportAvailableDescription": "Anda tidak sendirian. Langkah berikut dapat membantu Anda terus berkembang.",
+      "nextSteps": "Saran langkah berikutnya",
+      "steps": {
+        "contactInstructor": "Hubungi dosen Anda untuk membahas dukungan yang tersedia.",
+        "reviewCurrentWork": "Tinjau pekerjaan Anda saat ini dan tentukan satu langkah berikutnya yang dapat dilakukan."
+      }
     }
   },
   "instructorDashboard": {
