@@ -64,7 +64,7 @@
     conventions, with bounded processing and retry-safe behavior.
   - Confirm job tests pass.
 
-- [ ] Task: Phase verification and checkpoint (refer to `workflow.md`)
+- [~] Task: Phase verification and checkpoint (refer to `workflow.md`)
   - Verify lifecycle regression coverage, scheduler behavior, audit events, and
     no-automatic-action/no-notification guarantees before checkpointing.
 
