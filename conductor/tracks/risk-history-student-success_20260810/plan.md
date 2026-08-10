@@ -77,7 +77,7 @@
     notes outside the existing intervention boundary.
   - Confirm handler tests pass.
 
-- [ ] Task: Implement privacy-safe admin aggregate queries
+- [~] Task: Implement privacy-safe admin aggregate queries
   - Write failing tests for academic-context authorization, cohort aggregation,
     suppression below ten students, and prevention of individual drill-down.
   - Implement indexed, bounded aggregate queries and audit sensitive access.
