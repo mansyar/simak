@@ -127,7 +127,7 @@
   - Update implementation notes and any required operator/scheduler
     documentation.
 
-- [~] Task: Final phase verification and checkpoint (refer to `workflow.md`)
+- [x] Task: Final phase verification and checkpoint (refer to `workflow.md`)
   - Present automated evidence and role-specific manual verification steps,
     await explicit approval, attach the verification report as a git note, and
     record the final checkpoint.
