@@ -96,7 +96,7 @@
 
 ## Phase 4 — Accessible role-specific UI
 
-- [ ] Task: Build instructor risk-history and outcome surfaces
+- [~] Task: Build instructor risk-history and outcome surfaces
   - Write failing component/route tests for timeline/order, explanatory labels,
     filters, loading/empty/error states, and reassignment-safe authorization.
   - Implement responsive, bilingual, keyboard-accessible instructor views.
