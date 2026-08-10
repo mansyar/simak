@@ -9,6 +9,7 @@ import { safeAuditLog } from '@/lib/audit';
 import { ErrorCode, isServerError, serverError } from '@/lib/errors';
 import { isInstructor } from '@/lib/session-guards';
 import { getSessionFromHeaders } from '@/server/auth';
+import { captureLifecycleRiskObservation } from '@/server/lifecycle-risk-capture.server';
 import { getLiveStudentRiskContexts } from '@/server/student-risk-context.server';
 import type {
   CreateInterventionSchema,
@@ -157,6 +158,17 @@ export async function createInterventionHandler(args: { data: CreateIntervention
     });
 
     if (isServerError(result)) return result;
+
+    await captureLifecycleRiskObservation(db, 'createInterventionHandler', {
+      source: 'lifecycle_event',
+      eventType: 'intervention_updated',
+      sourceEventId: `intervention:${result.intervention.id}:created`,
+      assignmentId: result.intervention.assignmentId,
+      studentId: result.intervention.studentId,
+      interventionId: result.intervention.id,
+      actorId: session.user.id,
+      observedAt: result.intervention.createdAt,
+    });
 
     await safeAuditLog('intervention.created', {
       actorId: session.user.id,
@@ -308,6 +320,7 @@ export async function updateInterventionHandler(args: { data: UpdateIntervention
   const { interventionId, actionType, privateNote, followUpDate, status, resolutionReason } =
     args.data;
   const db = getDb();
+  const committedUpdatedAt = new Date();
 
   try {
     const result = await db.transaction(async (tx) => {
@@ -334,7 +347,7 @@ export async function updateInterventionHandler(args: { data: UpdateIntervention
       }
 
       const changedFields: string[] = [];
-      const values: Partial<typeof interventions.$inferInsert> = { updatedAt: new Date() };
+      const values: Partial<typeof interventions.$inferInsert> = { updatedAt: committedUpdatedAt };
 
       if (actionType !== undefined) {
         values.actionType = actionType;
@@ -371,6 +384,17 @@ export async function updateInterventionHandler(args: { data: UpdateIntervention
     });
 
     if (isServerError(result)) return result;
+
+    await captureLifecycleRiskObservation(db, 'updateInterventionHandler', {
+      source: 'lifecycle_event',
+      eventType: 'intervention_updated',
+      sourceEventId: `intervention:${result.intervention.id}:updated:${committedUpdatedAt.toISOString()}`,
+      assignmentId: result.intervention.assignmentId,
+      studentId: result.intervention.studentId,
+      interventionId: result.intervention.id,
+      actorId: session.user.id,
+      observedAt: committedUpdatedAt,
+    });
 
     const auditAction =
       result.intervention.status === 'resolved' || result.intervention.status === 'dismissed'

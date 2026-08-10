@@ -16,6 +16,7 @@ import { sendSubmissionReceivedEmail } from '../lib/submission-email';
 import { shouldSendInAppNotification } from '../lib/notification-prefs';
 import { isStudent } from '../lib/session-guards';
 import { logger } from '../lib/logger';
+import { captureLifecycleRiskObservation } from './lifecycle-risk-capture.server';
 import type { z } from 'zod';
 import type {
   SubmitCheckpointSchema,
@@ -54,6 +55,7 @@ export async function submitCheckpointHandler(args: { data: SubmitCheckpointInpu
     let instructorId: string | undefined;
     let assignmentTitle: string | undefined;
     let checkpointName: string | undefined;
+    let lifecycleAssignmentId: number | undefined;
 
     const result = await db.transaction(async (tx) => {
       // 1. Verify the checkpoint exists and belongs to the student via assignmentStudents
@@ -180,6 +182,7 @@ export async function submitCheckpointHandler(args: { data: SubmitCheckpointInpu
         .returning({ id: submissions.id });
 
       submissionId = submissionRecord.id;
+      lifecycleAssignmentId = checkpoint.assignmentId;
 
       // 4. Transition checkpoint state to 'submitted'
       await tx
@@ -231,6 +234,18 @@ export async function submitCheckpointHandler(args: { data: SubmitCheckpointInpu
 
       return { success: true };
     });
+
+    if (submissionId && lifecycleAssignmentId) {
+      await captureLifecycleRiskObservation(db, 'submitCheckpointHandler', {
+        source: 'lifecycle_event',
+        eventType: 'submission_recorded',
+        sourceEventId: `submission:${submissionId}`,
+        assignmentId: lifecycleAssignmentId,
+        studentId: session.user.id,
+        checkpointId,
+        actorId: session.user.id,
+      });
+    }
 
     // Post-commit advisory work: audit log of the successful submission.
     // Wrapped in try/catch so a failure here never surfaces an error for a committed transaction.

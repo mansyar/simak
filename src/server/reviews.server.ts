@@ -27,6 +27,7 @@ import {
 } from './revision-action-items.server';
 import { isInstructor } from '../lib/session-guards';
 import { logger } from '../lib/logger';
+import { captureLifecycleRiskObservation } from './lifecycle-risk-capture.server';
 import type { z } from 'zod';
 import type { ListPendingReviewsSchema, SubmitReviewSchema } from './reviews';
 
@@ -385,14 +386,26 @@ export async function submitReviewHandler(args: { data: SubmitReviewInput }) {
         },
       });
 
-      return { success: true, submission, breachDays, slaFields };
+      return { success: true, reviewId: review?.id, submission, breachDays, slaFields };
     });
 
     if (isServerError(txResult)) {
       return txResult;
     }
 
-    const { submission, breachDays, slaFields } = txResult;
+    const { reviewId, submission, breachDays, slaFields } = txResult;
+
+    if (reviewId !== undefined) {
+      await captureLifecycleRiskObservation(db, 'submitReviewHandler', {
+        source: 'lifecycle_event',
+        eventType: 'review_recorded',
+        sourceEventId: `review:${reviewId}`,
+        assignmentId: submission.assignmentId,
+        studentId: submission.studentId,
+        checkpointId: submission.checkpointId,
+        actorId: session.user.id,
+      });
+    }
 
     // 3. Audit logging (post-commit advisory — must not fail the request)
     try {

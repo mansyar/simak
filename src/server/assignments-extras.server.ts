@@ -7,6 +7,7 @@ import { logAuditEvent } from '../lib/audit';
 import { serverError, ErrorCode } from '../lib/errors';
 import { assignmentGradeConfig } from '../db/schema/gradebook';
 import { isInstructor } from '../lib/session-guards';
+import { captureLifecycleRiskObservation } from './lifecycle-risk-capture.server';
 import type { z } from 'zod';
 import type { UnlockCheckpointSchema, ExtendDeadlineSchema } from './assignments';
 
@@ -34,6 +35,7 @@ export async function unlockCheckpointHandler(args: { data: UnlockCheckpointInpu
         state: checkpoints.state,
         assignmentInstructorId: assignments.instructorId,
         assignmentId: checkpoints.assignmentId,
+        studentId: checkpoints.studentId,
         assignmentStatus: assignments.status,
       })
       .from(checkpoints)
@@ -57,10 +59,22 @@ export async function unlockCheckpointHandler(args: { data: UnlockCheckpointInpu
       return serverError(ErrorCode.BAD_REQUEST, 'Checkpoint is not in locked state');
     }
 
+    const updatedAt = new Date();
     await db
       .update(checkpoints)
-      .set({ state: 'unlocked', updatedAt: new Date() })
+      .set({ state: 'unlocked', updatedAt })
       .where(eq(checkpoints.id, checkpointId));
+
+    await captureLifecycleRiskObservation(db, 'unlockCheckpointHandler', {
+      source: 'lifecycle_event',
+      eventType: 'checkpoint_updated',
+      sourceEventId: `checkpoint:${checkpointId}:updated:${updatedAt.toISOString()}`,
+      assignmentId: checkpoint.assignmentId,
+      studentId: checkpoint.studentId,
+      checkpointId,
+      actorId: session.user.id,
+      observedAt: updatedAt,
+    });
 
     await logAuditEvent({
       actorId: session.user.id,
@@ -169,10 +183,22 @@ export async function extendDeadlineHandler(args: { data: ExtendDeadlineInput })
       );
     }
 
+    const updatedAt = new Date();
     await db
       .update(checkpoints)
-      .set({ dueDate: newDueDate, updatedAt: new Date() })
+      .set({ dueDate: newDueDate, updatedAt })
       .where(eq(checkpoints.id, checkpointId));
+
+    await captureLifecycleRiskObservation(db, 'extendDeadlineHandler', {
+      source: 'lifecycle_event',
+      eventType: 'checkpoint_updated',
+      sourceEventId: `checkpoint:${checkpointId}:updated:${updatedAt.toISOString()}`,
+      assignmentId: checkpoint.assignmentId,
+      studentId: checkpoint.studentId,
+      checkpointId,
+      actorId: session.user.id,
+      observedAt: updatedAt,
+    });
 
     await logAuditEvent({
       actorId: session.user.id,

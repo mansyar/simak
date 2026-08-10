@@ -1,7 +1,6 @@
 // Server-only handlers for consultation operations
 import { eq, and, desc, asc, sql, isNull } from 'drizzle-orm';
 import { getDb } from '../db/index';
-import type { Db } from '../db/index';
 import { consultations } from '../db/schema/consultations';
 import { checkpoints, assignments, assignmentStudents } from '../db/schema/assignments';
 import { users } from '../db/schema/users';
@@ -14,6 +13,8 @@ import { sendConsultationEmail } from '../lib/consultation-email';
 import { maybeInsertNotification } from '../lib/notification-prefs';
 import { isStudent, isInstructor } from '../lib/session-guards';
 import { logger } from '../lib/logger';
+import { captureLifecycleRiskObservation } from './lifecycle-risk-capture.server';
+import { fetchConsultationForUpdate } from './consultations-extras.server';
 import type { z } from 'zod';
 import type {
   LogConsultationSchema,
@@ -314,31 +315,6 @@ export async function listPendingConsultationsHandler(args: {
     });
   }
 }
-type Tx = Parameters<Parameters<Db['transaction']>[0]>[0];
-
-async function fetchConsultationForUpdate(tx: Tx, consultationId: number, instructorId: string) {
-  return tx
-    .select({
-      id: consultations.id,
-      status: consultations.status,
-      studentId: consultations.studentId,
-      assignmentId: consultations.assignmentId,
-      instructorId: assignments.instructorId,
-    })
-    .from(consultations)
-    .innerJoin(assignments, eq(consultations.assignmentId, assignments.id))
-    .where(
-      and(
-        eq(consultations.id, consultationId),
-        eq(assignments.instructorId, instructorId),
-        eq(assignments.status, 'active'),
-        isNull(assignments.deletedAt),
-      ),
-    )
-    .limit(1)
-    .for('update', { of: consultations });
-}
-
 export async function verifyConsultationHandler(args: { data: VerifyConsultationInput }) {
   const session = await getSessionFromHeaders();
   if (!isInstructor(session)) {
@@ -388,6 +364,14 @@ export async function verifyConsultationHandler(args: { data: VerifyConsultation
     });
 
     if (auditData) {
+      await captureLifecycleRiskObservation(db, 'verifyConsultationHandler', {
+        source: 'lifecycle_event',
+        eventType: 'consultation_verified',
+        sourceEventId: `consultation:${consultationId}:verified`,
+        assignmentId: auditData.assignmentId,
+        studentId: auditData.studentId,
+        actorId: session.user.id,
+      });
       try {
         await logAuditEvent({
           actorId: session.user.id,
