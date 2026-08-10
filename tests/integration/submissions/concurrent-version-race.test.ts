@@ -12,6 +12,7 @@ import {
   submissions,
   auditLog,
   uploadIntents,
+  riskObservations,
 } from '@/db/schema/index';
 import { submitCheckpointHandler } from '@/server/submissions.server';
 import * as auth from '@/server/auth';
@@ -133,6 +134,7 @@ describe('submitCheckpointHandler concurrent version race', () => {
   });
 
   afterEach(async () => {
+    await db.delete(riskObservations).where(eq(riskObservations.assignmentId, assignmentId));
     await db.delete(uploadIntents).where(eq(uploadIntents.checkpointId, checkpointId));
     await db.delete(submissions).where(eq(submissions.checkpointId, checkpointId));
     await db.delete(checkpoints).where(eq(checkpoints.id, checkpointId));

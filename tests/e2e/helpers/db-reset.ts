@@ -23,6 +23,7 @@ export const TABLES_TO_TRUNCATE = [
   'audit_log',
   'academic_records',
   'academic_record_policies',
+  'risk_observations',
   'interventions',
   'notifications',
   'extension_requests',

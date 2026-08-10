@@ -14,6 +14,7 @@ import {
   uploadIntents,
   notifications,
   auditLog,
+  riskObservations,
 } from '@/db/schema/index';
 import { submitCheckpointHandler } from '@/server/submissions.server';
 import { openForReviewHandler, submitReviewHandler } from '@/server/reviews.server';
@@ -171,6 +172,7 @@ describe('Review concurrency and atomic state transitions', () => {
       .delete(auditLog)
       .where(or(eq(auditLog.actorId, studentId), eq(auditLog.actorId, instructorId)));
     await db.delete(reviews).where(eq(reviews.submissionId, submissionId));
+    await db.delete(riskObservations).where(eq(riskObservations.assignmentId, assignmentId));
     await db.delete(uploadIntents).where(eq(uploadIntents.userId, studentId));
     await db.delete(submissions).where(eq(submissions.checkpointId, checkpointId));
     await db.delete(checkpoints).where(eq(checkpoints.id, checkpointId));

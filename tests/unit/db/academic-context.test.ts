@@ -181,6 +181,12 @@ describe('academic context fixtures', () => {
     }
   });
 
+  it('resets risk history before recreating E2E fixtures', async () => {
+    const { TABLES_TO_TRUNCATE } = await import('../../e2e/helpers/db-reset');
+
+    expect(TABLES_TO_TRUNCATE).toContain('risk_observations');
+  });
+
   it('seeds academic context before creating the E2E assignment', () => {
     const seedSource = readFileSync(resolve(process.cwd(), 'scripts/seed-e2e.ts'), 'utf8');
 

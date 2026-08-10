@@ -1,5 +1,5 @@
 /** @vitest-environment node */
-import { eq } from 'drizzle-orm';
+import { eq, inArray } from 'drizzle-orm';
 import { beforeAll, beforeEach, afterAll, describe, expect, it, vi } from 'vitest';
 import { getDb } from '@/db/index';
 import {
@@ -9,6 +9,8 @@ import {
   auditLog,
   checkpoints,
   interventions,
+  notifications,
+  riskObservations,
   users,
 } from '@/db/schema/index';
 import {
@@ -22,6 +24,7 @@ import {
   listInterventionsHandler,
   updateInterventionHandler,
 } from '@/server/interventions.server';
+import { listInstructorRiskHistoryHandler } from '@/server/risk-history.server';
 
 vi.mock('@/server/auth', () => ({
   getSessionFromHeaders: vi.fn(),
@@ -111,12 +114,14 @@ describe('intervention workflow database acceptance', () => {
 
   beforeEach(async () => {
     await db.delete(auditLog).where(eq(auditLog.actorId, instructorId));
+    await db.delete(riskObservations).where(eq(riskObservations.assignmentId, assignmentId));
     await db.delete(interventions).where(eq(interventions.assignmentId, assignmentId));
   });
 
   afterAll(async () => {
     await db.delete(auditLog).where(eq(auditLog.actorId, instructorId));
     await db.delete(auditLog).where(eq(auditLog.actorId, replacementInstructorId));
+    await db.delete(riskObservations).where(eq(riskObservations.assignmentId, assignmentId));
     await db.delete(interventions).where(eq(interventions.assignmentId, assignmentId));
     await db.delete(checkpoints).where(eq(checkpoints.id, checkpointId));
     await db.delete(assignmentStudents).where(eq(assignmentStudents.assignmentId, assignmentId));
@@ -160,6 +165,11 @@ describe('intervention workflow database acceptance', () => {
     vi.mocked(auth.getSessionFromHeaders).mockResolvedValue({
       user: { id: instructorId, role: 'instructor' },
     } as any);
+    const notificationRecipients = [instructorId, replacementInstructorId, studentId];
+    const notificationsBefore = await db
+      .select()
+      .from(notifications)
+      .where(inArray(notifications.userId, notificationRecipients));
 
     const monitoring = await updateInterventionHandler({
       data: { interventionId: created.id, status: 'monitoring' },
@@ -191,6 +201,20 @@ describe('intervention workflow database acceptance', () => {
       data: { interventionId: created.id, privateNote: 'Should not change' },
     });
     expect(immutable).toMatchObject({ error: { code: 'BAD_REQUEST' } });
+
+    const observations = await db
+      .select({ eventType: riskObservations.eventType })
+      .from(riskObservations)
+      .where(eq(riskObservations.interventionId, created.id));
+    expect(observations).toEqual([
+      { eventType: 'intervention_updated' },
+      { eventType: 'intervention_updated' },
+    ]);
+    const notificationsAfter = await db
+      .select()
+      .from(notifications)
+      .where(inArray(notifications.userId, notificationRecipients));
+    expect(notificationsAfter).toHaveLength(notificationsBefore.length);
   });
 
   it('scopes visibility to the current assignment owner after reassignment', async () => {
@@ -201,6 +225,13 @@ describe('intervention workflow database acceptance', () => {
     vi.mocked(auth.getSessionFromHeaders).mockResolvedValue({
       user: { id: instructorId, role: 'instructor' },
     } as any);
+    await updateInterventionHandler({
+      data: { interventionId: created.id, status: 'monitoring' },
+    });
+    const historyBefore = await listInstructorRiskHistoryHandler({
+      data: { assignmentId, studentId, from: null, to: null, page: 1, limit: 20 },
+    });
+    expect(historyBefore).toMatchObject({ total: 1 });
     const before = await listInterventionsHandler({
       data: { assignmentId, page: 1, limit: 20, overdue: false },
     });
@@ -215,6 +246,10 @@ describe('intervention workflow database acceptance', () => {
       data: { assignmentId, page: 1, limit: 20, overdue: false },
     });
     expect(formerOwner).toMatchObject({ interventions: [], total: 0 });
+    const formerHistory = await listInstructorRiskHistoryHandler({
+      data: { assignmentId, studentId, from: null, to: null, page: 1, limit: 20 },
+    });
+    expect(formerHistory).toMatchObject({ error: { code: 'NOT_FOUND' } });
 
     vi.mocked(auth.getSessionFromHeaders).mockResolvedValue({
       user: { id: replacementInstructorId, role: 'instructor' },
@@ -223,6 +258,10 @@ describe('intervention workflow database acceptance', () => {
       data: { assignmentId, page: 1, limit: 20, overdue: false },
     });
     expect(replacement).toMatchObject({ total: 1, interventions: [{ id: created.id }] });
+    const replacementHistory = await listInstructorRiskHistoryHandler({
+      data: { assignmentId, studentId, from: null, to: null, page: 1, limit: 20 },
+    });
+    expect(replacementHistory).toMatchObject({ total: 1 });
 
     const context = await getInterventionContextHandler({
       data: { assignmentId, studentId },
