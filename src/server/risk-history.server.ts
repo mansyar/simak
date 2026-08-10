@@ -4,7 +4,7 @@ import type {
   ListInstructorRiskHistorySchema,
 } from './risk-history';
 import type { z } from 'zod';
-import { and, asc, desc, eq, gte, isNull, lte, sql } from 'drizzle-orm';
+import { and, asc, desc, eq, gte, inArray, isNull, lte, sql } from 'drizzle-orm';
 import { getDb } from '@/db';
 import { assignments, assignmentStudents, checkpoints } from '@/db/schema/assignments';
 import { consultations } from '@/db/schema/consultations';
@@ -13,7 +13,7 @@ import { riskObservations } from '@/db/schema/risk-observations';
 import { reviews, submissions } from '@/db/schema/submissions';
 import { safeAuditLog } from '@/lib/audit';
 import { ErrorCode, serverError } from '@/lib/errors';
-import { isAdmin, isInstructor } from '@/lib/session-guards';
+import { isAdmin, isInstructor, isStudent } from '@/lib/session-guards';
 import { getSessionFromHeaders } from '@/server/auth';
 
 type InstructorHistoryInput = z.infer<typeof ListInstructorRiskHistorySchema>;
@@ -244,6 +244,60 @@ export async function getAdminRiskTrendsHandler({ data }: { data: AdminTrendsInp
   return { suppressed, minimumCohortSize: 10, cohortSize, trends };
 }
 
-export async function getStudentSupportStatusHandler(_: { data: StudentSupportInput }) {
-  throw new Error('Risk-history queries are not implemented yet');
+export async function getStudentSupportStatusHandler({ data }: { data: StudentSupportInput }) {
+  const session = await getSessionFromHeaders();
+  if (!isStudent(session)) return serverError(ErrorCode.UNAUTHORIZED, 'Unauthorized');
+
+  const db = getDb();
+  const [enrollment] = await db
+    .select({ assignmentId: assignmentStudents.assignmentId })
+    .from(assignmentStudents)
+    .innerJoin(assignments, eq(assignments.id, assignmentStudents.assignmentId))
+    .where(
+      and(
+        eq(assignmentStudents.assignmentId, data.assignmentId),
+        eq(assignmentStudents.studentId, session.user.id),
+        isNull(assignments.deletedAt),
+      ),
+    )
+    .limit(1);
+
+  if (!enrollment) {
+    await safeAuditLog('risk_history.student_support_denied', {
+      actorId: session.user.id,
+      action: 'risk_history.student_support_denied',
+      entityType: 'assignment',
+      entityId: String(data.assignmentId),
+      details: { assignmentId: data.assignmentId },
+    });
+    return serverError(ErrorCode.NOT_FOUND, 'Assignment not found');
+  }
+
+  const [activeSupport] = await db
+    .select({ id: interventions.id })
+    .from(interventions)
+    .where(
+      and(
+        eq(interventions.assignmentId, data.assignmentId),
+        eq(interventions.studentId, session.user.id),
+        inArray(interventions.status, ['open', 'monitoring']),
+      ),
+    )
+    .limit(1);
+  const supportAvailable = Boolean(activeSupport);
+
+  await safeAuditLog('risk_history.student_support_viewed', {
+    actorId: session.user.id,
+    action: 'risk_history.student_support_viewed',
+    entityType: 'assignment',
+    entityId: String(data.assignmentId),
+    details: { assignmentId: data.assignmentId, supportAvailable },
+  });
+
+  return supportAvailable
+    ? {
+        status: 'support_available' as const,
+        nextSteps: ['contact_instructor', 'review_current_work'],
+      }
+    : { status: 'on_track' as const, nextSteps: [] };
 }
