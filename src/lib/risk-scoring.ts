@@ -9,6 +9,9 @@
 /** Overall risk level — highest severity among active factors. */
 export type RiskLevel = 'high' | 'medium' | 'low';
 
+/** Immutable identifier for the risk rules used to produce an observation. */
+export const RISK_ALGORITHM_VERSION = 'risk-v1';
+
 /** Category grouping for dashboard display. */
 export type RiskCategory = 'student_inaction' | 'pending_review';
 
