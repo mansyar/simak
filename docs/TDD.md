@@ -331,6 +331,16 @@ Role-based analytics dashboards complement (do not duplicate) the real-time oper
 - **i18n:** All labels/headers in both `locales/en.json` and `locales/id.json` (`analytics.*` + `analyticsInstructor.*` namespaces).
 - **Rubric analytics (Track: Rubric-Based Grading):** Instructor and admin analytics extended with rubric-level metrics — average score per criterion, criterion-level weakness analysis, and cross-instructor criterion performance comparison. CSV/Excel exports include per-student criterion scores. The Excel export path sanitizes string cells against formula injection (matching the CSV path's `escapeCsvValue` mitigation).
 
+### Institutional Reporting & Secure Delivery [v1] (TRACK-061)
+
+- **Allowlisted reports:** `institutional_academic_summary`, `official_transcript`, and `analytics_summary` are the only accepted report types. Admins/superadmins receive institutional scope, instructors are constrained to active section enrollments, and students can request only their own transcript. Transcript and institutional-record calculations use canonical active immutable `academic_records`, never mutable `final_grades`.
+- **Routes and UI:** `/admin/reports`, `/instructor/reports`, and `/student/reports` render bilingual accessible catalog, dependent term/course/section/cohort filters, PDF locale selection, generation feedback, owner-scoped history, retry, download, and expiry states. Admin transcript subject search is a debounced, paginated server query exposed as a keyboard-operable combobox.
+- **Server boundary:** `src/server/reporting.ts` contains validated `typedServerFn` stubs. Catalog/loaders, orchestration, PDF rendering, R2 storage, and expiry cleanup live in server-only modules. Authorization occurs before job insertion and again for status/history/retry/download; unauthorized and nonexistent jobs are indistinguishable.
+- **PDF/runtime:** PDFKit 0.19 renders English/Indonesian tagged PDFs with local Noto Sans fonts, repeated table headers, bounded content, and safe inert text. The build copies fonts to `.output/server/assets/fonts/noto-sans` and creates an executable production renderer smoke bundle; Docker asserts both fonts exist.
+- **Persistence and concurrency:** `report_jobs` stores normalized filters, locale, requester, state, attempts, artifact metadata, safe failure metadata, and lifecycle timestamps. Guarded updates claim and transition jobs atomically. PDF/R2 work occurs outside transactions. Processing jobs older than ten minutes become failed with `generation_timeout` and can use the existing manual retry flow.
+- **Private delivery and retention:** PDFs use opaque UUID `reports/` keys, five-minute presigned attachment downloads, 30-day application expiry, and protected idempotent cleanup. Expiry first makes a report inaccessible, then deletes R2 and finalizes metadata; provider failures retain enough metadata for later retry. Operators must configure the documented 40-day R2 lifecycle rule for orphan crash-window objects.
+- **Scheduling boundary:** Generation is manual/on-demand only. Recurring schedules, cron workers, saved presets, and email attachments remain deferred.
+
 ### Hybrid Navigation Pattern
 
 - **Dashboard as hub**: Each role gets a dedicated dashboard (`/student/dashboard`, `/instructor/dashboard`, `/admin/dashboard`) with summary widgets and quick actions. [v1]
@@ -673,10 +683,28 @@ Claims use `claimedAt` and nullable `sentAt`: stale claims are reclaimed, locked
 | courseId    | integer (FK → courses)                      |       |
 | code        | text, not null                              | Unique within term/course |
 | name        | text                                        |       |
+| cohort      | text, nullable                              | Explicit reporting cohort label (max 120 characters); never inferred from section code/name |
 | status      | pgEnum (`course_section_status`), not null  | `active` \| `inactive` \| `archived` |
 | archivedAt  | timestamp                                   | Set when archived |
 
 Unique identity is `(termId, courseId, code)`; term/course foreign keys and status indexes support authorized context filtering.
+
+#### report_jobs (TRACK-061)
+
+| Column | Type | Notes |
+| ------ | ---- | ----- |
+| id | serial (PK) | Durable generation identity |
+| reportType | pgEnum (`report_type`), not null | Three allowlisted report templates |
+| requesterId | text (FK → users), not null | Owner used for history/status/download authorization |
+| parameters | jsonb, not null | Normalized term/course/section/cohort filters and transcript subject when applicable |
+| locale | pgEnum (`report_locale`), not null | `en` \| `id` |
+| state | pgEnum (`report_job_state`), not null | `pending` \| `processing` \| `completed` \| `failed` \| `expired` |
+| attempts | integer, default 0, not null | Nonnegative guarded claim count |
+| artifactKey / artifactSizeBytes / artifactSha256 | text / integer / text, nullable | Complete private artifact metadata; SHA-256 is validated |
+| failureCode / failureMessage | text, nullable | Safe bounded failure metadata; report contents are excluded |
+| createdAt / updatedAt / startedAt / completedAt / failedAt / expiresAt | timestamp | State lifecycle and 30-day expiry |
+
+State-metadata checks enforce valid pending, processing, completed, failed, and expired combinations. Indexes support pending claims, requester history, expiry selection, and stale-processing recovery. Migrations `0030`–`0032` include companion rollbacks.
 
 #### section_enrollments
 
@@ -1807,7 +1835,8 @@ Server functions whose output crosses the network boundary to a route loader dec
 | Notification preferences                                               |          | ✓             |
 | Analytics dashboards (admin + instructor)                              | ✓        |               |
 | Report export (CSV + Excel)                                            | ✓        |               |
-| Scheduled/PDF report delivery                                          |          | ✓             |
+| On-demand PDF reports with private secure delivery                     | ✓        |               |
+| Scheduled/recurring report delivery                                    |          | ✓             |
 | Deadline extension workflow                                            | ✓        |               |
 | Audit logging                                                          | ✓        |               |
 | Integration tests                                                      |          | ✓             |
