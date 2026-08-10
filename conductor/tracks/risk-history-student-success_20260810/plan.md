@@ -121,7 +121,7 @@
   - Confirm existing risk scoring, alerts, interventions, consultations,
     assignments, transcripts, analytics, and reporting behavior remains intact.
 
-- [~] Task: Complete full quality gates and documentation
+- [x] Task: Complete full quality gates and documentation (9ddda5fb)
   - Run the relevant unit/integration/E2E tests, coverage, typecheck, lint,
     formatting, i18n checks, modularity, and build.
   - Update implementation notes and any required operator/scheduler
