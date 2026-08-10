@@ -39,7 +39,7 @@
   - Provide the required manual verification plan, obtain explicit confirmation,
     attach the verification git note, and record the phase checkpoint.
 
-## Phase 2 — Observation capture and lifecycle integration
+## Phase 2 — Observation capture and lifecycle integration [checkpoint: 64da36b4]
 
 - [x] Task: Implement the explainable observation recorder
   - Write failing tests for deterministic snapshots, factor/version preservation,
@@ -64,7 +64,7 @@
     conventions, with bounded processing and retry-safe behavior.
   - Confirm job tests pass.
 
-- [x] Task: Phase verification and checkpoint (refer to `workflow.md`)
+- [x] Task: Phase verification and checkpoint (refer to `workflow.md`) [checkpoint: 64da36b4]
   - Verify lifecycle regression coverage, scheduler behavior, audit events, and
     no-automatic-action/no-notification guarantees before checkpointing.
 
