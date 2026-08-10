@@ -131,3 +131,10 @@
   - Present automated evidence and role-specific manual verification steps,
     await explicit approval, attach the verification report as a git note, and
     record the final checkpoint.
+
+## Phase 6 — Review fixes
+
+- [~] Task: Apply Principal Engineer review corrections
+  - Fix real-PostgreSQL retention anonymization and empty-context observation
+    processing, preserve meaningful lifecycle events, strengthen idempotency and
+    operational documentation, and add regression coverage.
