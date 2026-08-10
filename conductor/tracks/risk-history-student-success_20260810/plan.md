@@ -83,7 +83,7 @@
   - Implement indexed, bounded aggregate queries and audit sensitive access.
   - Confirm aggregate tests pass.
 
-- [~] Task: Implement student support projection
+- [x] Task: Implement student support projection (79d5b5a3)
   - Write failing tests proving a student can access only their own approved
     support status/next steps and never scores, factors, internal explanations,
     notes, intervention detail, or aggregate data.
