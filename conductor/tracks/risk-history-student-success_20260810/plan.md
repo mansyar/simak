@@ -56,7 +56,7 @@
     mutation.
   - Verify no dashboard read or notification path creates a record.
 
-- [ ] Task: Add daily snapshot and retention processing
+- [~] Task: Add daily snapshot and retention processing
   - Write failing tests for active-assignment selection, daily idempotency,
     five-academic-year expiry, anonymization, auditability, and unrecoverable
     identity removal.
