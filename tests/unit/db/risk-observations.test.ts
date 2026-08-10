@@ -130,4 +130,14 @@ describe('risk observations migration contract', () => {
     expect(rollback).toMatch(/DROP TABLE IF EXISTS "risk_observations"/i);
     expect(rollback).toMatch(/DROP TYPE IF EXISTS "risk_observation_source"/i);
   });
+
+  it('allows anonymized lifecycle observations to remove source-event details', () => {
+    const migrationPath = findRiskObservationsMigration();
+    expect(migrationPath).not.toBeNull();
+
+    const migration = readFileSync(migrationPath!, 'utf8');
+    expect(migration).toMatch(
+      /retention_state"\s*=\s*'anonymized'[\s\S]*source_event_id"\s+IS\s+NULL/i,
+    );
+  });
 });

@@ -1,11 +1,12 @@
 /** @vitest-environment node */
-import { eq, inArray } from 'drizzle-orm';
+import { eq, inArray, or } from 'drizzle-orm';
 import { beforeAll, beforeEach, afterAll, describe, expect, it, vi } from 'vitest';
 import { getDb } from '@/db/index';
 import {
   assignmentStudents,
   assignments,
   assignmentTemplates,
+  academicTerms,
   auditLog,
   checkpoints,
   interventions,
@@ -25,6 +26,11 @@ import {
   updateInterventionHandler,
 } from '@/server/interventions.server';
 import { listInstructorRiskHistoryHandler } from '@/server/risk-history.server';
+import {
+  processDailyRiskSnapshots,
+  processRiskObservationRetention,
+} from '@/server/risk-history-jobs.server';
+import { recordRiskObservation } from '@/server/risk-observation-recorder.server';
 
 vi.mock('@/server/auth', () => ({
   getSessionFromHeaders: vi.fn(),
@@ -114,14 +120,28 @@ describe('intervention workflow database acceptance', () => {
 
   beforeEach(async () => {
     await db.delete(auditLog).where(eq(auditLog.actorId, instructorId));
-    await db.delete(riskObservations).where(eq(riskObservations.assignmentId, assignmentId));
+    await db
+      .delete(riskObservations)
+      .where(
+        or(
+          eq(riskObservations.assignmentId, assignmentId),
+          eq(riskObservations.academicTermId, academicFixture.termId),
+        ),
+      );
     await db.delete(interventions).where(eq(interventions.assignmentId, assignmentId));
   });
 
   afterAll(async () => {
     await db.delete(auditLog).where(eq(auditLog.actorId, instructorId));
     await db.delete(auditLog).where(eq(auditLog.actorId, replacementInstructorId));
-    await db.delete(riskObservations).where(eq(riskObservations.assignmentId, assignmentId));
+    await db
+      .delete(riskObservations)
+      .where(
+        or(
+          eq(riskObservations.assignmentId, assignmentId),
+          eq(riskObservations.academicTermId, academicFixture.termId),
+        ),
+      );
     await db.delete(interventions).where(eq(interventions.assignmentId, assignmentId));
     await db.delete(checkpoints).where(eq(checkpoints.id, checkpointId));
     await db.delete(assignmentStudents).where(eq(assignmentStudents.assignmentId, assignmentId));
@@ -267,5 +287,81 @@ describe('intervention workflow database acceptance', () => {
       data: { assignmentId, studentId },
     });
     expect(context).toMatchObject({ context: { assignmentId, studentId } });
+  });
+
+  it('persists empty-context snapshots and anonymizes lifecycle rows in PostgreSQL', async () => {
+    const now = new Date('2026-08-10T05:30:00.000Z');
+    await db.update(checkpoints).set({ state: 'passed' }).where(eq(checkpoints.id, checkpointId));
+
+    try {
+      await expect(
+        recordRiskObservation(db, {
+          source: 'lifecycle_event',
+          eventType: 'review_recorded',
+          sourceEventId: `review:passed:${suffix}`,
+          assignmentId,
+          studentId,
+          checkpointId,
+          actorId: instructorId,
+          observedAt: now,
+        }),
+      ).resolves.toMatchObject({ created: true });
+      const dailyResult = await processDailyRiskSnapshots({ db, now });
+      expect(dailyResult.created).toBeGreaterThanOrEqual(1);
+
+      const identifiable = await db
+        .select({
+          riskLevel: riskObservations.riskLevel,
+          factorSnapshot: riskObservations.factorSnapshot,
+        })
+        .from(riskObservations)
+        .where(eq(riskObservations.assignmentId, assignmentId));
+      expect(identifiable).toHaveLength(2);
+      expect(identifiable).toEqual(
+        expect.arrayContaining([expect.objectContaining({ riskLevel: 'low', factorSnapshot: [] })]),
+      );
+
+      await db
+        .update(academicTerms)
+        .set({ startDate: '2020-01-01', endDate: '2020-06-30' })
+        .where(eq(academicTerms.id, academicFixture.termId));
+      await expect(processRiskObservationRetention({ db, now })).resolves.toMatchObject({
+        anonymized: 2,
+      });
+
+      const anonymized = await db
+        .select({
+          retentionState: riskObservations.retentionState,
+          assignmentId: riskObservations.assignmentId,
+          studentId: riskObservations.studentId,
+          eventType: riskObservations.eventType,
+          sourceEventId: riskObservations.sourceEventId,
+          factorSnapshot: riskObservations.factorSnapshot,
+        })
+        .from(riskObservations)
+        .where(eq(riskObservations.academicTermId, academicFixture.termId));
+      expect(anonymized).toHaveLength(2);
+      expect(anonymized).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            retentionState: 'anonymized',
+            assignmentId: null,
+            studentId: null,
+            eventType: null,
+            sourceEventId: null,
+            factorSnapshot: [],
+          }),
+        ]),
+      );
+    } finally {
+      await db
+        .update(academicTerms)
+        .set({ startDate: '2026-01-01', endDate: '2026-06-30' })
+        .where(eq(academicTerms.id, academicFixture.termId));
+      await db
+        .update(checkpoints)
+        .set({ state: 'unlocked' })
+        .where(eq(checkpoints.id, checkpointId));
+    }
   });
 });

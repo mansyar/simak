@@ -103,6 +103,7 @@ export async function processRiskObservationRetention(options: JobOptions = {}) 
       studentId: null,
       checkpointId: null,
       interventionId: null,
+      eventType: null,
       sourceEventId: null,
       idempotencyKey: sql`'risk-observation:anonymized:' || ${riskObservations.id}`,
       factorSnapshot: [],

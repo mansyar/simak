@@ -86,6 +86,10 @@ export const riskObservations = pgTable(
     check(
       'risk_observations_source_event_consistency',
       sql`(
+        ${table.retentionState} = 'anonymized'
+        AND ${table.eventType} IS NULL
+        AND ${table.sourceEventId} IS NULL
+      ) OR (
         ${table.source} = 'lifecycle_event'
         AND ${table.eventType} IS NOT NULL
         AND ${table.sourceEventId} IS NOT NULL

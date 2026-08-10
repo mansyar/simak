@@ -279,7 +279,7 @@ Look for:
 - migration completion or a clearly reported migration failure;
 - `requestId` on server-function errors and background-job events;
 - `advisory_failed`, `risk_observation_capture_failed`, email queue, deadline scanner, R2 cleanup, or `risk_history.daily_failed` events;
-- repeated risk-history failures or a missing `risk_history.daily_processed` event after a healthy 24-hour processing window; lifecycle capture failures include a replayable event envelope, while daily processing retries incomplete or failed batches on a later tick;
+- repeated risk-history failures or a missing `risk_history.daily_processed` event after a healthy 24-hour processing window; lifecycle capture failures include structured event context for diagnosis but have no automatic replay queue, while daily processing retries incomplete or failed batches on a later tick;
 - graceful shutdown and background-processor drain messages.
 
 Confirm that logs contain neither secret values nor full connection strings.

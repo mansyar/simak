@@ -156,21 +156,33 @@ describe('recordRiskObservation', () => {
     });
   });
 
-  it('rejects missing academic or live risk context before inserting', async () => {
+  it('rejects missing academic context before inserting', async () => {
     queueResults(mockDb, []);
 
     await expect(recordRiskObservation(mockDb as any, input)).rejects.toThrow(
       'Risk observation assignment context not found',
     );
     expect(mockDb.insert).not.toHaveBeenCalled();
+  });
 
-    queueResults(mockDb, [{ sectionId: 3, courseId: 4, academicTermId: 5 }]);
+  it('records a low-risk empty snapshot when no active risk context remains', async () => {
+    queueResults(mockDb, [{ sectionId: 3, courseId: 4, academicTermId: 5 }], [{ id: 100 }]);
     vi.mocked(getLiveStudentRiskContexts).mockResolvedValue([]);
 
-    await expect(recordRiskObservation(mockDb as any, input)).rejects.toThrow(
-      'Risk observation live context not found',
+    await expect(recordRiskObservation(mockDb as any, input)).resolves.toEqual({
+      created: true,
+      observationId: 100,
+    });
+    expect(mockDb.values).toHaveBeenCalledWith(
+      expect.objectContaining({
+        riskLevel: 'low',
+        factorSnapshot: [],
+        explanationSnapshot: {
+          version: 'risk-observation-explanation-v1',
+          factorCodes: [],
+        },
+      }),
     );
-    expect(mockDb.insert).not.toHaveBeenCalled();
   });
 
   it('propagates storage failures and does not write a success audit event', async () => {

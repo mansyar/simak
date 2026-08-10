@@ -95,6 +95,7 @@ describe('risk history scheduled processing', () => {
         studentId: null,
         checkpointId: null,
         interventionId: null,
+        eventType: null,
         sourceEventId: null,
         factorSnapshot: [],
         retentionState: 'anonymized',

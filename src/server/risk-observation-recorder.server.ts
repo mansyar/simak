@@ -68,11 +68,8 @@ export async function recordRiskObservation(db: Db, input: RecordRiskObservation
     studentId: input.studentId,
     now: observedAt,
   });
-  if (!liveContext) {
-    throw new Error('Risk observation live context not found');
-  }
-
-  const factorSnapshot = liveContext.assessment.factors
+  const assessment = liveContext?.assessment ?? { level: 'low' as const, factors: [] };
+  const factorSnapshot = assessment.factors
     .map((factor) => ({ code: factor.type, category: factor.category, severity: factor.severity }))
     .sort(
       (left, right) =>
@@ -96,7 +93,7 @@ export async function recordRiskObservation(db: Db, input: RecordRiskObservation
       academicTermId: academicContext.academicTermId,
       observedAt,
       algorithmVersion: RISK_ALGORITHM_VERSION,
-      riskLevel: liveContext.assessment.level,
+      riskLevel: assessment.level,
       factorSnapshot,
       explanationSnapshot: {
         version: 'risk-observation-explanation-v1',
