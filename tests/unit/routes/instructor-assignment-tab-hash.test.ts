@@ -7,6 +7,7 @@ describe('assignment detail tab hashes', () => {
     ['#extensions', 'extensions'],
     ['#discussions', 'discussions'],
     ['#interventions', 'interventions'],
+    ['#risk-history', 'risk-history'],
   ])('maps %s to %s', (hash, expected) => {
     expect(getAssignmentTabFromHash(hash)).toBe(expected);
   });

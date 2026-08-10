@@ -867,6 +867,69 @@
       }
     }
   },
+  "riskHistory": {
+    "tab": "Risk history",
+    "loading": "Loading risk history",
+    "noStudents": "No students are assigned",
+    "filters": {
+      "title": "History filters",
+      "student": "Student",
+      "from": "From date",
+      "to": "To date",
+      "apply": "Apply filters"
+    },
+    "error": {
+      "title": "Risk history could not be loaded",
+      "description": "Try again to retrieve the latest authorized history."
+    },
+    "empty": {
+      "title": "No observations in this period",
+      "description": "Adjust the date range or return after meaningful academic activity occurs."
+    },
+    "outcomes": {
+      "title": "Student outcomes",
+      "facts": "Recorded facts",
+      "interpretation": "Interpretation",
+      "interpretationNote": "Interpretations summarize recorded activity and do not change academic decisions."
+    },
+    "facts": {
+      "checkpoints": "Checkpoints passed",
+      "submissions": "Submissions",
+      "reviews": "Reviews",
+      "consultations": "Verified consultations",
+      "interventions": "Support actions"
+    },
+    "interpretation": {
+      "academicLabel": "Academic progress",
+      "engagementLabel": "Engagement",
+      "academic": {
+        "complete": "Complete",
+        "in_progress": "In progress",
+        "not_started": "Not started"
+      },
+      "engagement": {
+        "engaged": "Recorded engagement",
+        "no_recorded_engagement": "No recorded engagement"
+      }
+    },
+    "timeline": {
+      "title": "Observation timeline",
+      "factors": "Recorded factors"
+    },
+    "event": {
+      "checkpoint_updated": "Checkpoint updated",
+      "submission_recorded": "Submission recorded",
+      "review_recorded": "Review recorded",
+      "consultation_verified": "Consultation verified",
+      "intervention_updated": "Support action updated",
+      "daily_snapshot": "Daily observation"
+    },
+    "level": {
+      "low": "Low",
+      "medium": "Medium",
+      "high": "High"
+    }
+  },
   "instructorDashboard": {
     "title": "Dashboard",
     "subtitle": "Overview of your teaching activity",

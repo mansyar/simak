@@ -145,6 +145,10 @@ vi.mock('@/components/instructor/assignments/AssignmentInterventionsTab', () => 
   AssignmentInterventionsTab: () => <div data-testid="interventions-tab" />,
 }));
 
+vi.mock('@/components/instructor/assignments/InstructorRiskHistoryTab', () => ({
+  InstructorRiskHistoryTab: () => <div data-testid="risk-history-tab" />,
+}));
+
 vi.mock('@/components/instructor/assignments/AssignmentDetailTabs', () => ({
   AssignmentDetailTabs: ({ tabs, activeTab, onTabChange }: any) => (
     <div data-testid="assignment-detail-tabs">
@@ -213,6 +217,14 @@ describe('AssignmentDetailPage - Discussions tab', () => {
     expect(getByTestId('tab-interventions')).toBeTruthy();
     fireEvent.click(getByTestId('tab-interventions'));
     expect(getByTestId('interventions-tab')).toBeTruthy();
+  });
+
+  it('renders the risk-history tab and its instructor surface', () => {
+    const { getByTestId } = render(<AssignmentDetailPage />);
+
+    expect(getByTestId('tab-risk-history').textContent).toBe('riskHistory.tab');
+    fireEvent.click(getByTestId('tab-risk-history'));
+    expect(getByTestId('risk-history-tab')).toBeTruthy();
   });
 
   it('should render one selected DiscussionPanel and disclose other threads on demand', () => {

@@ -872,6 +872,69 @@ export type Translation = {
       }
     }
   }
+  riskHistory: {
+    tab: string
+    loading: string
+    noStudents: string
+    filters: {
+      title: string
+      student: string
+      from: string
+      to: string
+      apply: string
+    }
+    error: {
+      title: string
+      description: string
+    }
+    empty: {
+      title: string
+      description: string
+    }
+    outcomes: {
+      title: string
+      facts: string
+      interpretation: string
+      interpretationNote: string
+    }
+    facts: {
+      checkpoints: string
+      submissions: string
+      reviews: string
+      consultations: string
+      interventions: string
+    }
+    interpretation: {
+      academicLabel: string
+      engagementLabel: string
+      academic: {
+        complete: string
+        in_progress: string
+        not_started: string
+      }
+      engagement: {
+        engaged: string
+        no_recorded_engagement: string
+      }
+    }
+    timeline: {
+      title: string
+      factors: string
+    }
+    event: {
+      checkpoint_updated: string
+      submission_recorded: string
+      review_recorded: string
+      consultation_verified: string
+      intervention_updated: string
+      daily_snapshot: string
+    }
+    level: {
+      low: string
+      medium: string
+      high: string
+    }
+  }
   instructorDashboard: {
     title: string
     subtitle: string
