@@ -27,7 +27,7 @@ export default defineConfig({
     // Use process isolation because Zod 4's lazy JIT schemas can access stale
     // Vitest VM globals in VM worker pools, producing unhandled defineProperty errors.
     pool: 'forks',
-    maxWorkers: 14,
+    maxWorkers: 8,
     fileParallelism: true,
 
     // Performance: persist transform cache between runs
