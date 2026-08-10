@@ -17,7 +17,7 @@
 - Keep every source/test/script file below 500 lines; use the documented extras
   or multi-handler pattern only when it is necessary.
 
-## Phase 1 — Contracts, schema, and migration
+## Phase 1 — Contracts, schema, and migration [checkpoint: a6cecd1]
 
 - [x] Task: Define risk-history contracts and failing validation tests (495842af)
   - Write failing tests for observation sources, immutable snapshot shape,
@@ -34,7 +34,7 @@
     with required foreign keys, uniqueness constraints, and query indexes.
   - Confirm schema tests pass and migration SQL preserves the invariants.
 
-- [~] Task: Phase verification and checkpoint (refer to `workflow.md`)
+- [x] Task: Phase verification and checkpoint (refer to `workflow.md`) [checkpoint: a6cecd1]
   - Verify tests, coverage, modularity, type safety, and migration review.
   - Provide the required manual verification plan, obtain explicit confirmation,
     attach the verification git note, and record the phase checkpoint.
