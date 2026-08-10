@@ -90,7 +90,7 @@
   - Implement the narrow student response and audit conventions.
   - Confirm privacy tests pass.
 
-- [ ] Task: Phase verification and checkpoint (refer to `workflow.md`)
+- [~] Task: Phase verification and checkpoint (refer to `workflow.md`)
   - Verify authorization, reassignment, anonymization, and threshold tests with
     the required automated and manual verification protocol.
 
