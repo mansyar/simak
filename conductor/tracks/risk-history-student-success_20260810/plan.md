@@ -94,7 +94,7 @@
   - Verify authorization, reassignment, anonymization, and threshold tests with
     the required automated and manual verification protocol.
 
-## Phase 4 — Accessible role-specific UI
+## Phase 4 — Accessible role-specific UI [checkpoint: afde6356]
 
 - [x] Task: Build instructor risk-history and outcome surfaces (`be871ed9`)
   - Write failing component/route tests for timeline/order, explanatory labels,
@@ -108,7 +108,7 @@
   - Implement role-guarded, bilingual, responsive UI using existing primitives.
   - Regenerate and validate i18n types and confirm tests pass.
 
-- [x] Task: Phase verification and checkpoint (refer to `workflow.md`)
+- [x] Task: Phase verification and checkpoint (afde6356; refer to `workflow.md`)
   - Verify visual/accessibility behavior at mobile and desktop sizes and obtain
     explicit manual confirmation before recording the checkpoint.
 
