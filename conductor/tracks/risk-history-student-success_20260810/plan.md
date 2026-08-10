@@ -27,7 +27,7 @@
     repository's established server-function pattern.
   - Confirm the tests transition from Red to Green.
 
-- [ ] Task: Add persistence model and migration
+- [x] Task: Add persistence model and migration (4a1bc400)
   - Write failing schema tests for observation identity, context references,
     append-only state, idempotency, retention/anonymization fields, and indexes.
   - Add the dedicated Drizzle schema/relations and generate a reviewed migration
