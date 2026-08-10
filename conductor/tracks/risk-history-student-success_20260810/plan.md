@@ -102,7 +102,7 @@
   - Implement responsive, bilingual, keyboard-accessible instructor views.
   - Confirm component and route tests pass.
 
-- [ ] Task: Build admin aggregate and student support surfaces
+- [~] Task: Build admin aggregate and student support surfaces
   - Write failing tests for cohort suppression, no-drill-down behavior, student
     privacy, constructive support language, and mobile/accessibility behavior.
   - Implement role-guarded, bilingual, responsive UI using existing primitives.
