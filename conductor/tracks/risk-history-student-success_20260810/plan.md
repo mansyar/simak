@@ -34,7 +34,7 @@
     with required foreign keys, uniqueness constraints, and query indexes.
   - Confirm schema tests pass and migration SQL preserves the invariants.
 
-- [ ] Task: Phase verification and checkpoint (refer to `workflow.md`)
+- [~] Task: Phase verification and checkpoint (refer to `workflow.md`)
   - Verify tests, coverage, modularity, type safety, and migration review.
   - Provide the required manual verification plan, obtain explicit confirmation,
     attach the verification git note, and record the phase checkpoint.
