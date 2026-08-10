@@ -4,6 +4,17 @@ import type {
   ListInstructorRiskHistorySchema,
 } from './risk-history';
 import type { z } from 'zod';
+import { and, asc, desc, eq, gte, isNull, lte, sql } from 'drizzle-orm';
+import { getDb } from '@/db';
+import { assignments, assignmentStudents, checkpoints } from '@/db/schema/assignments';
+import { consultations } from '@/db/schema/consultations';
+import { interventions } from '@/db/schema/interventions';
+import { riskObservations } from '@/db/schema/risk-observations';
+import { reviews, submissions } from '@/db/schema/submissions';
+import { safeAuditLog } from '@/lib/audit';
+import { ErrorCode, serverError } from '@/lib/errors';
+import { isAdmin, isInstructor } from '@/lib/session-guards';
+import { getSessionFromHeaders } from '@/server/auth';
 
 type InstructorHistoryInput = z.infer<typeof ListInstructorRiskHistorySchema>;
 type AdminTrendsInput = z.infer<typeof GetAdminRiskTrendsSchema>;
@@ -185,21 +196,54 @@ export async function listInstructorRiskHistoryHandler({ data }: { data: Instruc
   };
 }
 
-export async function getAdminRiskTrendsHandler(_: { data: AdminTrendsInput }) {
-  throw new Error('Risk-history queries are not implemented yet');
+export async function getAdminRiskTrendsHandler({ data }: { data: AdminTrendsInput }) {
+  const session = await getSessionFromHeaders();
+  if (!isAdmin(session)) return serverError(ErrorCode.UNAUTHORIZED, 'Unauthorized');
+
+  const db = getDb();
+  const contextScope = and(
+    data.termId ? eq(riskObservations.academicTermId, data.termId) : undefined,
+    data.courseId ? eq(riskObservations.courseId, data.courseId) : undefined,
+    data.sectionId ? eq(riskObservations.sectionId, data.sectionId) : undefined,
+    dateConditions(riskObservations.observedAt, data.from, data.to),
+  );
+  const [cohort] = await db
+    .select({ cohortSize: sql<number>`count(distinct ${riskObservations.studentId})::int` })
+    .from(riskObservations)
+    .where(and(contextScope, eq(riskObservations.retentionState, 'identifiable')));
+
+  const cohortSize = cohort?.cohortSize ?? 0;
+  const suppressed = cohortSize < 10;
+  const trends = suppressed
+    ? []
+    : await db
+        .select({
+          date: sql<string>`date(${riskObservations.observedAt})::text`,
+          riskLevel: riskObservations.riskLevel,
+          observationCount: sql<number>`count(*)::int`,
+        })
+        .from(riskObservations)
+        .where(contextScope)
+        .groupBy(sql`date(${riskObservations.observedAt})`, riskObservations.riskLevel)
+        .orderBy(asc(sql`date(${riskObservations.observedAt})`), asc(riskObservations.riskLevel))
+        .limit(1000);
+
+  await safeAuditLog('risk_history.admin_aggregate_viewed', {
+    actorId: session.user.id,
+    action: 'risk_history.admin_aggregate_viewed',
+    entityType: 'academic_context',
+    entityId: String(data.sectionId ?? data.courseId ?? data.termId),
+    details: {
+      termId: data.termId,
+      courseId: data.courseId,
+      sectionId: data.sectionId,
+      suppressed,
+    },
+  });
+
+  return { suppressed, minimumCohortSize: 10, cohortSize, trends };
 }
 
 export async function getStudentSupportStatusHandler(_: { data: StudentSupportInput }) {
   throw new Error('Risk-history queries are not implemented yet');
 }
-import { and, asc, desc, eq, gte, isNull, lte, sql } from 'drizzle-orm';
-import { getDb } from '@/db';
-import { assignments, assignmentStudents, checkpoints } from '@/db/schema/assignments';
-import { consultations } from '@/db/schema/consultations';
-import { interventions } from '@/db/schema/interventions';
-import { riskObservations } from '@/db/schema/risk-observations';
-import { reviews, submissions } from '@/db/schema/submissions';
-import { safeAuditLog } from '@/lib/audit';
-import { ErrorCode, serverError } from '@/lib/errors';
-import { isInstructor } from '@/lib/session-guards';
-import { getSessionFromHeaders } from '@/server/auth';
