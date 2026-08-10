@@ -19,7 +19,7 @@
 
 ## Phase 1 — Contracts, schema, and migration
 
-- [ ] Task: Define risk-history contracts and failing validation tests
+- [x] Task: Define risk-history contracts and failing validation tests (495842af)
   - Write failing tests for observation sources, immutable snapshot shape,
     algorithm version, event idempotency key, dates, filters, and role-specific
     response schemas.
