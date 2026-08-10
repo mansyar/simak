@@ -132,9 +132,9 @@
     await explicit approval, attach the verification report as a git note, and
     record the final checkpoint.
 
-## Phase 6 — Review fixes
+## Phase 6 — Review fixes [checkpoint: 97e6dcf6]
 
-- [~] Task: Apply Principal Engineer review corrections
+- [x] Task: Apply Principal Engineer review corrections (97e6dcf6)
   - Fix real-PostgreSQL retention anonymization and empty-context observation
     processing, preserve meaningful lifecycle events, strengthen idempotency and
     operational documentation, and add regression coverage.
