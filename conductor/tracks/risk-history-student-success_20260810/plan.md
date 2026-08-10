@@ -112,7 +112,7 @@
   - Verify visual/accessibility behavior at mobile and desktop sizes and obtain
     explicit manual confirmation before recording the checkpoint.
 
-## Phase 5 — End-to-end quality and release readiness
+## Phase 5 — End-to-end quality and release readiness [checkpoint: ab1571a6]
 
 - [x] Task: Add end-to-end and regression coverage (9f456cc3)
   - Add E2E coverage for meaningful-event capture, daily snapshots, instructor
@@ -127,7 +127,7 @@
   - Update implementation notes and any required operator/scheduler
     documentation.
 
-- [x] Task: Final phase verification and checkpoint (refer to `workflow.md`)
+- [x] Task: Final phase verification and checkpoint (ab1571a6; refer to `workflow.md`)
   - Present automated evidence and role-specific manual verification steps,
     await explicit approval, attach the verification report as a git note, and
     record the final checkpoint.
