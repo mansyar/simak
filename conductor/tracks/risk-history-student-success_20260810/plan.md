@@ -108,7 +108,7 @@
   - Implement role-guarded, bilingual, responsive UI using existing primitives.
   - Regenerate and validate i18n types and confirm tests pass.
 
-- [~] Task: Phase verification and checkpoint (refer to `workflow.md`)
+- [x] Task: Phase verification and checkpoint (refer to `workflow.md`)
   - Verify visual/accessibility behavior at mobile and desktop sizes and obtain
     explicit manual confirmation before recording the checkpoint.
 
