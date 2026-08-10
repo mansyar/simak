@@ -80,6 +80,7 @@ export const courseSections = pgTable(
       .references(() => courses.id),
     code: text('code').notNull(),
     name: text('name'),
+    cohort: text('cohort'),
     status: courseSectionStatus('status').notNull().default('active'),
     createdAt: timestamp('created_at').defaultNow().notNull(),
     updatedAt: timestamp('updated_at').defaultNow().notNull(),

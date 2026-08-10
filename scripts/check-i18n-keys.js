@@ -46,6 +46,11 @@ const DYNAMIC_KEY_PATTERNS = [
   // Bulk import result statuses and server-side skip reasons resolved via translateKey
   /^bulkImport\.users\.errors\./,
   /^bulkImport\.users\.status\./,
+  // Report catalog keys constructed via template literals / config maps
+  /^reports\.subtitle\.(superadmin|admin|instructor|student)$/,
+  /^reports\.types\.(institutional_academic_summary|official_transcript|analytics_summary)\.description(Admin)?$/,
+  /^reports\.job\.(pending|processing|completed|failed|expired)$/,
+  /^reports\.history\.state\.(pending|processing|completed|failed|expired)$/,
 ];
 
 function isDynamicKey(key) {

@@ -27,6 +27,8 @@ COPY --from=builder /app/docker/start.sh /app/start.sh
 RUN test -f /app/.output/server/index.mjs \
   && test -f /app/.output/server/migrate.mjs \
   && test -f /app/.output/server/seed.mjs \
+  && test -f /app/.output/server/assets/fonts/noto-sans/NotoSans-Regular.ttf \
+  && test -f /app/.output/server/assets/fonts/noto-sans/NotoSans-Bold.ttf \
   && chmod 0555 /app/start.sh
 
 ENV NODE_ENV=production

@@ -113,6 +113,7 @@ export type Translation = {
     auditLog: string
     emailQueue: string
     analytics: string
+    reports: string
     branding: string
     sectionMain: string
     sectionPreferences: string
@@ -125,6 +126,7 @@ export type Translation = {
     interventions: string
     feedbackSnippets: string
     analytics: string
+    reports: string
     branding: string
     sectionMain: string
     sectionPreferences: string
@@ -536,6 +538,7 @@ export type Translation = {
       sectionCourse: string
       sectionCode: string
       sectionName: string
+      sectionCohort: string
       enrollmentSection: string
       enrollmentUser: string
       enrollmentRole: string
@@ -708,6 +711,7 @@ export type Translation = {
     dashboard: string
     assignments: string
     academicRecords: string
+    reports: string
     settings: string
     branding: string
     sectionMain: string
@@ -1841,6 +1845,103 @@ export type Translation = {
     }
     analytics: {
       gradeDistribution: string
+    }
+  }
+  reports: {
+    eyebrow: string
+    title: string
+    subtitle: {
+      superadmin: string
+      admin: string
+      instructor: string
+      student: string
+    }
+    loading: string
+    loadError: string
+    empty: string
+    emptyDescription: string
+    catalogLabel: string
+    types: {
+      institutional_academic_summary: {
+        name: string
+        description: string
+      }
+      official_transcript: {
+        name: string
+        description: string
+        descriptionAdmin: string
+      }
+      analytics_summary: {
+        name: string
+        description: string
+      }
+    }
+    filters: {
+      label: string
+      term: string
+      course: string
+      section: string
+      cohort: string
+      allTerms: string
+      allCourses: string
+      allSections: string
+      allCohorts: string
+      noCourses: string
+      noSections: string
+      noCohorts: string
+    }
+    student: {
+      label: string
+      searchLabel: string
+      searchPlaceholder: string
+      loading: string
+      loadError: string
+      empty: string
+      noResults: string
+      loadMore: string
+    }
+    locale: {
+      label: string
+      english: string
+      indonesian: string
+    }
+    generate: string
+    generating: string
+    validation: {
+      studentRequired: string
+    }
+    job: {
+      pending: string
+      processing: string
+      completed: string
+      failed: string
+      expired: string
+    }
+    history: {
+      title: string
+      description: string
+      loading: string
+      loadError: string
+      empty: string
+      emptyDescription: string
+      listLabel: string
+      state: {
+        pending: string
+        processing: string
+        completed: string
+        failed: string
+        expired: string
+      }
+      requestedLabel: string
+      generatedLabel: string
+      expiresLabel: string
+      expiredHint: string
+      download: string
+      downloading: string
+      retry: string
+      retrying: string
+      activeFeedback: string
+      upToDateFeedback: string
     }
   }
 }

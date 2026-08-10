@@ -93,7 +93,7 @@ type AcademicRecordsResponse = {
   cumulativeGpa: GpaCalculation | null;
 };
 
-const activeRecordCondition = sql`NOT EXISTS (
+export const activeAcademicRecordCondition = sql`NOT EXISTS (
   SELECT 1
   FROM academic_records newer
   WHERE newer.student_id = ${academicRecords.studentId}
@@ -143,7 +143,7 @@ type AggregateRow = {
   eligibleRecordIds: number[] | null;
 };
 
-async function aggregateGpa(
+export async function aggregateAcademicRecordGpa(
   conditions: SQL[],
   options: { termId?: number; latestAttempt: boolean },
 ): Promise<GpaCalculation | null> {
@@ -169,6 +169,8 @@ async function aggregateGpa(
         ) AS attempt_rank
       FROM ${academicRecords}
       INNER JOIN ${academicTerms} ON ${academicRecords.termId} = ${academicTerms.id}
+      INNER JOIN ${courseSections}
+        ON ${academicRecords.courseSectionId} = ${courseSections.id}
       INNER JOIN ${academicRecordPolicies}
         ON ${academicRecords.policyVersion} = ${academicRecordPolicies.version}
       WHERE ${and(...conditions)}
@@ -199,7 +201,7 @@ async function aggregateGpa(
 }
 
 async function queryRecords(options: QueryOptions): Promise<AcademicRecordsResponse> {
-  const baseConditions: SQL[] = [activeRecordCondition];
+  const baseConditions: SQL[] = [activeAcademicRecordCondition];
   if (options.studentId) baseConditions.push(eq(academicRecords.studentId, options.studentId));
   if (options.sectionId)
     baseConditions.push(eq(academicRecords.courseSectionId, options.sectionId));
@@ -236,8 +238,11 @@ async function queryRecords(options: QueryOptions): Promise<AcademicRecordsRespo
       .groupBy(academicTerms.id, academicTerms.code, academicTerms.name, academicTerms.startDate)
       .orderBy(desc(academicTerms.startDate), desc(academicTerms.id))
       .limit(500),
-    aggregateGpa(baseConditions, { termId: options.termId, latestAttempt: false }),
-    aggregateGpa(baseConditions, { latestAttempt: true }),
+    aggregateAcademicRecordGpa(baseConditions, {
+      termId: options.termId,
+      latestAttempt: false,
+    }),
+    aggregateAcademicRecordGpa(baseConditions, { latestAttempt: true }),
   ]);
 
   const normalizedRows = (rows as AcademicRecordRow[]).map(normalizeRecord);

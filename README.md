@@ -1,6 +1,6 @@
 # SIMAK
 
-**Sistem Informasi dan Manajemen Akademik** — A web-based academic assignment management system for universities and schools. Instructors create assignments with sequential checkpoints, students submit work for review, and structured feedback cycles drive progress through defined stages. Assignment-scoped advising appointments support direct booking without changing consultation evidence rules. The completed TRACK-060 adds official release-derived transcripts with term and cumulative GPA for students and authorized academic staff.
+**Sistem Informasi dan Manajemen Akademik** — A web-based academic assignment management system for universities and schools. Instructors create assignments with sequential checkpoints, students submit work for review, and structured feedback cycles drive progress through defined stages. Assignment-scoped advising appointments support direct booking without changing consultation evidence rules. Official release-derived transcripts, GPA, and secure role-scoped on-demand PDF reporting are available to authorized users.
 
 ## Tech Stack
 
@@ -14,6 +14,7 @@
 | Database | PostgreSQL 16 |
 | ORM | Drizzle ORM |
 | File Storage | Cloudflare R2 (presigned URL uploads) |
+| PDF Rendering | PDFKit 0.19 (server-only, embedded Noto Sans fonts) |
 | Email | Resend (transactional, via background queue) |
 | Logging | pino (structured JSON logging, server-side only; `pino-pretty` in dev) |
 | i18n | typesafe-i18n (English + Indonesian) |
@@ -83,9 +84,9 @@
 simak/
 ├── src/
 │   ├── routes/           → TanStack Router files (file-based routing)
-│   ├── components/       → React components (ui/, layout/, dashboard including StudentNextActions, academic-records/, gradebook/, instructor/feedback-snippets/, appointment scheduling panels, revision action-plan editor/history, interventions, etc.)
-│   ├── server/           → Server functions (*.ts = stubs, *.server.ts = handlers), including academic context, academic records/transcript queries, appointment lifecycle/detail/list handlers, assignment lifecycle, revision action plans, interventions, and feedback snippets
-│   ├── db/schema/        → Drizzle schema (split by domain, including academic context, academic records, appointments/reminders, revision action items, interventions, and feedback snippets)
+│   ├── components/       → React components (ui/, layout/, dashboards, academic-records/, reporting/, gradebook/, feedback snippets, appointments, revision plans, interventions, etc.)
+│   ├── server/           → Server functions (*.ts = stubs, *.server.ts = handlers), including reporting/PDF/storage, academic context and records, appointments, assignments, revisions, interventions, and feedback snippets
+│   ├── db/schema/        → Drizzle schema (split by domain, including report jobs, academic context/records, appointments/reminders, revision action items, interventions, and feedback snippets)
 │   ├── auth/             → Better-Auth configuration
 │   ├── i18n/             → Translation init + locale detection
 │   ├── lib/              → Shared utilities (student-next-actions resolver, email, storage, errors, logging, etc.)
@@ -116,7 +117,18 @@ TRACK-060 is complete, reviewed, and archived. Official academic records are cre
 - Records retain source assignment/snapshot/release-version and policy-version provenance. Database triggers reject mismatched student, assignment, release, section, course, or term references and prevent transcript-source reassignment after official records exist. Later releases insert a new immutable record version; recomputing a working grade cannot rewrite historical records.
 - The default policy maps `A/B/C/D/F` to `4/3/2/1/0`; institutions may add explicit mappings. Term and cumulative GPA use positive course credits and half-up rounding (default scale: two decimal places). Cumulative GPA uses the latest eligible attempt per course; incomplete and withdrawn records remain visible but are excluded.
 - Role-scoped routes are available at `/student/academic-records`, `/instructor/academic-records`, and `/admin/academic-records`. Students see their own transcript, instructors require active enrollment in authorized sections, and admins can inspect authorized records with source and policy metadata. Incomplete publication requires an explicit per-student reason.
-- The track includes bilingual responsive views, loading/empty/error/unavailable states, accessibility coverage, transactional release/withdrawal persistence, and unit, integration, and end-to-end regression coverage. PDF generation and scheduled delivery remain in TRACK-061.
+- The track includes bilingual responsive views, loading/empty/error/unavailable states, accessibility coverage, transactional release/withdrawal persistence, and unit, integration, and end-to-end regression coverage. TRACK-061 consumes these immutable records for on-demand PDF transcripts; recurring delivery remains deferred.
+
+## Institutional Reporting & Secure Delivery (TRACK-061)
+
+TRACK-061 is complete, reviewed, and archived. The role-scoped `/admin/reports`, `/instructor/reports`, and `/student/reports` surfaces generate exactly three bilingual PDF templates: Institutional Academic Summary, Analytics Summary, and Official Transcript.
+
+- Admins/superadmins can generate institutional summaries and authorized student transcripts. Instructors receive analytics only for actively enrolled sections. Students generate only their own official transcript.
+- Term, course, section, and explicit cohort filters are authorized server-side. Transcript PDFs use immutable released academic records and established term/cumulative GPA calculations rather than mutable gradebook data.
+- Durable report jobs expose pending, processing, completed, failed, and expired states with concurrency-safe claims, manual retries, stale-processing failure recovery, audit-safe history, and 30-day expiry.
+- PDFKit renders server-side with bundled Noto Sans fonts. Production builds copy and smoke-test those assets, and Docker verifies they are present.
+- PDFs are stored under opaque private `reports/` R2 keys and downloaded through owner-authorized five-minute attachment URLs. Operators must configure the documented 40-day `reports/` lifecycle rule to sweep crash-window orphans.
+- Scheduling, recurring delivery, saved presets, email attachments, arbitrary report builders, and public/permanent URLs remain out of scope.
 
 ## Documentation
 
@@ -124,6 +136,7 @@ TRACK-060 is complete, reviewed, and archived. Official academic records are cre
 - **[docs/TDD.md](docs/TDD.md)** — Technical Design Document (architecture, data model, schemas)
 - **[docs/roadmap.md](docs/roadmap.md)** — Remediation roadmap (audit findings, tracks, milestones)
 - **[Archived TRACK-058 plan](conductor/archive/consultation-scheduling-advising-calendar_20260808/)** — Consultation scheduling, advising appointments, reminders, and private calendar decisions
+- **[Archived TRACK-061 plan](conductor/archive/institutional_reporting_secure_delivery_20260809/)** — On-demand institutional PDFs, durable jobs, private delivery, retention, and review decisions
 - **[Archived UI/UX audit remediation track](conductor/archive/ui-ux-audit-remediation_20260804/)** — Full-surface accessibility, responsive, feedback, localization, motion, and hydration decisions
 - **[docs/vitest-coverage-performance.md](docs/vitest-coverage-performance.md)** — Vitest coverage benchmark and optimization decision record
 - **[AGENTS.md](AGENTS.md)** — Developer guide (commands, architecture, testing patterns, formatting)
@@ -163,6 +176,7 @@ TRACK-060 is complete, reviewed, and archived. Official academic records are cre
 - **Keyboard shortcuts:** A two-layer shortcut architecture: global shortcuts (`R` = refresh data, `?` = cheat-sheet popover) active on all authenticated pages, and review-specific shortcuts (`J`/`K` = navigate pending review queue) active only on the review detail page. Shortcuts are disabled when typing in inputs. The pending review list is preloaded on mount for instant J/K navigation.
 - **Route prefetch:** Sidebar navigation links use `preload="intent"` so hovering a link prefetches the route's data/loader. The router's `defaultPreload` is `false` to avoid over-prefetching on the public landing page.
 - **Analytics & reporting:** Role-based analytics dashboards at `/admin/analytics` and `/instructor/analytics` with URL-driven date ranges (`?range=7d|30d|90d|all`). All metrics are NEW (historical trends, verification/breach rates, response times) — they don't duplicate the real-time operational dashboards. No new DB tables; aggregate queries (`GROUP BY`, `date_trunc`) over existing data. CSV export via server function → client `Blob` download (with CSV formula-injection sanitization); Excel export via client-side SheetJS (reuses the existing `xlsx` dependency).
+- **Institutional PDF reporting (TRACK-061):** Three allowlisted role-scoped reports reuse analytics, academic-context, and immutable academic-record contracts. Durable `report_jobs` coordinate synchronous on-demand generation without holding transactions across PDF/R2 work; owner-scoped history, retry, expiry, cleanup, five-minute private downloads, embedded-font production smoke checks, and bilingual accessible role routes are included. Recurring scheduling remains deferred.
 - **Rubric-based grading:** Template checkpoints can optionally have a grading type (`numeric` = direct 0–100 per criterion, `qualitative` = level-based scoring with configurable numeric mapping). Admins build rubrics (criteria with weights summing to 100%, qualitative levels with score mappings). Instructors score criteria during review; the system auto-computes a weighted total. Rubric scores are stored as a full denormalized snapshot (`criterionTitle`, `levelLabel`, `score`, `weight`) so completed reviews are unaffected by later rubric edits. The `updateTemplateHandler` uses upsert/diff to preserve checkpoint IDs across template edits (rubric FKs survive). Rubric analytics (avg per criterion, cross-instructor comparison) extend the existing dashboards, with CSV/Excel export of per-student criterion scores (formula-injection sanitized on both paths).
 - **Gradebook & final grade computation:** A pure grade computation engine (`src/lib/grade-computation.ts`) aggregates rubric-based review scores and pass/fail checkpoint states into weighted final grades with configurable letter grade mapping. Per-assignment grade config (`assignment_grade_config` — scheme, custom weights, letter bounds, and release metadata) is auto-created on assignment creation. Computed working grades are cached in a `final_grades` table and recomputed automatically on `pass` review decisions (post-commit advisory, never affects the review transaction) or manually via admin "Recompute All Grades" (wrapped in `db.transaction` for atomicity). Stale custom weights (sum≠100, missing/extra checkpoint entries) fall back to equal-weight averaging with a warning badge. Instructor gradebook view at `/instructor/assignments/$id/gradebook` includes CSV/Excel export (formula-injection sanitized) and instructor-owned release controls. Student final grade cards show only active immutable snapshots, with unavailable/not-yet-released states before publication or without an eligible snapshot. Admin grade distribution analytics (A/B/C/D/F progress bars). TRACK-057 refuses unknown legacy assignment rows at prelaunch migration instead of backfilling fabricated grade/context data.
 - **At-risk student identification:** A pure function (`computeStudentRisk` in `src/lib/risk-scoring.ts`) evaluates 5 risk signals per student-checkpoint (overdue checkpoint=High, approaching deadline with no submission=Medium, insufficient consultations=Medium, repeated revise≥2=Medium, stalled review>3d=Low) and returns an overall risk level with contributing factors. Risk scores remain ephemeral — computed on-demand from existing data, never persisted. The instructor dashboard displays an at-risk student widget (sorted by severity, i18n-localized factor descriptions, colored Badges, EmptyState when none). Event-driven alerts fire post-commit (advisory, try/catch) when an instructor submits a `revise` decision or an SLA breach occurs — dispatching in-app `student_at_risk` notifications + localized emails to the instructor via `Promise.allSettled` with 7-day dedup. The deadline reminder scanner also calls the risk alert function. Admin analytics shows aggregate at-risk counts (high/medium/low) with colored Badge UI. TRACK-050 persists instructor response records separately in the `interventions` table; persistence does not alter risk scoring or automatically resolve an intervention.

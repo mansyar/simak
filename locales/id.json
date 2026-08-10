@@ -108,6 +108,7 @@
     "auditLog": "Log Audit",
     "emailQueue": "Antrian Email",
     "analytics": "Analitik",
+    "reports": "Laporan",
     "branding": "SIMAK",
     "sectionMain": "UTAMA",
     "sectionPreferences": "PENGATURAN"
@@ -120,6 +121,7 @@
     "interventions": "Intervensi",
     "feedbackSnippets": "Cuplikan umpan balik",
     "analytics": "Analitik",
+    "reports": "Laporan",
     "branding": "SIMAK",
     "sectionMain": "UTAMA",
     "sectionPreferences": "PENGATURAN"
@@ -531,6 +533,7 @@
       "sectionCourse": "ID mata kuliah",
       "sectionCode": "Kode kelas",
       "sectionName": "Nama kelas",
+      "sectionCohort": "Angkatan",
       "enrollmentSection": "ID kelas",
       "enrollmentUser": "ID pengguna",
       "enrollmentRole": "Peran pendaftaran",
@@ -703,6 +706,7 @@
     "dashboard": "Dasbor",
     "assignments": "Tugas",
     "academicRecords": "Rekam akademik",
+    "reports": "Laporan",
     "settings": "Pengaturan",
     "branding": "SIMAK",
     "sectionMain": "UTAMA",
@@ -1836,6 +1840,103 @@
     },
     "analytics": {
       "gradeDistribution": "Distribusi Nilai"
+    }
+  },
+  "reports": {
+    "eyebrow": "LAPORAN",
+    "title": "Laporan",
+    "subtitle": {
+      "superadmin": "Buat ringkasan institusional, transkrip resmi, dan laporan analitik dari data akademik yang telah dirilis.",
+      "admin": "Buat ringkasan institusional, transkrip resmi, dan laporan analitik dari data akademik yang telah dirilis.",
+      "instructor": "Buat laporan analitik untuk mata kuliah dan kelas yang Anda ampu.",
+      "student": "Buat transkrip akademik resmi Anda."
+    },
+    "loading": "Memuat laporan yang tersedia...",
+    "loadError": "Gagal memuat laporan. Silakan coba lagi.",
+    "empty": "Tidak ada laporan tersedia",
+    "emptyDescription": "Saat ini tidak ada laporan yang dapat Anda buat.",
+    "catalogLabel": "Laporan yang tersedia",
+    "types": {
+      "institutional_academic_summary": {
+        "name": "Ringkasan Akademik Institusional",
+        "description": "Gambaran umum per term, mata kuliah, kelas, dan kohort yang disusun dari catatan akademik yang telah dirilis."
+      },
+      "official_transcript": {
+        "name": "Transkrip Resmi",
+        "description": "Transkrip akademik resmi Anda dari catatan akademik yang telah dirilis.",
+        "descriptionAdmin": "Buat transkrip akademik resmi seorang mahasiswa dari catatan akademik yang telah dirilis."
+      },
+      "analytics_summary": {
+        "name": "Ringkasan Analitik",
+        "description": "Ringkasan penyelesaian dan pengumpulan untuk konteks yang dipilih."
+      }
+    },
+    "filters": {
+      "label": "Filter laporan",
+      "term": "Term akademik",
+      "course": "Mata kuliah",
+      "section": "Kelas",
+      "cohort": "Kohort",
+      "allTerms": "Semua term",
+      "allCourses": "Semua mata kuliah",
+      "allSections": "Semua kelas",
+      "allCohorts": "Semua kohort",
+      "noCourses": "Tidak ada mata kuliah untuk term ini.",
+      "noSections": "Tidak ada kelas untuk pilihan ini.",
+      "noCohorts": "Tidak ada kohort untuk pilihan ini."
+    },
+    "student": {
+      "label": "Mahasiswa",
+      "searchLabel": "Cari mahasiswa",
+      "searchPlaceholder": "Cari mahasiswa berdasarkan nama atau email...",
+      "loading": "Memuat mahasiswa...",
+      "loadError": "Gagal memuat daftar mahasiswa.",
+      "empty": "Tidak ada mahasiswa tersedia.",
+      "noResults": "Tidak ada mahasiswa yang cocok dengan pencarian Anda.",
+      "loadMore": "Muat lebih banyak mahasiswa"
+    },
+    "locale": {
+      "label": "Bahasa laporan",
+      "english": "Inggris",
+      "indonesian": "Indonesia"
+    },
+    "generate": "Buat laporan",
+    "generating": "Membuat laporan...",
+    "validation": {
+      "studentRequired": "Pilih mahasiswa untuk membuat transkrip ini."
+    },
+    "job": {
+      "pending": "Laporan diminta. Laporan akan tersedia untuk diunduh setelah selesai.",
+      "processing": "Laporan sedang dibuat. Laporan akan tersedia untuk diunduh sebentar lagi.",
+      "completed": "Laporan berhasil dibuat.",
+      "failed": "Gagal membuat laporan. Silakan coba lagi.",
+      "expired": "Laporan ini telah kedaluwarsa."
+    },
+    "history": {
+      "title": "Riwayat laporan",
+      "description": "Unduh laporan yang sudah dibuat atau coba lagi laporan yang gagal.",
+      "loading": "Memuat riwayat laporan...",
+      "loadError": "Gagal memuat riwayat laporan.",
+      "empty": "Belum ada laporan",
+      "emptyDescription": "Laporan yang Anda buat akan muncul di sini.",
+      "listLabel": "Laporan yang dibuat",
+      "state": {
+        "pending": "Menunggu",
+        "processing": "Diproses",
+        "completed": "Selesai",
+        "failed": "Gagal",
+        "expired": "Kedaluwarsa"
+      },
+      "requestedLabel": "Diminta {date}",
+      "generatedLabel": "Dibuat {date}",
+      "expiresLabel": "Kedaluwarsa {date}",
+      "expiredHint": "Laporan ini telah kedaluwarsa dan tidak dapat diunduh lagi.",
+      "download": "Unduh",
+      "downloading": "Menyiapkan unduhan...",
+      "retry": "Coba lagi",
+      "retrying": "Mencoba lagi...",
+      "activeFeedback": "{count} laporan masih sedang dibuat.",
+      "upToDateFeedback": "{count} laporan di riwayat Anda."
     }
   }
 }

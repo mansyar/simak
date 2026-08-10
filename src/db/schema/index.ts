@@ -23,6 +23,7 @@ export * from './interventions';
 export * from './feedback-snippets';
 export * from './calendar-feed-tokens';
 export * from './revision-action-items';
+export * from './report-jobs';
 
 // Import tables for relations
 import { users } from './users';
@@ -46,6 +47,7 @@ import { interventions } from './interventions';
 import { feedbackSnippets } from './feedback-snippets';
 import { calendarFeedTokens } from './calendar-feed-tokens';
 import { revisionActionItems } from './revision-action-items';
+import { reportJobs } from './report-jobs';
 
 // ---- Relations ----
 
@@ -90,6 +92,7 @@ export const usersRelations = relations(users, ({ many }) => ({
   calendarFeedTokens: many(calendarFeedTokens),
   sectionEnrollments: many(sectionEnrollments),
   academicRecords: many(academicRecords),
+  reportJobs: many(reportJobs),
 }));
 
 export const academicTermsRelations = relations(academicTerms, ({ many }) => ({
@@ -437,6 +440,13 @@ export const academicRecordsRelations = relations(academicRecords, ({ one }) => 
   policy: one(academicRecordPolicies, {
     fields: [academicRecords.policyVersion],
     references: [academicRecordPolicies.version],
+  }),
+}));
+
+export const reportJobsRelations = relations(reportJobs, ({ one }) => ({
+  requester: one(users, {
+    fields: [reportJobs.requesterId],
+    references: [users.id],
   }),
 }));
 

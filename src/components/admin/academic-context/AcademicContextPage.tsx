@@ -31,6 +31,7 @@ export interface CourseSectionRow {
   id: number;
   code: string;
   name: string | null;
+  cohort?: string | null;
   termId: number;
   courseId: number;
   status: SectionStatus;
@@ -69,6 +70,7 @@ interface AcademicContextPageProps {
     courseId: number;
     code: string;
     name: string;
+    cohort: string;
   }) => void | Promise<void>;
   onAddEnrollment?: (input: {
     sectionId: number;
@@ -95,6 +97,7 @@ interface AcademicContextPageProps {
     courseId: number;
     code: string;
     name: string;
+    cohort: string;
     status: SectionStatus;
   }) => void | Promise<void>;
   onUpdateEnrollment?: (input: {
@@ -178,6 +181,7 @@ export function AcademicContextPage({
         courseId: Number(value('courseId')),
         code: value('code'),
         name: value('name'),
+        cohort: value('cohort'),
       });
     } else {
       void onAddEnrollment?.({
@@ -300,6 +304,7 @@ export function AcademicContextPage({
                   />
                   <Field name="code" label={t('adminAcademicContext.forms.sectionCode')} required />
                   <Field name="name" label={t('adminAcademicContext.forms.sectionName')} required />
+                  <Field name="cohort" label={t('adminAcademicContext.forms.sectionCohort')} />
                 </>
               )}
               {openForm === 'enrollment' && (
@@ -414,6 +419,12 @@ export function AcademicContextPage({
                     <>
                       <span aria-hidden="true"> · </span>
                       <span>{section.name}</span>
+                    </>
+                  )}
+                  {section.cohort && (
+                    <>
+                      <span aria-hidden="true"> · </span>
+                      <span>{section.cohort}</span>
                     </>
                   )}
                 </>

@@ -64,11 +64,17 @@ export const ListCoursesSchema = z.object({
 
 export const CourseSectionIdSchema = z.object({ id: IdSchema });
 
+const CohortSchema = z.preprocess(
+  (value) => (typeof value === 'string' && value.trim() === '' ? null : value),
+  z.string().trim().min(1).max(120).nullable().optional(),
+);
+
 export const CreateCourseSectionSchema = z.object({
   termId: IdSchema,
   courseId: IdSchema,
   code: z.string().trim().min(1).max(50),
   name: z.string().trim().max(160).nullable().optional(),
+  cohort: CohortSchema,
   status: CourseSectionStatusSchema.default('active'),
 });
 

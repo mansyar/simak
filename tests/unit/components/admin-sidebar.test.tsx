@@ -104,6 +104,25 @@ describe('AdminSidebar', () => {
     expect(academicRecordsLink.textContent).toBe('adminSidebar.academicRecords');
   });
 
+  it('should render the reports link', () => {
+    mockLocation.mockReturnValue({ pathname: '/admin/dashboard' });
+    render(<AdminSidebar isOpen={true} onClose={vi.fn()} />);
+
+    const reportsLink = screen.getByTestId('sidebar-link-/admin/reports');
+    expect(reportsLink).toBeDefined();
+    expect(reportsLink.textContent).toBe('adminSidebar.reports');
+  });
+
+  it('should highlight the reports route', () => {
+    mockLocation.mockReturnValue({ pathname: '/admin/reports' });
+    render(<AdminSidebar isOpen={true} onClose={vi.fn()} />);
+
+    const reportsLink = screen.getByTestId('sidebar-link-/admin/reports');
+    expect(reportsLink.className).toContain('bg-sidebar-accent');
+    expect(reportsLink.className).toContain('text-sidebar-primary-foreground');
+    expect(reportsLink.getAttribute('aria-current')).toBe('page');
+  });
+
   it('should highlight the currently active route', () => {
     mockLocation.mockReturnValue({ pathname: '/admin/dashboard' });
     render(<AdminSidebar isOpen={true} onClose={vi.fn()} />);

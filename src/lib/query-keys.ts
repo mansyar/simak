@@ -2,8 +2,10 @@
  * Typed query-key factories for TanStack Query.
  *
  * Covers notification, consultation, extension, assignment, user, template,
- * discussion, settings, and gradebook domains.
+ * discussion, settings, gradebook, and reporting domains.
  */
+
+import type { ReportingRole } from '@/lib/reporting-policy';
 
 export const notificationKeys = {
   all: () => ['notifications'] as const,
@@ -85,4 +87,10 @@ export const feedbackSnippetKeys = {
   all: () => ['feedbackSnippets'] as const,
   list: (filters: { archived: boolean; search: string; page: number; limit: number }) =>
     ['feedbackSnippets', 'list', filters] as const,
+};
+
+export const reportKeys = {
+  all: () => ['reports'] as const,
+  catalog: (role: ReportingRole) => ['reports', 'catalog', role] as const,
+  history: (role: ReportingRole) => ['reports', 'history', role] as const,
 };

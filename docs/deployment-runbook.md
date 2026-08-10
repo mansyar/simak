@@ -94,6 +94,33 @@ that the browser's preflight `OPTIONS` response includes
 presigned `PUT` should return a successful response. Never paste a signed URL
 or its query string into an issue, commit, or operator log.
 
+## R2 object lifecycle (reports/ prefix)
+
+Report PDFs are stored under the `reports/` key prefix with opaque UUID names
+(e.g. `reports/4f3a….pdf`) and are **never** served through a public URL;
+downloads use short-lived presigned GET URLs only. Deletion of report objects
+is driven by the application's expiry cleanup (`report_expiry_cleanup` audit
+events), which only knows keys still attached to database report jobs.
+
+The application cannot discover orphaned objects: if the server crashes between
+uploading a report to R2 and recording the artifact on its job row, or if a job
+row is deleted while the object still exists, the key is unrecoverable from the
+database and no application process can clean it up.
+
+> **Required: configure an R2 lifecycle rule for the `reports/` prefix.**
+> In Cloudflare R2 **Bucket → Settings → Lifecycle rules**, add a rule that
+> **deletes objects with prefix `reports/` after 40 days**. The application
+> already deletes objects at 30-day job expiry (plus a short grace for in-flight
+> expiry runs); 40 days is strictly longer, so legitimate reports are deleted by
+> the application first and the rule only sweeps orphans left by crashes or
+> manual database edits. Verify the rule after configuration and record it in
+> the deployment ticket. Until this rule exists, a crash between upload and
+> completion leaves an orphaned report object in the bucket indefinitely.
+
+Do not apply the rule to other prefixes (`submissions/` has a separate
+retention policy and must be reviewed independently before any lifecycle rule
+touches it).
+
 ## Pre-deployment checklist
 
 1. Confirm the intended repository branch and commit in Coolify. Record the
@@ -114,7 +141,9 @@ or its query string into an issue, commit, or operator log.
    PgBouncer-specific setting has been enabled accidentally.
 6. Confirm R2 bucket CORS, scoped credentials, and the Resend sender/domain
    are ready for the release.
-7. Confirm DNS still points the pilot domain to the Coolify ingress and the
+7. Confirm the R2 lifecycle rule for the `reports/` prefix (see
+   "R2 object lifecycle (reports/ prefix)") exists and is verified.
+8. Confirm DNS still points the pilot domain to the Coolify ingress and the
    certificate is valid.
 
 ## Deploy or redeploy

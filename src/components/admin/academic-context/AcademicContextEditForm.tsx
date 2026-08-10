@@ -35,6 +35,7 @@ interface AcademicContextEditFormProps {
     courseId: number;
     code: string;
     name: string;
+    cohort: string;
     status: CourseSectionRow['status'];
   }) => void | Promise<void>;
   onUpdateEnrollment: (input: {
@@ -84,6 +85,7 @@ export function AcademicContextEditForm({
         courseId: Number(value('courseId')),
         code: value('code'),
         name: value('name'),
+        cohort: value('cohort'),
         status: value('status') as CourseSectionRow['status'],
       });
     } else {
@@ -175,6 +177,12 @@ export function AcademicContextEditForm({
             name="name"
             label={t('adminAcademicContext.forms.sectionName')}
             value={target.row.name ?? ''}
+            required={false}
+          />
+          <InputField
+            name="cohort"
+            label={t('adminAcademicContext.forms.sectionCohort')}
+            value={target.row.cohort ?? ''}
             required={false}
           />
           <StatusField
