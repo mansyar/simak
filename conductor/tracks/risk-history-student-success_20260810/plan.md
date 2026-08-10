@@ -48,7 +48,7 @@
     risk context without altering score semantics.
   - Confirm recorder tests pass.
 
-- [~] Task: Capture meaningful lifecycle events
+- [x] Task: Capture meaningful lifecycle events (94c05433)
   - Write failing integration tests for checkpoint, submission/review,
     verified-consultation, and intervention transitions that affect risk context.
   - Wire post-commit capture into the existing lifecycle boundaries so a capture
