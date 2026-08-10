@@ -21,6 +21,7 @@ import { ChevronLeft } from 'lucide-react';
 import { useI18n } from '../../../__root';
 import { getErrorTranslationKey, isServerError } from '@/lib/errors';
 import { ErrorState } from '@/components/ui/error-state';
+import { StudentSupportCard } from '@/components/student/assignments/StudentSupportCard';
 
 export const Route = createFileRoute('/_authenticated/student/assignments/$id')({
   loader: async ({ params }) => {
@@ -282,6 +283,8 @@ function AssignmentDetailPage() {
       <AssignmentDetailHeader detail={detail} />
 
       <StudentFinalGradeCard assignmentId={assignment.id} />
+
+      <StudentSupportCard assignmentId={assignment.id} />
 
       <Tabs
         tabs={assignmentTabs}

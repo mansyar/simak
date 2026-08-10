@@ -867,6 +867,94 @@
       }
     }
   },
+  "riskHistory": {
+    "tab": "Riwayat risiko",
+    "loading": "Memuat riwayat risiko",
+    "noStudents": "Tidak ada mahasiswa yang ditugaskan",
+    "filters": {
+      "title": "Filter riwayat",
+      "student": "Mahasiswa",
+      "from": "Dari tanggal",
+      "to": "Sampai tanggal",
+      "apply": "Terapkan filter"
+    },
+    "error": {
+      "title": "Riwayat risiko tidak dapat dimuat",
+      "description": "Coba lagi untuk mengambil riwayat terbaru yang dapat diakses."
+    },
+    "empty": {
+      "title": "Tidak ada observasi pada periode ini",
+      "description": "Ubah rentang tanggal atau kembali setelah aktivitas akademik yang bermakna terjadi."
+    },
+    "outcomes": {
+      "title": "Hasil mahasiswa",
+      "facts": "Fakta tercatat",
+      "interpretation": "Interpretasi",
+      "interpretationNote": "Interpretasi merangkum aktivitas tercatat dan tidak mengubah keputusan akademik."
+    },
+    "facts": {
+      "checkpoints": "Checkpoint lulus",
+      "submissions": "Pengumpulan",
+      "reviews": "Review",
+      "consultations": "Konsultasi terverifikasi",
+      "interventions": "Tindakan dukungan"
+    },
+    "interpretation": {
+      "academicLabel": "Kemajuan akademik",
+      "engagementLabel": "Keterlibatan",
+      "academic": {
+        "complete": "Selesai",
+        "in_progress": "Sedang berlangsung",
+        "not_started": "Belum dimulai"
+      },
+      "engagement": {
+        "engaged": "Keterlibatan tercatat",
+        "no_recorded_engagement": "Belum ada keterlibatan tercatat"
+      }
+    },
+    "timeline": {
+      "title": "Linimasa observasi",
+      "factors": "Faktor tercatat"
+    },
+    "event": {
+      "checkpoint_updated": "Checkpoint diperbarui",
+      "submission_recorded": "Pengumpulan tercatat",
+      "review_recorded": "Review tercatat",
+      "consultation_verified": "Konsultasi terverifikasi",
+      "intervention_updated": "Tindakan dukungan diperbarui",
+      "daily_snapshot": "Observasi harian"
+    },
+    "level": {
+      "low": "Rendah",
+      "medium": "Sedang",
+      "high": "Tinggi"
+    },
+    "admin": {
+      "title": "Tren risiko yang menjaga privasi",
+      "loading": "Memuat tren risiko agregat",
+      "error": "Tren agregat tidak dapat dimuat",
+      "empty": "Tidak ada observasi agregat pada periode ini",
+      "aggregateList": "Observasi risiko agregat",
+      "observationCount": "Jumlah observasi",
+      "suppressedTitle": "Detail tren dilindungi",
+      "suppressedDescription": "Hasil tetap disembunyikan sampai kelompok akademik ini berisi minimal 10 mahasiswa.",
+      "termFilter": "Semester akademik",
+      "selectTerm": "Pilih semester akademik"
+    },
+    "student": {
+      "loading": "Memuat status dukungan",
+      "error": "Status dukungan tidak dapat dimuat",
+      "onTrackTitle": "Teruslah melangkah maju",
+      "onTrackDescription": "Lanjutkan rencana tugas Anda dan hubungi dosen kapan pun Anda memerlukan arahan.",
+      "supportAvailableTitle": "Dukungan tersedia",
+      "supportAvailableDescription": "Anda tidak sendirian. Langkah berikut dapat membantu Anda terus berkembang.",
+      "nextSteps": "Saran langkah berikutnya",
+      "steps": {
+        "contactInstructor": "Hubungi dosen Anda untuk membahas dukungan yang tersedia.",
+        "reviewCurrentWork": "Tinjau pekerjaan Anda saat ini dan tentukan satu langkah berikutnya yang dapat dilakukan."
+      }
+    }
+  },
   "instructorDashboard": {
     "title": "Dasbor",
     "subtitle": "Ikhtisar aktivitas mengajar Anda",

@@ -1,14 +1,17 @@
 /** @vitest-environment node */
-import { eq } from 'drizzle-orm';
+import { eq, inArray, or } from 'drizzle-orm';
 import { beforeAll, beforeEach, afterAll, describe, expect, it, vi } from 'vitest';
 import { getDb } from '@/db/index';
 import {
   assignmentStudents,
   assignments,
   assignmentTemplates,
+  academicTerms,
   auditLog,
   checkpoints,
   interventions,
+  notifications,
+  riskObservations,
   users,
 } from '@/db/schema/index';
 import {
@@ -22,6 +25,12 @@ import {
   listInterventionsHandler,
   updateInterventionHandler,
 } from '@/server/interventions.server';
+import { listInstructorRiskHistoryHandler } from '@/server/risk-history.server';
+import {
+  processDailyRiskSnapshots,
+  processRiskObservationRetention,
+} from '@/server/risk-history-jobs.server';
+import { recordRiskObservation } from '@/server/risk-observation-recorder.server';
 
 vi.mock('@/server/auth', () => ({
   getSessionFromHeaders: vi.fn(),
@@ -111,12 +120,28 @@ describe('intervention workflow database acceptance', () => {
 
   beforeEach(async () => {
     await db.delete(auditLog).where(eq(auditLog.actorId, instructorId));
+    await db
+      .delete(riskObservations)
+      .where(
+        or(
+          eq(riskObservations.assignmentId, assignmentId),
+          eq(riskObservations.academicTermId, academicFixture.termId),
+        ),
+      );
     await db.delete(interventions).where(eq(interventions.assignmentId, assignmentId));
   });
 
   afterAll(async () => {
     await db.delete(auditLog).where(eq(auditLog.actorId, instructorId));
     await db.delete(auditLog).where(eq(auditLog.actorId, replacementInstructorId));
+    await db
+      .delete(riskObservations)
+      .where(
+        or(
+          eq(riskObservations.assignmentId, assignmentId),
+          eq(riskObservations.academicTermId, academicFixture.termId),
+        ),
+      );
     await db.delete(interventions).where(eq(interventions.assignmentId, assignmentId));
     await db.delete(checkpoints).where(eq(checkpoints.id, checkpointId));
     await db.delete(assignmentStudents).where(eq(assignmentStudents.assignmentId, assignmentId));
@@ -160,6 +185,11 @@ describe('intervention workflow database acceptance', () => {
     vi.mocked(auth.getSessionFromHeaders).mockResolvedValue({
       user: { id: instructorId, role: 'instructor' },
     } as any);
+    const notificationRecipients = [instructorId, replacementInstructorId, studentId];
+    const notificationsBefore = await db
+      .select()
+      .from(notifications)
+      .where(inArray(notifications.userId, notificationRecipients));
 
     const monitoring = await updateInterventionHandler({
       data: { interventionId: created.id, status: 'monitoring' },
@@ -191,6 +221,20 @@ describe('intervention workflow database acceptance', () => {
       data: { interventionId: created.id, privateNote: 'Should not change' },
     });
     expect(immutable).toMatchObject({ error: { code: 'BAD_REQUEST' } });
+
+    const observations = await db
+      .select({ eventType: riskObservations.eventType })
+      .from(riskObservations)
+      .where(eq(riskObservations.interventionId, created.id));
+    expect(observations).toEqual([
+      { eventType: 'intervention_updated' },
+      { eventType: 'intervention_updated' },
+    ]);
+    const notificationsAfter = await db
+      .select()
+      .from(notifications)
+      .where(inArray(notifications.userId, notificationRecipients));
+    expect(notificationsAfter).toHaveLength(notificationsBefore.length);
   });
 
   it('scopes visibility to the current assignment owner after reassignment', async () => {
@@ -201,6 +245,13 @@ describe('intervention workflow database acceptance', () => {
     vi.mocked(auth.getSessionFromHeaders).mockResolvedValue({
       user: { id: instructorId, role: 'instructor' },
     } as any);
+    await updateInterventionHandler({
+      data: { interventionId: created.id, status: 'monitoring' },
+    });
+    const historyBefore = await listInstructorRiskHistoryHandler({
+      data: { assignmentId, studentId, from: null, to: null, page: 1, limit: 20 },
+    });
+    expect(historyBefore).toMatchObject({ total: 1 });
     const before = await listInterventionsHandler({
       data: { assignmentId, page: 1, limit: 20, overdue: false },
     });
@@ -215,6 +266,10 @@ describe('intervention workflow database acceptance', () => {
       data: { assignmentId, page: 1, limit: 20, overdue: false },
     });
     expect(formerOwner).toMatchObject({ interventions: [], total: 0 });
+    const formerHistory = await listInstructorRiskHistoryHandler({
+      data: { assignmentId, studentId, from: null, to: null, page: 1, limit: 20 },
+    });
+    expect(formerHistory).toMatchObject({ error: { code: 'NOT_FOUND' } });
 
     vi.mocked(auth.getSessionFromHeaders).mockResolvedValue({
       user: { id: replacementInstructorId, role: 'instructor' },
@@ -223,10 +278,90 @@ describe('intervention workflow database acceptance', () => {
       data: { assignmentId, page: 1, limit: 20, overdue: false },
     });
     expect(replacement).toMatchObject({ total: 1, interventions: [{ id: created.id }] });
+    const replacementHistory = await listInstructorRiskHistoryHandler({
+      data: { assignmentId, studentId, from: null, to: null, page: 1, limit: 20 },
+    });
+    expect(replacementHistory).toMatchObject({ total: 1 });
 
     const context = await getInterventionContextHandler({
       data: { assignmentId, studentId },
     });
     expect(context).toMatchObject({ context: { assignmentId, studentId } });
+  });
+
+  it('persists empty-context snapshots and anonymizes lifecycle rows in PostgreSQL', async () => {
+    const now = new Date('2026-08-10T05:30:00.000Z');
+    await db.update(checkpoints).set({ state: 'passed' }).where(eq(checkpoints.id, checkpointId));
+
+    try {
+      await expect(
+        recordRiskObservation(db, {
+          source: 'lifecycle_event',
+          eventType: 'review_recorded',
+          sourceEventId: `review:passed:${suffix}`,
+          assignmentId,
+          studentId,
+          checkpointId,
+          actorId: instructorId,
+          observedAt: now,
+        }),
+      ).resolves.toMatchObject({ created: true });
+      const dailyResult = await processDailyRiskSnapshots({ db, now });
+      expect(dailyResult.created).toBeGreaterThanOrEqual(1);
+
+      const identifiable = await db
+        .select({
+          riskLevel: riskObservations.riskLevel,
+          factorSnapshot: riskObservations.factorSnapshot,
+        })
+        .from(riskObservations)
+        .where(eq(riskObservations.assignmentId, assignmentId));
+      expect(identifiable).toHaveLength(2);
+      expect(identifiable).toEqual(
+        expect.arrayContaining([expect.objectContaining({ riskLevel: 'low', factorSnapshot: [] })]),
+      );
+
+      await db
+        .update(academicTerms)
+        .set({ startDate: '2020-01-01', endDate: '2020-06-30' })
+        .where(eq(academicTerms.id, academicFixture.termId));
+      await expect(processRiskObservationRetention({ db, now })).resolves.toMatchObject({
+        anonymized: 2,
+      });
+
+      const anonymized = await db
+        .select({
+          retentionState: riskObservations.retentionState,
+          assignmentId: riskObservations.assignmentId,
+          studentId: riskObservations.studentId,
+          eventType: riskObservations.eventType,
+          sourceEventId: riskObservations.sourceEventId,
+          factorSnapshot: riskObservations.factorSnapshot,
+        })
+        .from(riskObservations)
+        .where(eq(riskObservations.academicTermId, academicFixture.termId));
+      expect(anonymized).toHaveLength(2);
+      expect(anonymized).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            retentionState: 'anonymized',
+            assignmentId: null,
+            studentId: null,
+            eventType: null,
+            sourceEventId: null,
+            factorSnapshot: [],
+          }),
+        ]),
+      );
+    } finally {
+      await db
+        .update(academicTerms)
+        .set({ startDate: '2026-01-01', endDate: '2026-06-30' })
+        .where(eq(academicTerms.id, academicFixture.termId));
+      await db
+        .update(checkpoints)
+        .set({ state: 'unlocked' })
+        .where(eq(checkpoints.id, checkpointId));
+    }
   });
 });

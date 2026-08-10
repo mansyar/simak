@@ -4,6 +4,7 @@ import { processDeadlineReminders } from './deadline-reminder-scanner';
 import { processAppointmentReminders } from './appointment-reminder-scanner';
 import { processOrphanedR2Objects } from './r2-cleanup';
 import { logger } from '@/lib/logger';
+import { processRiskHistoryJobs } from '@/server/risk-history-jobs.server';
 
 const POLL_INTERVAL_MS = 30_000;
 const PRUNE_INTERVAL_MS = 24 * 60 * 60 * 1000; // 24 hours
@@ -15,6 +16,7 @@ let lastPruneAt: Date | null = null;
 let lastReminderScanAt: Date | null = null;
 let lastAppointmentReminderScanAt: Date | null = null;
 let lastR2CleanupAt: Date | null = null;
+let lastRiskHistoryAt: Date | null = null;
 let currentTickPromise: Promise<void> | null = null;
 
 async function tick(): Promise<void> {
@@ -76,6 +78,20 @@ async function tick(): Promise<void> {
       const result = await pruneOldEmails();
       lastPruneAt = new Date();
       tickLogger.info({ event: 'email_queue.retention_pruned', deleted: result.deleted });
+    }
+
+    if (lastRiskHistoryAt === null || now - lastRiskHistoryAt.getTime() > PRUNE_INTERVAL_MS) {
+      try {
+        const result = await processRiskHistoryJobs();
+        if (result.complete) lastRiskHistoryAt = new Date();
+        tickLogger.info({ event: 'risk_history.daily_processed', ...result });
+      } catch (error) {
+        tickLogger.error({
+          event: 'risk_history.daily_failed',
+          error: error instanceof Error ? error.message : String(error),
+          willRetryNextInterval: true,
+        });
+      }
     }
   } catch (error) {
     tickLogger.error({

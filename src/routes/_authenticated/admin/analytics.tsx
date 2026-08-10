@@ -32,6 +32,7 @@ import {
 import { exportAssignmentProgressCsv } from '@/server/analytics';
 import { useCsvDownload } from '@/hooks/use-csv-download';
 import { exportToExcel } from '@/lib/excel-export';
+import { AdminRiskHistorySection } from '@/components/admin/AdminRiskTrendsPanel';
 
 const AnalyticsSearchSchema = z.object({
   range: z.enum(['7d', '30d', '90d', 'all']).optional(),
@@ -293,6 +294,8 @@ function AdminAnalyticsPage() {
           )}
         </CardContent>
       </Card>
+
+      <AdminRiskHistorySection from={searchParams.start} to={searchParams.end} />
 
       {/* Status Distribution */}
       <Card>

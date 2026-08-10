@@ -1,7 +1,7 @@
-import { eq, and, sql, inArray } from 'drizzle-orm';
-import { getDb } from '../db/index';
+import { eq, and, sql, inArray, isNull } from 'drizzle-orm';
+import { getDb, type Db } from '../db/index';
 import { consultations } from '../db/schema/consultations';
-import { checkpoints } from '../db/schema/assignments';
+import { assignments, checkpoints } from '../db/schema/assignments';
 import { getSessionFromHeaders } from './auth';
 import { verifyAssignmentAccess } from './ownership';
 import { serverError, ErrorCode } from '../lib/errors';
@@ -9,6 +9,34 @@ import type { z } from 'zod';
 import type { ListVerifiedCountsSchema } from './consultations';
 
 type ListVerifiedCountsInput = z.infer<typeof ListVerifiedCountsSchema>;
+type Tx = Parameters<Parameters<Db['transaction']>[0]>[0];
+
+export async function fetchConsultationForUpdate(
+  tx: Tx,
+  consultationId: number,
+  instructorId: string,
+) {
+  return tx
+    .select({
+      id: consultations.id,
+      status: consultations.status,
+      studentId: consultations.studentId,
+      assignmentId: consultations.assignmentId,
+      instructorId: assignments.instructorId,
+    })
+    .from(consultations)
+    .innerJoin(assignments, eq(consultations.assignmentId, assignments.id))
+    .where(
+      and(
+        eq(consultations.id, consultationId),
+        eq(assignments.instructorId, instructorId),
+        eq(assignments.status, 'active'),
+        isNull(assignments.deletedAt),
+      ),
+    )
+    .limit(1)
+    .for('update', { of: consultations });
+}
 
 export async function listVerifiedCountsHandler(args: { data: ListVerifiedCountsInput }) {
   const session = await getSessionFromHeaders();

@@ -24,6 +24,7 @@ export * from './feedback-snippets';
 export * from './calendar-feed-tokens';
 export * from './revision-action-items';
 export * from './report-jobs';
+export * from './risk-observations';
 
 // Import tables for relations
 import { users } from './users';

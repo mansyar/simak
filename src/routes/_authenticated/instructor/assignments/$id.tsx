@@ -19,6 +19,7 @@ import { AssignmentOverviewTab } from '@/components/instructor/assignments/Assig
 import { AssignmentConsultationsTab } from '@/components/instructor/assignments/AssignmentConsultationsTab';
 import { AssignmentExtensionsTab } from '@/components/instructor/assignments/AssignmentExtensionsTab';
 import { AssignmentInterventionsTab } from '@/components/instructor/assignments/AssignmentInterventionsTab';
+import { InstructorRiskHistoryTab } from '@/components/instructor/assignments/InstructorRiskHistoryTab';
 import { AssignmentDetailTabs } from '@/components/instructor/assignments/AssignmentDetailTabs';
 import { InstructorDiscussionBrowser } from '@/components/instructor/assignments/InstructorDiscussionBrowser';
 import { useAssignmentTabs } from '@/hooks/use-assignment-tabs';
@@ -56,6 +57,7 @@ const assignmentTabIds = new Set([
   'extensions',
   'discussions',
   'interventions',
+  'risk-history',
 ]);
 
 export function getAssignmentTabFromHash(hash: string) {
@@ -226,6 +228,7 @@ function AssignmentDetailPage() {
     { id: 'extensions', label: t('extensions.queueTitle'), count: tabs.extensionRequests.length },
     { id: 'discussions', label: t('discussions.title') },
     { id: 'interventions', label: t('instructorInterventions.title') },
+    { id: 'risk-history', label: t('riskHistory.tab') },
   ];
 
   return (
@@ -358,6 +361,12 @@ function AssignmentDetailPage() {
         )}
         {activeTab === 'interventions' && (
           <AssignmentInterventionsTab
+            assignmentId={assignmentData.id}
+            students={assignmentData.students}
+          />
+        )}
+        {activeTab === 'risk-history' && (
+          <InstructorRiskHistoryTab
             assignmentId={assignmentData.id}
             students={assignmentData.students}
           />

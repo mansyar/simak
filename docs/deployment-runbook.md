@@ -277,8 +277,10 @@ Look for:
 
 - deployment commit and container start time;
 - migration completion or a clearly reported migration failure;
+- successful application of risk-history review migration `0034_smart_quentin_quire.sql`, which permits expired observations to clear lifecycle event/source details during anonymization;
 - `requestId` on server-function errors and background-job events;
-- `advisory_failed`, email queue, deadline scanner, or R2 cleanup failures;
+- `advisory_failed`, `risk_observation_capture_failed`, email queue, deadline scanner, R2 cleanup, or `risk_history.daily_failed` events;
+- repeated risk-history failures or a missing `risk_history.daily_processed` event after a healthy 24-hour processing window; lifecycle capture failures include structured event context for diagnosis but have no automatic replay queue, while daily processing retries incomplete or failed batches on a later tick;
 - graceful shutdown and background-processor drain messages.
 
 Confirm that logs contain neither secret values nor full connection strings.

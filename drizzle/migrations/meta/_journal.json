@@ -232,6 +232,20 @@
       "when": 1791301914006,
       "tag": "0032_little_moon_knight",
       "breakpoints": true
+    },
+    {
+      "idx": 33,
+      "version": "7",
+      "when": 1791301914007,
+      "tag": "0033_romantic_mephisto",
+      "breakpoints": true
+    },
+    {
+      "idx": 34,
+      "version": "7",
+      "when": 1791301914008,
+      "tag": "0034_smart_quentin_quire",
+      "breakpoints": true
     }
   ]
 }
