@@ -114,7 +114,7 @@
 
 ## Phase 5 — End-to-end quality and release readiness
 
-- [~] Task: Add end-to-end and regression coverage
+- [x] Task: Add end-to-end and regression coverage (9f456cc3)
   - Add E2E coverage for meaningful-event capture, daily snapshots, instructor
     reassignment, admin suppression, student privacy, retention anonymization,
     and the absence of automatic actions/notifications.
