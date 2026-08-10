@@ -12,7 +12,7 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ### TRACK-062: Risk History & Student Success
 
-- **Status:** Planned
+- **Status:** In Progress
 - **Type:** Feature
 - **Dependencies:** TRACK-023, TRACK-050
 - **Coordinates with:** TRACK-057, TRACK-058, TRACK-061
