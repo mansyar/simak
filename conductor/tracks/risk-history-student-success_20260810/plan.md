@@ -70,7 +70,7 @@
 
 ## Phase 3 — Role-scoped history, outcomes, and aggregate APIs
 
-- [ ] Task: Implement instructor history and intervention outcome queries
+- [~] Task: Implement instructor history and intervention outcome queries
   - Write failing handler tests for current-owner access, reassignment transfer,
     time filtering, observation ordering, and academic/engagement outcomes.
   - Implement assignment-scoped instructor projections without exposing private
