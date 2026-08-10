@@ -41,7 +41,7 @@
 
 ## Phase 2 — Observation capture and lifecycle integration
 
-- [ ] Task: Implement the explainable observation recorder
+- [~] Task: Implement the explainable observation recorder
   - Write failing tests for deterministic snapshots, factor/version preservation,
     append-only writes, idempotency, retries, audit events, and storage failures.
   - Implement the server-only recorder using `computeStudentRisk` and the live
